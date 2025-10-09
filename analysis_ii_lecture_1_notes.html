@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis II Lecture 1 Notes</title>
+    
+    <!-- MathJax for mathematical equations - renders LaTeX math notation -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],  // Inline math: $x^2$ or \(x^2\)
+                displayMath: [['$$', '$$'], ['\\[', '\\]']], // Display math: $$x^2$$ or \[x^2\]
+                processEscapes: true,  // Process backslash escapes
+                processEnvironments: true  // Process LaTeX environments
+            },
+            options: {
+                skipHtmlTags: ['script', 'style', 'textarea', 'pre']  // Skip these HTML tags
+            }
+        };
+    </script>
+    
+    <style>
+        /* ===== GLOBAL STYLES ===== */
+        body {
+            font-family: 'Times New Roman', serif;  /* Professional academic font */
+            line-height: 1.6;  /* Comfortable line spacing */
+            margin: 0;  /* Remove default margins */
+            padding: 0;  /* Remove default padding */
+            background-color: #f9f9f9;  /* Light background */
+            color: #333;  /* Dark text for readability */
+            font-size: 18px;
+            overflow-x: hidden;  /* Prevent horizontal scroll */
+        }
+        
+        /* ===== MAIN LAYOUT CONTAINER ===== */
+        .main-container {
+            display: flex;  /* Flexbox for side-by-side layout */
+            min-height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== LEFT SIDE - CONTENT ===== */
+        .content-side {
+            flex: 1;  /* Take up remaining space */
+            padding: 20px;  /* Page margins */
+            max-width: 50%;  /* Half the width */
+            display: flex;  /* Flexbox for centering */
+            justify-content: center;  /* Center horizontally */
+            position: relative;  /* For absolute positioning of scrollable content */
+        }
+        
+        /* When video is not open, take full width and center the content */
+        .content-side.full-width {
+            max-width: 100%;  /* Full width when no video */
+            justify-content: center;  /* Center the content */
+        }
+        
+        /* Scrollable content container when video is open */
+        .scrollable-content {
+            width: 100%;
+            max-width: 1000px;
+            overflow-y: auto;
+            max-height: 95vh;  /* 95% viewport height */
+            padding-right: 10px;  /* Space for scrollbar */
+        }
+        
+        /* When video is not open, no height restriction and center the container */
+        .content-side.full-width .scrollable-content {
+            max-height: none;
+        }
+        
+        /* ===== RIGHT SIDE - VIDEO ===== */
+        .video-side {
+            flex: 1;  /* Take up remaining space */
+            max-width: 50%;  /* Half the width */
+            background-color: #000;  /* Black background for video */
+            position: relative;  /* For absolute positioning of close button */
+            display: none;  /* Hidden by default */
+            overflow: hidden;  /* Prevent video from scrolling */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            background-color: white;  /* White content area */
+            padding: 40px;  /* Internal spacing */
+            border-radius: 8px;  /* Rounded corners */
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);  /* Subtle shadow */
+            max-width: 1000px;  /* Optimal reading width */
+            margin: 0 auto;  /* Center the content */
+        }
+        
+        /* ===== HEADINGS ===== */
+        h1 {
+            text-align: center;  /* Center the main title */
+            font-size: 2.2em;  /* Large title */
+            margin-bottom: 40px;  /* Space below title */
+            color: #2c3e50;  /* Dark blue color */
+            padding-bottom: 15px;  /* Space below title */
+        }
+        
+        h2, h3, h4, h5, h6 {
+            color: #2c3e50;  /* Dark blue for all headings */
+            padding-bottom: 8px;  /* Space below headings */
+            margin-top: 30px;  /* Space above headings */
+            font-size: 1.2em;  /* Slightly larger than body text */
+        }
+        
+        /* ===== CONTENT BOXES ===== */
+        /* Base styling for all content boxes */
+        .content-box {
+            padding: 20px;  /* Internal spacing */
+            margin: 20px 0;  /* Vertical spacing between boxes */
+            border-radius: 5px;  /* Rounded corners */
+            position: relative;  /* For absolute positioning of timestamps */
+            border-left: 5px solid;  /* Colored left border */
+            font-size: 18px;  /* Consistent text size */
+        }
+        
+        /* ===== CONTENT BOX TYPES ===== */
+        /* Definition boxes - Green theme for definitions */
+        .definition {
+            background-color: #f0f8f0;  /* Light green background */
+            border-left-color: #28a745;  /* Green left border */
+        }
+        
+        /* Theorem boxes - Purple theme for theorems */
+        .theorem {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Claim boxes - Light purple theme for claims */
+        .claim {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Corollary boxes - Medium purple theme for corollaries */
+        .corollary {
+            background-color: #f0e6ff;  /* Slightly darker purple background */
+            border-left-color: #8e44ad;  /* Darker purple left border */
+        }
+        
+        /* Proposition boxes - Dark purple theme for propositions */
+        .proposition {
+            background-color: #e8d5f2;  /* Even darker purple background */
+            border-left-color: #9b59b6;  /* Dark purple left border */
+        }
+        
+        /* Example boxes - Orange theme for examples */
+        .example {
+            background-color: #fff8f0;  /* Light orange background */
+            border-left-color: #fd7e14;  /* Orange left border */
+        }
+        
+        /* Proof boxes - Pink theme for proofs */
+        .proof {
+            background-color: #fff0f5;  /* Light pink background */
+            border-left-color: #e83e8c;  /* Pink left border */
+        }
+        
+        /* Default boxes - No special styling */
+        .default {
+            background-color: transparent;  /* No background */
+            border: none;  /* No border */
+            padding-left: 0;  /* No left padding */
+        }
+        
+        /* Non-examinable boxes - Gray theme for optional content */
+        .non-examinable {
+            background-color: #f8f9fa;  /* Light gray background */
+            border-left-color: #6c757d;  /* Gray left border */
+            opacity: 0.7;  /* Slightly faded to indicate optional nature */
+        }
+        
+        /* ===== TIMESTAMP STYLING ===== */
+        .timestamp {
+            position: absolute;  /* Positioned relative to content box */
+            top: 10px;  /* 10px from top of content box */
+            right: 15px;  /* 15px from right edge */
+            font-size: 0.8em;  /* Smaller text */
+            color: #666;  /* Gray color */
+            background-color: rgba(255,255,255,0.8);  /* Semi-transparent white background */
+            padding: 2px 6px;  /* Small padding */
+            border-radius: 3px;  /* Rounded corners */
+            cursor: pointer;  /* Indicates clickable */
+            transition: all 0.2s ease;  /* Smooth transitions */
+            display: flex;  /* Flexbox for icon alignment */
+            align-items: center;  /* Vertical center alignment */
+            gap: 3px;  /* Space between icon and text */
+        }
+        
+        /* Hover effect for timestamps */
+        .timestamp:hover {
+            background-color: rgba(255,255,255,0.95);  /* More opaque on hover */
+            color: #333;  /* Darker text on hover */
+            transform: scale(1.05);  /* Slight scale up */
+        }
+        
+        /* Play icon styling */
+        .play-icon {
+            font-size: 0.7em;  /* Smaller than timestamp text */
+        }
+        
+        /* ===== CONTENT BOX HEADINGS ===== */
+        .content-box h3 {
+            margin-top: 0;  /* No top margin for h3 in content boxes */
+            color: inherit;  /* Inherit color from parent */
+            border-bottom: none;  /* No bottom border */
+            padding-bottom: 0;  /* No bottom padding */
+        }
+        
+        /* Add prefixes to content box headings */
+        .content-box h3:before {
+            font-weight: bold;  /* Bold prefix text */
+        }
+        
+        .definition h3:before {
+            content: "Definition: ";  /* "Definition: " prefix */
+        }
+        
+        .theorem h3:before {
+            content: "Theorem: ";  /* "Theorem: " prefix */
+        }
+        
+        .claim h3:before {
+            content: "Claim: ";  /* "Claim: " prefix */
+        }
+        
+        .corollary h3:before {
+            content: "Corollary: ";  /* "Corollary: " prefix */
+        }
+        
+        .proposition h3:before {
+            content: "Proposition: ";  /* "Proposition: " prefix */
+        }
+        
+        .example h3:before {
+            content: "Example: ";  /* "Example: " prefix */
+        }
+        
+        .proof h3:before {
+            content: "Proof: ";  /* "Proof: " prefix */
+        }
+        
+        .default h3:before {
+            content: "";  /* No prefix for default boxes */
+        }
+        
+        /* ===== LISTS ===== */
+        ul, ol {
+            padding-left: 25px;  /* Indent lists */
+        }
+        
+        li {
+            margin: 8px 0;  /* Space between list items */
+        }
+        
+        /* ===== LINKS ===== */
+        a {
+            color: #3498db;  /* Blue link color */
+            text-decoration: none;  /* No underline by default */
+        }
+        
+        a:hover {
+            text-decoration: underline;  /* Underline on hover */
+        }
+        
+        /* ===== MATH EQUATIONS ===== */
+        .MathJax {
+            font-size: 1.1em !important;  /* Slightly larger math text */
+        }
+        
+        /* ===== VIDEO SIDE STYLES ===== */
+        .video-container {
+            position: relative;  /* For absolute positioning of iframe */
+            width: 100%;  /* Full width */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* Video iframe */
+        .video-container iframe {
+            position: absolute;  /* Absolute positioning within container */
+            top: 0;
+            left: 0;
+            width: 100%;  /* Full width */
+            height: 100%;  /* Full height */
+            border: none;  /* No border */
+        }
+        
+        /* ===== CLOSE BUTTON ===== */
+        .close-button {
+            position: absolute;  /* Absolute positioning */
+            top: 20px;  /* 20px from top */
+            right: 20px;  /* 20px from right */
+            background-color: rgba(0,0,0,0.7);  /* Semi-transparent black background */
+            color: white;  /* White text */
+            border: none;  /* No border */
+            font-size: 24px;  /* Large close button */
+            font-weight: bold;  /* Bold text */
+            cursor: pointer;  /* Indicates clickable */
+            line-height: 1;  /* Tight line height */
+            padding: 10px 15px;  /* Padding for button */
+            border-radius: 50%;  /* Circular button */
+            z-index: 10;  /* Above video */
+            transition: all 0.2s ease;  /* Smooth transitions */
+        }
+        
+        /* Close button hover effect */
+        .close-button:hover {
+            background-color: rgba(0,0,0,0.9);  /* More opaque on hover */
+            transform: scale(1.1);  /* Slight scale up */
+        }
+        
+        /* ===== RESPONSIVE DESIGN ===== */
+        /* Mobile and tablet styles */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;  /* Stack vertically on mobile */
+            }
+            
+            .content-side {
+                max-width: 100%;  /* Full width on mobile */
+                padding: 10px;  /* Smaller margins on mobile */
+            }
+            
+            .video-side {
+                max-width: 100%;  /* Full width on mobile */
+                height: 50vh;  /* Half viewport height on mobile */
+            }
+            
+            .video-container {
+                height: 100%;  /* Full height of video side */
+            }
+            
+            .container {
+                padding: 20px;  /* Smaller internal padding */
+            }
+            
+            h1 {
+                font-size: 1.8em;  /* Smaller title on mobile */
+            }
+            
+            /* Timestamps become static on mobile */
+            .timestamp {
+                position: static;  /* Normal flow instead of absolute */
+                display: block;  /* Block display */
+                margin-bottom: 10px;  /* Space below timestamp */
+            }
+            
+            /* On mobile, when video is open, content should still be scrollable */
+            .content-side {
+                overflow-y: auto;  /* Ensure content is scrollable on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- ===== LEFT SIDE - CONTENT ===== -->
+        <div class="content-side full-width">
+            <div class="scrollable-content">
+                <div class="container">
+                    <!-- ===== LECTURE TITLE ===== -->
+                    <h1>Analysis II Lecture 1</h1>
+                    <p style="text-align: center; color: #666; font-style: italic;">Introduction and Uniform Convergence</p>
+                    
+                    <!-- ===== CONTENT BOXES ===== -->
+                    
+                    <div class="content-box default">
+                        <div class="timestamp" onclick="openVideoSide('2:04', 'Course Goals', 'default', this)">
+                            <span class="play-icon">▶</span>2:04
+                        </div>
+                        <h3>Main Goals of the Course</h3>
+                        <p>The course has two primary objectives:</p>
+                        <ol>
+                            <li><strong>Further develop key concepts and results seen in Analysis I</strong> - We will extend the concepts of limits, convergence, continuity, differentiability, and Riemann integrability into broader contexts, including metric spaces and functions of multiple variables.</li>
+                            <li><strong>Applications of the theory</strong> - We will prove two central theorems in analysis:
+                                <ul>
+                                    <li>The <strong>Inverse Function Theorem</strong></li>
+                                    <li><strong>Existence of solutions to systems of ordinary differential equations</strong> - proving that solutions exist under certain conditions without explicitly solving the equations</li>
+                                </ul>
+                            </li>
+                        </ol>
+                    </div>
+                    
+                    <div class="content-box default">
+                        <div class="timestamp" onclick="openVideoSide('3:07', 'Key Concepts from Analysis I', 'default', this)">
+                            <span class="play-icon">▶</span>3:07
+                        </div>
+                        <h3>Key Concepts from Analysis I</h3>
+                        <p>The fundamental concepts from Analysis I that we will extend include:</p>
+                        <ul>
+                            <li><strong>Limits and convergence</strong> for sequences of real or complex numbers</li>
+                            <li><strong>Continuity</strong> of functions defined on the real line (or subsets thereof)</li>
+                            <li><strong>Differentiability</strong> of real-valued functions</li>
+                            <li><strong>Riemann integrability</strong> of functions</li>
+                        </ul>
+                        <p>We will extend these notions to more general settings, including metric spaces and functions of multiple variables.</p>
+                    </div>
+                    
+                    <div class="content-box default">
+                        <div class="timestamp" onclick="openVideoSide('8:46', 'Section 1: Uniform Convergence', 'default', this)">
+                            <span class="play-icon">▶</span>8:46
+                        </div>
+                        <h3>Section 1: Uniform Convergence</h3>
+                        <p>We begin with the study of uniform convergence of sequences of functions.</p>
+                    </div>
+                    
+                    <div class="content-box default">
+                        <div class="timestamp" onclick="openVideoSide('9:17', 'Setup: Sequences of Functions', 'default', this)">
+                            <span class="play-icon">▶</span>9:17
+                        </div>
+                        <h3>Setup: Sequences of Functions</h3>
+                        <p>Let $E$ be an arbitrary set (for the moment). Consider a sequence of functions $f_n : E \to \mathbb{R}$ for $n = 1, 2, 3, \ldots$, where each function is defined on $E$ and takes real values.</p>
+                        <p>This could also be done with complex-valued functions, but we will focus on real-valued functions for now.</p>
+                    </div>
+                    
+                    <div class="content-box definition">
+                        <div class="timestamp" onclick="openVideoSide('10:45', 'Pointwise Convergence', 'definition', this)">
+                            <span class="play-icon">▶</span>10:45
+                        </div>
+                        <h3>Pointwise Limit and Pointwise Convergence</h3>
+                        <p>Suppose that for any $x \in E$, the sequence of real numbers $f_n(x)$ converges to some real number. We can define a new function $f : E \to \mathbb{R}$ by:</p>
+                        <p>$$f(x) = \lim_{n \to \infty} f_n(x)$$</p>
+                        <p>This function $f$ is called the <strong>pointwise limit</strong> of the sequence $(f_n)$. We say that $(f_n)$ <strong>converges to $f$ pointwise on $E$</strong>.</p>
+                        <p>The key idea is that we fix an arbitrary point $x \in E$ and require the sequence of real numbers $f_n(x)$ to converge. Since this holds for every $x$, the limit defines a function.</p>
+                    </div>
+                    
+                    <div class="content-box default">
+                        <div class="timestamp" onclick="openVideoSide('15:40', 'Preservation of Properties', 'default', this)">
+                            <span class="play-icon">▶</span>15:40
+                        </div>
+                        <h3>Preservation of Properties Under Pointwise Convergence</h3>
+                        <p>A natural question arises: if each $f_n$ has a useful property (such as continuity, differentiability, or integrability), does the pointwise limit $f$ also have that property?</p>
+                        <p>For example: <strong>If $f_n$ is continuous on $E$ for every $n$, does it follow that $f$ is continuous on $E$?</strong></p>
+                        <p>Unfortunately, with pointwise convergence, this is <strong>not true</strong>. Continuity is not preserved, and neither are differentiability or integrability. Pointwise convergence is too weak a notion.</p>
+                    </div>
+                    
+                    <div class="content-box example">
+                        <div class="timestamp" onclick="openVideoSide('18:36', 'Example 1.1: Continuity Not Preserved', 'example', this)">
+                            <span class="play-icon">▶</span>18:36
+                        </div>
+                        <h3>Continuity Not Preserved Under Pointwise Convergence</h3>
+                        <p>Consider the sequence of functions $f_n : [-1, 1] \to \mathbb{R}$ defined by:</p>
+                        <p>$$f_n(x) = x^{2n+1}$$</p>
+                        <p>Each $f_n$ is continuous on $[-1, 1]$ (being a polynomial). However, the pointwise limit is:</p>
+                        <p>$$f(x) = \begin{cases}
+                        1 & \text{if } x > 0 \\
+                        0 & \text{if } x = 0 \\
+                        -1 & \text{if } x < 0
+                        \end{cases}$$</p>
+                        <p>This limit function $f$ is discontinuous at $x = 0$, with a jump discontinuity. We can visualize this as the functions getting steeper and steeper, eventually "collapsing" to the step function.</p>
+                        <p>As $n$ increases, $x^{2n+1}$ approaches 0 for $|x| < 1$, approaches 1 for $x = 1$, and approaches -1 for $x = -1$. For $x$ near 0, the functions become very flat near 0 but then rise/fall steeply to approach the limiting step function.</p>
+                    </div>
+                    
+                    <div class="content-box example">
+                        <div class="timestamp" onclick="openVideoSide('22:11', 'Example 1.2: Integrability Not Preserved', 'example', this)">
+                            <span class="play-icon">▶</span>22:11
+                        </div>
+                        <h3>Integrability Not Preserved Under Pointwise Convergence</h3>
+                        <p>Consider the interval $[0, 1]$ with the rationals enumerated as $q_1, q_2, q_3, \ldots$ (the rationals are countable). Define:</p>
+                        <p>$$f_n(x) = \begin{cases}
+                        1 & \text{if } x \in \{q_1, q_2, \ldots, q_n\} \\
+                        0 & \text{otherwise}
+                        \end{cases}$$</p>
+                        <p>Each $f_n$ is <strong>Riemann integrable</strong> on $[0, 1]$ because it is continuous everywhere except at a finite set of points (namely, the first $n$ rationals). A result from Analysis I states that functions continuous except on a finite set are integrable.</p>
+                        <p>However, $(f_n)$ converges pointwise to:</p>
+                        <p>$$f(x) = \begin{cases}
+                        1 & \text{if } x \in \mathbb{Q} \\
+                        0 & \text{otherwise}
+                        \end{cases}$$</p>
+                        <p>This limit function is the characteristic function of the rationals, which is <strong>not Riemann integrable</strong> on $[0, 1]$ (another result from Analysis I).</p>
+                    </div>
+                    
+                    <div class="content-box example">
+                        <div class="timestamp" onclick="openVideoSide('28:14', 'Example 1.3: Integrals Do Not Converge', 'example', this)">
+                            <span class="play-icon">▶</span>28:14
+                        </div>
+                        <h3>Integrals Do Not Converge Under Pointwise Convergence</h3>
+                        <p>Even if $f_n$ converges pointwise to $f$ and both $f_n$ and $f$ are integrable, the integrals may not converge. That is, it may not be true that:</p>
+                        <p>$$\int_0^1 f_n(x) \, dx \to \int_0^1 f(x) \, dx$$</p>
+                        <p>Consider a sequence of "triangle" functions on $[0, 1]$:</p>
+                        <p>$$f_n(x) = \begin{cases}
+                        n^2 x & \text{if } 0 \le x \le \frac{1}{n} \\
+                        n^2 \left(\frac{2}{n} - x\right) & \text{if } \frac{1}{n} < x \le \frac{2}{n} \\
+                        0 & \text{otherwise}
+                        \end{cases}$$</p>
+                        <p>This is an isosceles triangle with base $[0, \frac{2}{n}]$ and height $n$. The area (integral) of each triangle is:</p>
+                        <p>$$\int_0^1 f_n(x) \, dx = 1$$</p>
+                        <p>However, for any fixed $x > 0$, eventually the triangle will be entirely to the left of $x$ (since the base width $\frac{2}{n} \to 0$), so $f_n(x) \to 0$. At $x = 0$, $f_n(0) = 0$ for all $n$. Therefore:</p>
+                        <p>$$f(x) = \lim_{n \to \infty} f_n(x) = 0 \text{ for all } x \in [0, 1]$$</p>
+                        <p>This gives $\int_0^1 f(x) \, dx = 0$, but $\int_0^1 f_n(x) \, dx = 1$ for all $n$. The integrals do not converge!</p>
+                    </div>
+                    
+                    <div class="content-box default">
+                        <div class="timestamp" onclick="openVideoSide('34:37', 'Need for Stronger Notion', 'default', this)">
+                            <span class="play-icon">▶</span>34:37
+                        </div>
+                        <h3>Need for a Stronger Notion of Convergence</h3>
+                        <p>Pointwise convergence is not strong enough to ensure that useful properties like continuity and integrability are preserved in the limit. We need a stronger notion of convergence for sequences of functions.</p>
+                        <p>However, the notion cannot be <em>too strong</em>. For example, if we required that $f_n$ is eventually identically equal to $f$, then all properties would be preserved—but this is too restrictive to be interesting or useful.</p>
+                        <p>The key challenge in mathematics is finding the "happy medium": a class of objects or a notion that is:</p>
+                        <ul>
+                            <li><strong>Rich enough</strong> to include many interesting examples</li>
+                            <li><strong>Restrictive enough</strong> to allow useful theorems to be proved</li>
+                        </ul>
+                        <p>For convergence of function sequences, the happy medium is <strong>uniform convergence</strong>.</p>
+                    </div>
+                    
+                    <div class="content-box definition">
+                        <div class="timestamp" onclick="openVideoSide('39:21', 'Uniform Convergence Definition', 'definition', this)">
+                            <span class="play-icon">▶</span>39:21
+                        </div>
+                        <h3>Uniform Convergence</h3>
+                        <p>Let $(f_n)$ be a sequence of real-valued functions defined on a set $E$, and let $f : E \to \mathbb{R}$ be another function. We say that <strong>$(f_n)$ converges to $f$ uniformly on $E$</strong> if:</p>
+                        <p>For every $\epsilon > 0$, there exists $N$ (depending on $\epsilon$) such that for every $n \ge N$ and for every $x \in E$, we have:</p>
+                        <p>$$|f_n(x) - f(x)| < \epsilon$$</p>
+                        <p>The crucial point is that the same $N$ works for <em>all</em> $x \in E$ simultaneously. The value $N$ depends only on $\epsilon$, not on the choice of $x$.</p>
+                    </div>
+                    
+                    <div class="content-box default">
+                        <div class="timestamp" onclick="openVideoSide('43:01', 'Equivalent Formulation', 'default', this)">
+                            <span class="play-icon">▶</span>43:01
+                        </div>
+                        <h3>Equivalent Formulation of Uniform Convergence</h3>
+                        <p>An extremely useful equivalent way to express uniform convergence is:</p>
+                        <p>$(f_n)$ converges to $f$ uniformly on $E$ if and only if:</p>
+                        <p>$$\sup_{x \in E} |f_n(x) - f(x)| \to 0 \text{ as } n \to \infty$$</p>
+                        <p>This formulation is very practical: to check uniform convergence, compute the supremum of $|f_n - f|$ over all $x \in E$. This gives a sequence of real numbers (depending on $n$). If this sequence tends to 0, then $(f_n)$ converges to $f$ uniformly.</p>
+                        <p><em>Exercise:</em> Check the equivalence of these two formulations.</p>
+                    </div>
+                    
+                    <div class="content-box default">
+                        <div class="timestamp" onclick="openVideoSide('45:58', 'Comparison to Pointwise Convergence', 'default', this)">
+                            <span class="play-icon">▶</span>45:58
+                        </div>
+                        <h3>Comparison: Uniform vs. Pointwise Convergence</h3>
+                        <p>Let's compare the two notions in terms of their $\epsilon$-$N$ definitions.</p>
+                        <p><strong>Pointwise convergence:</strong> $f_n(x) \to f(x)$ for each $x \in E$ means:</p>
+                        <p>For every $x \in E$ and every $\epsilon > 0$, there exists $N$ (depending on both $\epsilon$ and $x$) such that for all $n \ge N$:</p>
+                        <p>$$|f_n(x) - f(x)| < \epsilon$$</p>
+                        <p>Here, $N$ is allowed to depend on both $\epsilon$ <em>and</em> $x$. Different points may require different values of $N$.</p>
+                        <p><strong>Uniform convergence:</strong> For every $\epsilon > 0$, there exists $N$ (depending only on $\epsilon$) such that for all $n \ge N$ and for <em>all</em> $x \in E$ simultaneously:</p>
+                        <p>$$|f_n(x) - f(x)| < \epsilon$$</p>
+                        <p>The key difference: <strong>for uniform convergence, the same $N$ works for all $x$ given $\epsilon$</strong>. For pointwise convergence, $N$ can depend on $x$.</p>
+                        <p>This seemingly small difference makes all the difference! In the next lecture, we will prove that uniform convergence is strong enough to preserve continuity and the values of integrals.</p>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== RIGHT SIDE - VIDEO ===== -->
+        <div id="videoSide" class="video-side">
+            <div class="video-container">
+                <iframe 
+                    id="videoFrame"
+                    src="" 
+                    allowfullscreen 
+                    allow="autoplay">
+                </iframe>
+            </div>
+            
+            <!-- ===== CLOSE BUTTON ===== -->
+            <button class="close-button" onclick="closeVideoSide()">&times;</button>
+        </div>
+    </div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // ===== VIDEO CONFIGURATION =====
+        const PANOPTO_BASE_URL = "https://cambridgelectures.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=410d75eb-47eb-4e87-b138-b33700b56498&autoplay=false&offerviewer=true&showtitle=true&showbrand=false&captions=false&interactivity=all";
+        
+        // ===== OPEN VIDEO SIDE FUNCTION =====
+        function openVideoSide(timestamp, title, contentType, timestampElement) {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Convert timestamp to seconds for Panopto
+            const timeInSeconds = convertTimestampToSeconds(timestamp);
+            
+            // Set the video URL with the timestamp
+            const videoUrl = PANOPTO_BASE_URL + `&start=${timeInSeconds}`;
+            videoFrame.src = videoUrl;
+            
+            // Remove full-width class and show video
+            contentSide.classList.remove('full-width');
+            videoSide.style.display = 'block';
+        }
+        
+        // ===== CLOSE VIDEO SIDE FUNCTION =====
+        function closeVideoSide() {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Hide the video side
+            videoSide.style.display = 'none';
+            
+            // Clear the video source to stop playback
+            videoFrame.src = '';
+            
+            // Add full-width class back
+            contentSide.classList.add('full-width');
+        }
+        
+        // ===== TIMESTAMP CONVERSION FUNCTION =====
+        function convertTimestampToSeconds(timestamp) {
+            const parts = timestamp.split(':');
+            const minutes = parseInt(parts[0]);
+            const seconds = parseInt(parts[1]);
+            return minutes * 60 + seconds;
+        }
+    </script>
+</body>
+</html>
+
