@@ -1,0 +1,783 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Methods Lecture 1 Notes</title>
+    
+    <!-- MathJax for mathematical equations - renders LaTeX math notation -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true,
+                processEnvironments: true
+            },
+            options: {
+                skipHtmlTags: ['script', 'style', 'textarea', 'pre']
+            }
+        };
+    </script>
+    
+    <style>
+        /* ===== GLOBAL STYLES ===== */
+        body {
+            font-family: 'Times New Roman', serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+            font-size: 18px;
+            overflow-x: hidden;
+        }
+        
+        /* ===== MAIN LAYOUT CONTAINER ===== */
+        .main-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* ===== LEFT SIDE - CONTENT ===== */
+        .content-side {
+            flex: 1;
+            padding: 20px;
+            max-width: 50%;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .content-side.full-width {
+            max-width: 100%;
+            justify-content: center;
+        }
+        
+        .scrollable-content {
+            width: 100%;
+            max-width: 1000px;
+            overflow-y: auto;
+            max-height: 95vh;
+            padding-right: 10px;
+        }
+        
+        .content-side.full-width .scrollable-content {
+            max-height: none;
+        }
+        
+        /* ===== RIGHT SIDE - VIDEO ===== */
+        .video-side {
+            flex: 1;
+            max-width: 50%;
+            background-color: #000;
+            position: relative;
+            display: none;
+            overflow: hidden;
+            height: 100vh;
+        }
+        
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            background-color: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        /* ===== HEADINGS ===== */
+        h1 {
+            text-align: center;
+            font-size: 2.2em;
+            margin-bottom: 40px;
+            color: #2c3e50;
+            padding-bottom: 15px;
+        }
+        
+        h2, h3, h4, h5, h6 {
+            color: #2c3e50;
+            padding-bottom: 8px;
+            margin-top: 30px;
+            font-size: 1.2em;
+        }
+        
+        /* ===== CONTENT BOXES ===== */
+        .content-box {
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+            position: relative;
+            border-left: 5px solid;
+            font-size: 18px;
+        }
+        
+        /* ===== CONTENT BOX TYPES ===== */
+        .definition {
+            background-color: #f0f8f0;
+            border-left-color: #28a745;
+        }
+        
+        .theorem {
+            background-color: #f8f0ff;
+            border-left-color: #6f42c1;
+        }
+        
+        .claim {
+            background-color: #f8f0ff;
+            border-left-color: #6f42c1;
+        }
+        
+        .corollary {
+            background-color: #f0e6ff;
+            border-left-color: #8e44ad;
+        }
+        
+        .proposition {
+            background-color: #e8d5f2;
+            border-left-color: #9b59b6;
+        }
+        
+        .example {
+            background-color: #fff8f0;
+            border-left-color: #fd7e14;
+        }
+        
+        .proof {
+            background-color: #fff0f5;
+            border-left-color: #e83e8c;
+        }
+        
+        .default {
+            background-color: transparent;
+            border: none;
+            padding-left: 0;
+        }
+        
+        .non-examinable {
+            background-color: #f8f9fa;
+            border-left-color: #6c757d;
+            opacity: 0.7;
+        }
+        
+        /* ===== TIMESTAMP STYLING ===== */
+        .timestamp {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 0.8em;
+            color: #666;
+            background-color: rgba(255,255,255,0.8);
+            padding: 2px 6px;
+            border-radius: 3px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        
+        .timestamp:hover {
+            background-color: rgba(255,255,255,0.95);
+            color: #333;
+            transform: scale(1.05);
+        }
+        
+        .play-icon {
+            font-size: 0.7em;
+        }
+        
+        /* ===== CONTENT BOX HEADINGS ===== */
+        .content-box h3 {
+            margin-top: 0;
+            color: inherit;
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+        
+        .content-box h3:before {
+            font-weight: bold;
+        }
+        
+        .definition h3:before {
+            content: "Definition: ";
+        }
+        
+        .theorem h3:before {
+            content: "Theorem: ";
+        }
+        
+        .claim h3:before {
+            content: "Claim: ";
+        }
+        
+        .corollary h3:before {
+            content: "Corollary: ";
+        }
+        
+        .proposition h3:before {
+            content: "Proposition: ";
+        }
+        
+        .example h3:before {
+            content: "Example: ";
+        }
+        
+        .proof h3:before {
+            content: "Proof: ";
+        }
+        
+        .default h3:before {
+            content: "";
+        }
+        
+        /* ===== LISTS ===== */
+        ul, ol {
+            padding-left: 25px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        /* ===== LINKS ===== */
+        a {
+            color: #3498db;
+            text-decoration: none;
+        }
+        
+        a:hover {
+            text-decoration: underline;
+        }
+        
+        /* ===== MATH EQUATIONS ===== */
+        .MathJax {
+            font-size: 1.1em !important;
+        }
+        
+        /* ===== VIDEO SIDE STYLES ===== */
+        .video-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+        }
+        
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        /* ===== CLOSE BUTTON ===== */
+        .close-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            line-height: 1;
+            padding: 10px 15px;
+            border-radius: 50%;
+            z-index: 10;
+            transition: all 0.2s ease;
+        }
+        
+        .close-button:hover {
+            background-color: rgba(0,0,0,0.9);
+            transform: scale(1.1);
+        }
+        
+        /* ===== RESPONSIVE DESIGN ===== */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+            
+            .content-side {
+                max-width: 100%;
+                padding: 10px;
+            }
+            
+            .video-side {
+                max-width: 100%;
+                height: 50vh;
+            }
+            
+            .video-container {
+                height: 100%;
+            }
+            
+            .container {
+                padding: 20px;
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .timestamp {
+                position: static;
+                display: block;
+                margin-bottom: 10px;
+            }
+            
+            .content-side {
+                overflow-y: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- ===== LEFT SIDE - CONTENT ===== -->
+        <div class="content-side full-width">
+            <div class="scrollable-content">
+                <div class="container">
+                    <!-- ===== LECTURE TITLE ===== -->
+                    <h1>Methods Lecture 1</h1>
+                    <p style="text-align: center; color: #666; font-style: italic;">Fourier Series: Motivation and Modern Treatment</p>
+                    
+                    <!-- ===== CONTENT BOXES ===== -->
+                    
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('00:34', 'Course Introduction', 'default', this)">
+                            <span class="play-icon">▶</span>00:34
+                        </div>
+                        <h3>What is 1B Methods?</h3>
+                        <p>This is a course on mathematical methods that serves two purposes:</p>
+                        <ul>
+                            <li><strong>For applied mathematics and theoretical physics:</strong> A toolkit for solving problems in applied maths and physics</li>
+                            <li><strong>For pure mathematics:</strong> A precursor to functional analysis and spectral theory</li>
+                        </ul>
+                        <p>Some techniques won't be completely rigorous - to make this course fully rigorous would require Part II Linear Analysis and Part II Analysis of Functions. However, when something is not mathematically rigorous, it will be clearly noted.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('01:38', 'Section 1.1 Motivation', 'default', this)">
+                            <span class="play-icon">▶</span>01:38
+                        </div>
+                        <h3>Section 1.1: Motivation</h3>
+                        <p>Around 1807, Joseph Fourier was studying <strong>heat conduction along a metal rod</strong>. For a cylindrical rod, measuring the temperature on top of the rod, if you go around in radians by another $2\pi$, you're at the same point on the rod. Therefore, the temperature should be a $2\pi$-periodic function.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('02:47', 'Two Pi Periodic Functions', 'definition', this)">
+                            <span class="play-icon">▶</span>02:47
+                        </div>
+                        <h3>$2\pi$-Periodic Functions</h3>
+                        <p>A function $f: \mathbb{R} \to \mathbb{R}$ is called <strong>$2\pi$-periodic</strong> if:</p>
+                        <p>$$f(\theta + 2\pi) = f(\theta) \quad \text{for all } \theta \in \mathbb{R}$$</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('03:43', 'Fourier Discovery', 'default', this)">
+                            <span class="play-icon">▶</span>03:43
+                        </div>
+                        <h3>Fourier's Discovery</h3>
+                        <p>Fourier discovered that if $f(\theta)$ is a $2\pi$-periodic function, it can be written in the form:</p>
+                        <p>$$f(\theta) = \sum_{n \in \mathbb{Z}} \hat{f}_n e^{in\theta}$$</p>
+                        <p>where the sum is over all integers $n \in \mathbb{Z}$.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('04:25', 'Fourier Coefficients Formula', 'definition', this)">
+                            <span class="play-icon">▶</span>04:25
+                        </div>
+                        <h3>Fourier Coefficients</h3>
+                        <p>The coefficients $\hat{f}_n$ in the Fourier series are given by the formula:</p>
+                        <p>$$\hat{f}_n = \frac{1}{2\pi} \int_0^{2\pi} f(\theta) e^{-in\theta} \, d\theta$$</p>
+                        <p>where $n \in \mathbb{Z}$ (any integer).</p>
+                    </div>
+
+                    <div class="claim content-box">
+                        <div class="timestamp" onclick="openVideoSide('05:07', 'Fourier Belief', 'claim', this)">
+                            <span class="play-icon">▶</span>05:07
+                        </div>
+                        <h3>Fourier's Grand Claim</h3>
+                        <p>Fourier believed this worked for <strong>any</strong> $2\pi$-periodic function. That is:</p>
+                        <ol>
+                            <li>Given any $2\pi$-periodic function $f$</li>
+                            <li>Compute each $\hat{f}_n$ using the formula above</li>
+                            <li>Construct the sum $\sum_{n \in \mathbb{Z}} \hat{f}_n e^{in\theta}$</li>
+                            <li>This sum would return your original function!</li>
+                        </ol>
+                        <p><strong>Note:</strong> This claim is actually not quite correct in its original form - it requires certain conditions on the function.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('07:49', 'Historical Context', 'default', this)">
+                            <span class="play-icon">▶</span>07:49
+                        </div>
+                        <h3>Historical Context</h3>
+                        <p>This was before the birth of analysis as we know it today. Fourier made the claim without attempting to prove it rigorously - back in those days, you just asserted mathematical statements. However, he put it to excellent use in developing a wonderful theory of heat conduction.</p>
+                        <p><strong>Lesson:</strong> Learn to be brave with mathematics, like physicists are. They manipulate infinite sums, eliminate inconvenient infinities, and develop quantum field theories that agree with experiment - all by being brave and not worrying about complete justification.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('08:48', 'Section 1.2 Modern Treatment', 'default', this)">
+                            <span class="play-icon">▶</span>08:48
+                        </div>
+                        <h3>Section 1.2: Modern Treatment</h3>
+                        <p>Let's make this slightly more mathematical with a modern approach.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('09:13', 'Vector Space V', 'definition', this)">
+                            <span class="play-icon">▶</span>09:13
+                        </div>
+                        <h3>Vector Space of $L$-Periodic Functions</h3>
+                        <p>Introduce a vector space $V$ of $L$-periodic functions:</p>
+                        <p>$$V = \{f: \mathbb{R} \to \mathbb{C} \mid f \text{ is "nice" and } f(\theta + L) = f(\theta) \text{ for all } \theta \in \mathbb{R}\}$$</p>
+                        <p>Here we allow complex-valued functions. The term <strong>"nice"</strong> is a technical condition (to be defined more precisely later) - the nicer the function, the more we can do with it.</p>
+                        <p>We assume the property of niceness is preserved under addition and scalar multiplication, so $V$ is indeed a vector space.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('10:58', 'Periodic Functions and Intervals', 'default', this)">
+                            <span class="play-icon">▶</span>10:58
+                        </div>
+                        <h3>Note on Periodic Functions</h3>
+                        <p>For $f \in V$, we need only consider values of $f$ taken in an interval of length $L$, e.g., $[0, L]$ or $[-L/2, L/2]$.</p>
+                        <p><strong>Reason:</strong> Once we know what the function does in one period, periodicity tells us what it does everywhere else.</p>
+                        <p>A generic real-valued function in this vector space might have jump discontinuities but still be reasonably nice on these intervals.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('13:00', 'Inner Product', 'definition', this)">
+                            <span class="play-icon">▶</span>13:00
+                        </div>
+                        <h3>Inner Product on $V$</h3>
+                        <p>We introduce an inner product on $V$ defined by:</p>
+                        <p>$$\langle f, g \rangle = \int_0^L f(\theta) \overline{g(\theta)} \, d\theta$$</p>
+                        <p>where $f, g \in V$, and the bar denotes complex conjugation.</p>
+                        <p>This satisfies all the required properties of an inner product.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('14:00', 'Associated Norm', 'definition', this)">
+                            <span class="play-icon">▶</span>14:00
+                        </div>
+                        <h3>Associated Norm</h3>
+                        <p>The associated norm is defined as:</p>
+                        <p>$$\|f\| = \sqrt{\langle f, f \rangle} = \sqrt{\int_0^L |f(\theta)|^2 \, d\theta}$$</p>
+                        <p>This gives us a nice inner product space structure.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('14:29', 'Basis Functions e_n', 'definition', this)">
+                            <span class="play-icon">▶</span>14:29
+                        </div>
+                        <h3>The Functions $e_n$</h3>
+                        <p>For $n \in \mathbb{Z}$, consider the functions $e_n$ defined by:</p>
+                        <p>$$e_n(\theta) = e^{2\pi i n \theta / L}$$</p>
+                        <p>These are <strong>extremely nice functions</strong> - they are smooth, in fact analytic (coinciding with their Taylor series which converges locally uniformly everywhere). They are clearly $L$-periodic, so $e_n \in V$ for all $n \in \mathbb{Z}$.</p>
+                    </div>
+
+                    <div class="proposition content-box">
+                        <div class="timestamp" onclick="openVideoSide('15:34', 'Orthogonality of e_n', 'proposition', this)">
+                            <span class="play-icon">▶</span>15:34
+                        </div>
+                        <h3>Orthogonality of the $e_n$ Functions</h3>
+                        <p>The inner product of two basis functions is:</p>
+                        <p>$$\langle e_n, e_m \rangle = \int_0^L e^{2\pi i (n-m) \theta / L} \, d\theta = L \cdot \delta_{nm}$$</p>
+                        <p>where $\delta_{nm}$ is the Kronecker delta (1 if $n = m$, 0 otherwise).</p>
+                        <p><strong>Consequences:</strong></p>
+                        <ul>
+                            <li>The $e_n$ are <strong>orthogonal</strong> in our vector space</li>
+                            <li>$\|e_n\|^2 = L$ for all $n$</li>
+                        </ul>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('17:52', 'Analogy with 1A', 'default', this)">
+                            <span class="play-icon">▶</span>17:52
+                        </div>
+                        <h3>Analogy with 1A Vectors and Matrices</h3>
+                        <p>This looks like 1A Vectors and Matrices! Let's recall some concepts from that finite-dimensional setting to guide our intuition.</p>
+                        <p><strong>Recall:</strong> If $V_n$ is an $n$-dimensional vector space equipped with the usual inner product (dot product), and if $\{e_1, \ldots, e_n\}$ are orthogonal vectors each with length $\sqrt{L}$, then we can use such a set of vectors as a basis.</p>
+                        <p>For each $x \in V_n$, we can write:</p>
+                        <p>$$x = \sum_{n=1}^{N} \hat{x}_n e_n$$</p>
+                        <p>for some complex numbers $\hat{x}_n$.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('20:21', 'Finding Coefficients', 'default', this)">
+                            <span class="play-icon">▶</span>20:21
+                        </div>
+                        <h3>Finding Coefficients in Finite Dimensions</h3>
+                        <p>To find $\hat{x}_n$, we dot both sides with $e_m$:</p>
+                        <p>$$x \cdot e_m = \sum_{n=1}^{N} \hat{x}_n (e_n \cdot e_m) = \sum_{n=1}^{N} \hat{x}_n L \delta_{nm} = L\hat{x}_m$$</p>
+                        <p>Therefore:</p>
+                        <p>$$\hat{x}_n = \frac{1}{L} x \cdot e_n$$</p>
+                        <p>We found the coefficients in terms of the original vector $x$ and the orthogonal vectors $e_n$.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('22:35', 'Infinite Dimensional Case', 'default', this)">
+                            <span class="play-icon">▶</span>22:35
+                        </div>
+                        <h3>Could This Work on $V$?</h3>
+                        <p>Our vector space $V$ is <strong>not finite-dimensional</strong>. For example, every finite subset of the countable collection $\{e_n\}_{n \in \mathbb{Z}}$ is linearly independent.</p>
+                        <p>We're now entering the realm of 18th century mathematics (vs. 20th and 21st century rigor). We're not going to worry about full justification - we'll be brave!</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('23:54', 'Assumption for Fourier Series', 'default', this)">
+                            <span class="play-icon">▶</span>23:54
+                        </div>
+                        <h3>Key Assumption</h3>
+                        <p>Let's assume that for any $f \in V$, we can write:</p>
+                        <p>$$f(\theta) = \sum_{n \in \mathbb{Z}} \hat{f}_n e_n(\theta) = \sum_{n \in \mathbb{Z}} \hat{f}_n e^{2\pi i n \theta / L}$$</p>
+                        <p>Given this assumption, what can we derive?</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('24:45', 'Deriving Fourier Coefficients', 'proof', this)">
+                            <span class="play-icon">▶</span>24:45
+                        </div>
+                        <h3>Deriving the Formula for Fourier Coefficients</h3>
+                        <p>Just as in the finite-dimensional case, we take the inner product of both sides with $e_m$:</p>
+                        <p>$$\langle f, e_m \rangle = \sum_{n \in \mathbb{Z}} \hat{f}_n \langle e_n, e_m \rangle = \sum_{n \in \mathbb{Z}} \hat{f}_n L \delta_{nm} = L\hat{f}_m$$</p>
+                        <p>Therefore:</p>
+                        <p>$$\hat{f}_n = \frac{1}{L} \langle f, e_n \rangle = \frac{1}{L} \int_0^L f(\theta) e^{-2\pi i n \theta / L} \, d\theta$$</p>
+                        <p><strong>Important note:</strong> This derivation involves interchanging a sum and an integral (both are limiting processes). This would require justification - typically uniform convergence - which we're not providing. When functions are sufficiently nice, this can be justified.</p>
+                        <p>This is precisely Fourier's formula (with $L = 2\pi$ in the original case)!</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('27:49', 'Complex Fourier Series', 'definition', this)">
+                            <span class="play-icon">▶</span>27:49
+                        </div>
+                        <h3>Complex Fourier Series</h3>
+                        <p>For an $L$-periodic function $f: \mathbb{R} \to \mathbb{C}$, we define its <strong>complex Fourier series</strong> by:</p>
+                        <p>$$\sum_{n \in \mathbb{Z}} \hat{f}_n e^{2\pi i n \theta / L}$$</p>
+                        <p>where the <strong>complex Fourier coefficients</strong> are:</p>
+                        <p>$$\hat{f}_n = \frac{1}{L} \int_0^L f(\theta) e^{-2\pi i n \theta / L} \, d\theta$$</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('29:56', 'Notation for Fourier Series', 'default', this)">
+                            <span class="play-icon">▶</span>29:56
+                        </div>
+                        <h3>Notation</h3>
+                        <p>For $f \in V$, we write:</p>
+                        <p>$$f(\theta) \sim \sum_{n \in \mathbb{Z}} \hat{f}_n e^{2\pi i n \theta / L}$$</p>
+                        <p>The symbol $\sim$ means: "the series on the right-hand side <strong>corresponds to</strong> the complex Fourier series for the function on the left-hand side."</p>
+                        <p><strong>Note:</strong> We would like to replace $\sim$ with $=$ (equality), but this needs justification, which we'll address in the next lecture.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('32:21', 'Real Fourier Series Introduction', 'default', this)">
+                            <span class="play-icon">▶</span>32:21
+                        </div>
+                        <h3>Real Fourier Series (Sines and Cosines)</h3>
+                        <p>You may have seen Fourier series in terms of sines and cosines rather than exponentials. Fourier's original work used trigonometric sines and cosines. The presentation is slightly messier but sometimes useful.</p>
+                        <p>Let's show how to go from the exponential form to the sine/cosine form.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('32:49', 'Real Fourier Series Definition', 'definition', this)">
+                            <span class="play-icon">▶</span>32:49
+                        </div>
+                        <h3>Real Fourier Series</h3>
+                        <p>We can split the complex Fourier series into parts where $n = 0$, $n > 0$, and $n < 0$:</p>
+                        <p>$$\sum_{n \in \mathbb{Z}} \hat{f}_n e^{2\pi i n \theta / L} = \hat{f}_0 + \sum_{n=1}^{\infty} \hat{f}_n e^{2\pi i n \theta / L} + \sum_{n=1}^{\infty} \hat{f}_{-n} e^{-2\pi i n \theta / L}$$</p>
+                        <p>Using Euler's formula $e^{i\theta} = \cos\theta + i\sin\theta$, this becomes:</p>
+                        <p>$$\hat{f}_0 + \sum_{n=1}^{\infty} \left[(\hat{f}_n + \hat{f}_{-n})\cos\frac{2\pi n\theta}{L} + i(\hat{f}_n - \hat{f}_{-n})\sin\frac{2\pi n\theta}{L}\right]$$</p>
+                        <p>Defining for $n \geq 0$:</p>
+                        <ul>
+                            <li>$a_n = \hat{f}_n + \hat{f}_{-n}$</li>
+                            <li>$b_n = i(\hat{f}_n - \hat{f}_{-n})$</li>
+                        </ul>
+                        <p>The <strong>(real) Fourier series</strong> is:</p>
+                        <p>$$\frac{a_0}{2} + \sum_{n=1}^{\infty} \left[a_n \cos\frac{2\pi n\theta}{L} + b_n \sin\frac{2\pi n\theta}{L}\right]$$</p>
+                        <p>where the <strong>Fourier coefficients</strong> are:</p>
+                        <p>$$a_n = \frac{2}{L} \int_0^L f(\theta) \cos\frac{2\pi n\theta}{L} \, d\theta$$</p>
+                        <p>$$b_n = \frac{2}{L} \int_0^L f(\theta) \sin\frac{2\pi n\theta}{L} \, d\theta$$</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('39:28', 'Even and Odd Functions', 'default', this)">
+                            <span class="play-icon">▶</span>39:28
+                        </div>
+                        <h3>Even and Odd Functions</h3>
+                        <p>The real Fourier series representation is particularly useful for even or odd functions:</p>
+                        <ul>
+                            <li>If $f$ is <strong>even</strong>, then all $b_n = 0$ (only cosine terms remain)</li>
+                            <li>If $f$ is <strong>odd</strong>, then all $a_n = 0$ (only sine terms remain)</li>
+                        </ul>
+                    </div>
+
+                    <div class="proposition content-box">
+                        <div class="timestamp" onclick="openVideoSide('40:55', 'Orthogonality of Sines and Cosines', 'proposition', this)">
+                            <span class="play-icon">▶</span>40:55
+                        </div>
+                        <h3>Orthogonality of Sines and Cosines</h3>
+                        <p>Define $c_n(\theta) = \cos\frac{2\pi n\theta}{L}$ and $s_n(\theta) = \sin\frac{2\pi n\theta}{L}$.</p>
+                        <p>Then for $n, m \geq 1$:</p>
+                        <ul>
+                            <li>$\langle c_n, c_m \rangle = \langle s_n, s_m \rangle = \frac{L}{2} \delta_{nm}$</li>
+                            <li>$\langle c_n, 1 \rangle = \langle s_m, 1 \rangle = \langle c_n, s_m \rangle = 0$</li>
+                        </ul>
+                        <p>Therefore, the system $\{1, c_1, c_2, \ldots, s_1, s_2, \ldots\}$ is also an <strong>orthogonal set</strong> in $V$.</p>
+                        <p><em>Proof left as an exercise (Example Sheet 1, Question 1).</em></p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('43:09', 'Technical Note on Limits', 'default', this)">
+                            <span class="play-icon">▶</span>43:09
+                        </div>
+                        <h3>Technical Note on Symmetric Limits</h3>
+                        <p>One technical point: for the complex Fourier series $\sum_{n \in \mathbb{Z}}$, we have a sum with two "tails" (positive and negative integers). This is clearly a limit.</p>
+                        <p>For the real Fourier series $\sum_{n=1}^{\infty}$, it's clear how to define the limit (partial sums up to $N$).</p>
+                        <p><strong>Important:</strong> For equivalent statements in the exponential setting, you must take the <strong>symmetric limit</strong>: $\sum_{n=-N}^{N}$, not separate limits for positive and negative terms.</p>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('43:16', 'Example Computation', 'example', this)">
+                            <span class="play-icon">▶</span>43:16
+                        </div>
+                        <h3>Computing a Fourier Series</h3>
+                        <p>Let $f: \mathbb{R} \to \mathbb{R}$ be a real-valued, period-1 function such that:</p>
+                        <p>$$f(\theta) = \theta(1 - \theta) \quad \text{for } \theta \in [0, 1]$$</p>
+                        <p>Always <strong>draw the graph</strong> before computing the Fourier series! The graph tells you about regularity (continuity, differentiability) and this tells you about the decay rate of Fourier coefficients.</p>
+                        <p>The graph shows this is an even function that's continuous everywhere but not quite differentiable at integer points (corners). This is a reasonably nice function.</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('45:55', 'Computing Fourier Coefficients', 'proof', this)">
+                            <span class="play-icon">▶</span>45:55
+                        </div>
+                        <h3>Computing Complex Fourier Coefficients</h3>
+                        <p>For $n \neq 0$:</p>
+                        <p>$$\hat{f}_n = \frac{1}{1} \int_0^1 \theta(1-\theta) e^{-2\pi i n \theta} \, d\theta$$</p>
+                        <p><strong>Key technique:</strong> Integrate by parts! Integrate the exponential and differentiate the other part.</p>
+                        <p><strong>First integration by parts:</strong></p>
+                        <p>$$= \left[-\frac{\theta(1-\theta)}{2\pi i n} e^{-2\pi i n \theta}\right]_0^1 + \frac{1}{2\pi i n} \int_0^1 (1-2\theta) e^{-2\pi i n \theta} \, d\theta$$</p>
+                        <p>The boundary term vanishes (at $\theta = 0$ and $\theta = 1$, the function $\theta(1-\theta) = 0$).</p>
+                        <p><strong>Second integration by parts:</strong></p>
+                        <p>$$= \frac{1}{2\pi i n} \left[\left(-\frac{(1-2\theta)}{2\pi i n} e^{-2\pi i n \theta}\right)_0^1 + \frac{1}{2\pi i n} \int_0^1 2 e^{-2\pi i n \theta} \, d\theta\right]$$</p>
+                        <p>The boundary term gives: $\frac{1}{2\pi i n} \left[-\frac{1}{2\pi i n} - \frac{1}{2\pi i n}\right] = -\frac{1}{(2\pi i n)^2}$</p>
+                        <p>For the integral term: if $n \neq 0$, $\int_0^1 e^{-2\pi i n \theta} \, d\theta = 0$.</p>
+                        <p>Therefore:</p>
+                        <p>$$\hat{f}_n = -\frac{1}{2\pi^2 n^2} \quad \text{for } n \neq 0$$</p>
+                        <p>For $n = 0$:</p>
+                        <p>$$\hat{f}_0 = \int_0^1 \theta(1-\theta) \, d\theta = \left[\frac{\theta^2}{2} - \frac{\theta^3}{3}\right]_0^1 = \frac{1}{2} - \frac{1}{3} = \frac{1}{6}$$</p>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('48:46', 'Final Fourier Series', 'example', this)">
+                            <span class="play-icon">▶</span>48:46
+                        </div>
+                        <h3>The Fourier Series Result</h3>
+                        <p>Therefore, the complex Fourier series is:</p>
+                        <p>$$f(\theta) \sim \frac{1}{6} - \frac{1}{2\pi^2} \sum_{n \neq 0} \frac{e^{2\pi i n \theta}}{n^2}$$</p>
+                        <p>In terms of sines and cosines (using the even function property):</p>
+                        <p>$$f(\theta) \sim \frac{1}{6} - \sum_{n=1}^{\infty} \frac{\cos(2\pi n\theta)}{\pi^2 n^2}$$</p>
+                        <p>Note: only cosine terms appear, as expected for an even function!</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('49:50', 'Verification', 'default', this)">
+                            <span class="play-icon">▶</span>49:50
+                        </div>
+                        <h3>Verification and Convergence</h3>
+                        <p>We'd really like this to be an equality (not just $\sim$). Let's check at $\theta = 0$:</p>
+                        <ul>
+                            <li>Left side: $f(0) = 0$</li>
+                            <li>Right side: $\frac{1}{6} - \frac{1}{\pi^2}\sum_{n=1}^{\infty} \frac{1}{n^2}$</li>
+                        </ul>
+                        <p>This looks promising! You can also check at $\theta = 1/2$ and find it works.</p>
+                        <p>By the <strong>Weierstrass M-test</strong> (from Analysis II), because of the rate of convergence ($1/n^2$), we know the right-hand side is a continuous function. The right-hand side is even, and we've checked it equals $f$ at several points.</p>
+                        <p>It's beginning to look like Fourier's claim was correct - at least for sufficiently nice functions!</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('51:17', 'Conclusion', 'default', this)">
+                            <span class="play-icon">▶</span>51:17
+                        </div>
+                        <h3>Conclusion</h3>
+                        <p>We'll be able to justify convergence and prove when the Fourier series equals the original function in Monday's lecture.</p>
+                        <p>Enjoy the weekend!</p>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== RIGHT SIDE - VIDEO ===== -->
+        <div id="videoSide" class="video-side">
+            <div class="video-container">
+                <iframe 
+                    id="videoFrame"
+                    src="" 
+                    allowfullscreen 
+                    allow="autoplay">
+                </iframe>
+            </div>
+            
+            <!-- ===== CLOSE BUTTON ===== -->
+            <button class="close-button" onclick="closeVideoSide()">&times;</button>
+        </div>
+    </div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // ===== VIDEO CONFIGURATION =====
+        const PANOPTO_BASE_URL = "https://cambridgelectures.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=0db07ef7-7898-4291-bc5b-b33700b42af3&autoplay=true&offerviewer=true&showtitle=true&showbrand=false&captions=false&interactivity=all";
+        
+        // ===== OPEN VIDEO SIDE FUNCTION =====
+        function openVideoSide(timestamp, title, contentType, timestampElement) {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Convert timestamp to seconds for Panopto
+            const timeInSeconds = convertTimestampToSeconds(timestamp);
+            
+            // Set the video URL with the timestamp
+            const videoUrl = PANOPTO_BASE_URL + `&start=${timeInSeconds}`;
+            videoFrame.src = videoUrl;
+            
+            // Remove full-width class and show video
+            contentSide.classList.remove('full-width');
+            videoSide.style.display = 'block';
+        }
+        
+        // ===== CLOSE VIDEO SIDE FUNCTION =====
+        function closeVideoSide() {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Hide the video side
+            videoSide.style.display = 'none';
+            
+            // Clear the video source to stop playback
+            videoFrame.src = '';
+            
+            // Add full-width class back
+            contentSide.classList.add('full-width');
+        }
+        
+        // ===== TIMESTAMP CONVERSION FUNCTION =====
+        function convertTimestampToSeconds(timestamp) {
+            const parts = timestamp.split(':');
+            const minutes = parseInt(parts[0]);
+            const seconds = parseInt(parts[1]);
+            return minutes * 60 + seconds;
+        }
+    </script>
+</body>
+</html>
+
