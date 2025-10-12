@@ -445,21 +445,24 @@
                     <p>Since $\epsilon$ was arbitrary and this holds for all $n \ge N$, we have shown $f_n \to f$ uniformly. $\square$</p>
                 </div>
 
-                <!-- Example 1.3: sin(nx)/n -->
+                <!-- Example 1.3: Triangle spike function (recall from Lecture 1) -->
                 <div class="example content-box">
-                    <div class="timestamp" onclick="openVideoSide('27:52', 'Example: sin(nx)/n', 'example', this)">
+                    <div class="timestamp" onclick="openVideoSide('27:52', 'Example: Triangle spike function', 'example', this)">
                         <span class="play-icon">▶</span>27:52
                     </div>
-                    <h3>$f_n(x) = \frac{\sin(nx)}{n}$ on $[0,1]$</h3>
-                    <p>Consider the sequence $f_n(x) = \frac{\sin(nx)}{n}$ defined on the interval $[0,1]$.</p>
-                    <p><strong>Pointwise limit:</strong> For any fixed $x \in [0,1]$, since $|\sin(nx)| \le 1$:</p>
-                    <p>$$|f_n(x)| = \left|\frac{\sin(nx)}{n}\right| \le \frac{1}{n} \to 0$$</p>
-                    <p>So $f_n \to 0$ pointwise on $[0,1]$.</p>
-                    <p><strong>Uniform convergence:</strong> Now check the supremum:</p>
-                    <p>$$\sup_{x \in [0,1]} |f_n(x) - 0| = \sup_{x \in [0,1]} \frac{|\sin(nx)|}{n} \le \frac{1}{n} = \frac{1}{n} \to 0$$</p>
-                    <p>In fact, the supremum equals $n$ (the maximum value of $|\sin(nx)|$ is 1), so:</p>
-                    <p>$$\sup_{x \in [0,1]} |f_n(x)| = n \not\to 0$$</p>
-                    <p><strong>Conclusion:</strong> The sequence converges pointwise to 0 but <em>does not</em> converge uniformly on $[0,1]$.</p>
+                    <h3>Triangle Spike Function (Recall from Lecture 1)</h3>
+                    <p>Recall Example 1.3 from Lecture 1: the sequence of triangle functions on $[0,1]$ defined by:</p>
+                    <p>$$f_n(x) = \begin{cases}
+                    n^2 x & \text{if } 0 \le x \le \frac{1}{n} \\
+                    n^2 \left(\frac{2}{n} - x\right) & \text{if } \frac{1}{n} < x \le \frac{2}{n} \\
+                    0 & \text{otherwise}
+                    \end{cases}$$</p>
+                    <p>This is an isosceles triangle with base $[0, \frac{2}{n}]$ and height $n$.</p>
+                    <p><strong>Pointwise limit:</strong> For any fixed $x > 0$, eventually the triangle is entirely to the left of $x$ (since $\frac{2}{n} \to 0$), so $f_n(x) \to 0$. Also $f_n(0) = 0$ for all $n$. Therefore $f_n \to 0$ pointwise on $[0,1]$.</p>
+                    <p><strong>Uniform convergence:</strong> However, the supremum is:</p>
+                    <p>$$\sup_{x \in [0,1]} |f_n(x) - 0| = \sup_{x \in [0,1]} |f_n(x)| = n$$</p>
+                    <p>The maximum value is $n$ (the height of the triangle), which tends to infinity, not zero.</p>
+                    <p><strong>Conclusion:</strong> The sequence converges pointwise to 0 but <em>does not</em> converge uniformly on $[0,1]$. This example was previously discussed to show that integrals need not converge: $\int_0^1 f_n(x) \, dx = 1$ for all $n$, but $\int_0^1 f(x) \, dx = 0$.</p>
                 </div>
 
                 <!-- Example 1.4: x/n on R -->
