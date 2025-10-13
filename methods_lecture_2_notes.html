@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Methods Lecture 2 Notes</title>
+    
+    <!-- MathJax for mathematical equations - renders LaTeX math notation -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],  // Inline math: $x^2$ or \(x^2\)
+                displayMath: [['$$', '$$'], ['\\[', '\\]']], // Display math: $$x^2$$ or \[x^2\]
+                processEscapes: true,  // Process backslash escapes
+                processEnvironments: true  // Process LaTeX environments
+            },
+            options: {
+                skipHtmlTags: ['script', 'style', 'textarea', 'pre']  // Skip these HTML tags
+            }
+        };
+    </script>
+    
+    <style>
+        /* ===== GLOBAL STYLES ===== */
+        body {
+            font-family: 'Times New Roman', serif;  /* Professional academic font */
+            line-height: 1.6;  /* Comfortable line spacing */
+            margin: 0;  /* Remove default margins */
+            padding: 0;  /* Remove default padding */
+            background-color: #f9f9f9;  /* Light background */
+            color: #333;  /* Dark text for readability */
+            font-size: 18px;
+            overflow-x: hidden;  /* Prevent horizontal scroll */
+        }
+        
+        /* ===== MAIN LAYOUT CONTAINER ===== */
+        .main-container {
+            display: flex;  /* Flexbox for side-by-side layout */
+            min-height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== LEFT SIDE - CONTENT ===== */
+        .content-side {
+            flex: 1;  /* Take up remaining space */
+            padding: 20px;  /* Page margins */
+            max-width: 50%;  /* Half the width */
+            display: flex;  /* Flexbox for centering */
+            justify-content: center;  /* Center horizontally */
+            position: relative;  /* For absolute positioning of scrollable content */
+        }
+        
+        /* When video is not open, take full width and center the content */
+        .content-side.full-width {
+            max-width: 100%;  /* Full width when no video */
+            justify-content: center;  /* Center the content */
+        }
+        
+        /* Scrollable content container when video is open */
+        .scrollable-content {
+            width: 100%;
+            max-width: 1000px;
+            overflow-y: auto;
+            max-height: 95vh;  /* 95% viewport height */
+            padding-right: 10px;  /* Space for scrollbar */
+        }
+        
+        /* When video is not open, no height restriction and center the container */
+        .content-side.full-width .scrollable-content {
+            max-height: none;
+        }
+        
+        /* ===== RIGHT SIDE - VIDEO ===== */
+        .video-side {
+            flex: 1;  /* Take up remaining space */
+            max-width: 50%;  /* Half the width */
+            background-color: #000;  /* Black background for video */
+            position: relative;  /* For absolute positioning of close button */
+            display: none;  /* Hidden by default */
+            overflow: hidden;  /* Prevent video from scrolling */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            background-color: white;  /* White content area */
+            padding: 40px;  /* Internal spacing */
+            border-radius: 8px;  /* Rounded corners */
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);  /* Subtle shadow */
+            max-width: 1000px;  /* Optimal reading width */
+            margin: 0 auto;  /* Center the content */
+        }
+        
+        /* ===== HEADINGS ===== */
+        h1 {
+            text-align: center;  /* Center the main title */
+            font-size: 2.2em;  /* Large title */
+            margin-bottom: 40px;  /* Space below title */
+            color: #2c3e50;  /* Dark blue color */
+            padding-bottom: 15px;  /* Space below title */
+        }
+        
+        h2, h3, h4, h5, h6 {
+            color: #2c3e50;  /* Dark blue for all headings */
+            padding-bottom: 8px;  /* Space below headings */
+            margin-top: 30px;  /* Space above headings */
+            font-size: 1.2em;  /* Slightly larger than body text */
+        }
+        
+        /* ===== CONTENT BOXES ===== */
+        /* Base styling for all content boxes */
+        .content-box {
+            padding: 20px;  /* Internal spacing */
+            margin: 20px 0;  /* Vertical spacing between boxes */
+            border-radius: 5px;  /* Rounded corners */
+            position: relative;  /* For absolute positioning of timestamps */
+            border-left: 5px solid;  /* Colored left border */
+            font-size: 18px;  /* Consistent text size */
+        }
+        
+        /* ===== CONTENT BOX TYPES ===== */
+        /* Definition boxes - Green theme for definitions */
+        .definition {
+            background-color: #f0f8f0;  /* Light green background */
+            border-left-color: #28a745;  /* Green left border */
+        }
+        
+        /* Theorem boxes - Purple theme for theorems */
+        .theorem {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Claim boxes - Light purple theme for claims */
+        .claim {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Corollary boxes - Medium purple theme for corollaries */
+        .corollary {
+            background-color: #f0e6ff;  /* Slightly darker purple background */
+            border-left-color: #8e44ad;  /* Darker purple left border */
+        }
+        
+        /* Proposition boxes - Dark purple theme for propositions */
+        .proposition {
+            background-color: #e8d5f2;  /* Even darker purple background */
+            border-left-color: #9b59b6;  /* Dark purple left border */
+        }
+        
+        /* Example boxes - Orange theme for examples */
+        .example {
+            background-color: #fff8f0;  /* Light orange background */
+            border-left-color: #fd7e14;  /* Orange left border */
+        }
+        
+        /* Proof boxes - Pink theme for proofs */
+        .proof {
+            background-color: #fff0f5;  /* Light pink background */
+            border-left-color: #e83e8c;  /* Pink left border */
+        }
+        
+        /* Default boxes - No special styling */
+        .default {
+            background-color: transparent;  /* No background */
+            border: none;  /* No border */
+            padding-left: 0;  /* No left padding */
+        }
+        
+        /* Non-examinable boxes - Gray theme for optional content */
+        .non-examinable {
+            background-color: #f8f9fa;  /* Light gray background */
+            border-left-color: #6c757d;  /* Gray left border */
+            opacity: 0.7;  /* Slightly faded to indicate optional nature */
+        }
+        
+        /* ===== TIMESTAMP STYLING ===== */
+        .timestamp {
+            position: absolute;  /* Positioned relative to content box */
+            top: 10px;  /* 10px from top of content box */
+            right: 15px;  /* 15px from right edge */
+            font-size: 0.8em;  /* Smaller text */
+            color: #666;  /* Gray color */
+            background-color: rgba(255,255,255,0.8);  /* Semi-transparent white background */
+            padding: 2px 6px;  /* Small padding */
+            border-radius: 3px;  /* Rounded corners */
+            cursor: pointer;  /* Indicates clickable */
+            transition: all 0.2s ease;  /* Smooth transitions */
+            display: flex;  /* Flexbox for icon alignment */
+            align-items: center;  /* Vertical center alignment */
+            gap: 3px;  /* Space between icon and text */
+        }
+        
+        /* Hover effect for timestamps */
+        .timestamp:hover {
+            background-color: rgba(255,255,255,0.95);  /* More opaque on hover */
+            color: #333;  /* Darker text on hover */
+            transform: scale(1.05);  /* Slight scale up */
+        }
+        
+        /* Play icon styling */
+        .play-icon {
+            font-size: 0.7em;  /* Smaller than timestamp text */
+        }
+        
+        /* ===== CONTENT BOX HEADINGS ===== */
+        .content-box h3 {
+            margin-top: 0;  /* No top margin for h3 in content boxes */
+            color: inherit;  /* Inherit color from parent */
+            border-bottom: none;  /* No bottom border */
+            padding-bottom: 0;  /* No bottom padding */
+        }
+        
+        /* Add prefixes to content box headings */
+        .content-box h3:before {
+            font-weight: bold;  /* Bold prefix text */
+        }
+        
+        .definition h3:before {
+            content: "Definition: ";  /* "Definition: " prefix */
+        }
+        
+        .theorem h3:before {
+            content: "Theorem: ";  /* "Theorem: " prefix */
+        }
+        
+        .claim h3:before {
+            content: "Claim: ";  /* "Claim: " prefix */
+        }
+        
+        .corollary h3:before {
+            content: "Corollary: ";  /* "Corollary: " prefix */
+        }
+        
+        .proposition h3:before {
+            content: "Proposition: ";  /* "Proposition: " prefix */
+        }
+        
+        .example h3:before {
+            content: "Example: ";  /* "Example: " prefix */
+        }
+        
+        .proof h3:before {
+            content: "Proof: ";  /* "Proof: " prefix */
+        }
+        
+        .default h3:before {
+            content: "";  /* No prefix for default boxes */
+        }
+        
+        /* ===== LISTS ===== */
+        ul, ol {
+            padding-left: 25px;  /* Indent lists */
+        }
+        
+        li {
+            margin: 8px 0;  /* Space between list items */
+        }
+        
+        /* ===== LINKS ===== */
+        a {
+            color: #3498db;  /* Blue link color */
+            text-decoration: none;  /* No underline by default */
+        }
+        
+        a:hover {
+            text-decoration: underline;  /* Underline on hover */
+        }
+        
+        /* ===== MATH EQUATIONS ===== */
+        .MathJax {
+            font-size: 1.1em !important;  /* Slightly larger math text */
+        }
+        
+        /* ===== VIDEO SIDE STYLES ===== */
+        .video-container {
+            position: relative;  /* For absolute positioning of iframe */
+            width: 100%;  /* Full width */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* Video iframe */
+        .video-container iframe {
+            position: absolute;  /* Absolute positioning within container */
+            top: 0;
+            left: 0;
+            width: 100%;  /* Full width */
+            height: 100%;  /* Full height */
+            border: none;  /* No border */
+        }
+        
+        /* ===== CLOSE BUTTON ===== */
+        .close-button {
+            position: absolute;  /* Absolute positioning */
+            top: 20px;  /* 20px from top */
+            right: 20px;  /* 20px from right */
+            background-color: rgba(0,0,0,0.7);  /* Semi-transparent black background */
+            color: white;  /* White text */
+            border: none;  /* No border */
+            font-size: 24px;  /* Large close button */
+            font-weight: bold;  /* Bold text */
+            cursor: pointer;  /* Indicates clickable */
+            line-height: 1;  /* Tight line height */
+            padding: 10px 15px;  /* Padding for button */
+            border-radius: 50%;  /* Circular button */
+            z-index: 10;  /* Above video */
+            transition: all 0.2s ease;  /* Smooth transitions */
+        }
+        
+        /* Close button hover effect */
+        .close-button:hover {
+            background-color: rgba(0,0,0,0.9);  /* More opaque on hover */
+            transform: scale(1.1);  /* Slight scale up */
+        }
+        
+        /* ===== RESPONSIVE DESIGN ===== */
+        /* Mobile and tablet styles */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;  /* Stack vertically on mobile */
+            }
+            
+            .content-side {
+                max-width: 100%;  /* Full width on mobile */
+                padding: 10px;  /* Smaller margins on mobile */
+            }
+            
+            .video-side {
+                max-width: 100%;  /* Full width on mobile */
+                height: 50vh;  /* Half viewport height on mobile */
+            }
+            
+            .video-container {
+                height: 100%;  /* Full height of video side */
+            }
+            
+            .container {
+                padding: 20px;  /* Smaller internal padding */
+            }
+            
+            h1 {
+                font-size: 1.8em;  /* Smaller title on mobile */
+            }
+            
+            /* Timestamps become static on mobile */
+            .timestamp {
+                position: static;  /* Normal flow instead of absolute */
+                display: block;  /* Block display */
+                margin-bottom: 10px;  /* Space below timestamp */
+            }
+            
+            /* On mobile, when video is open, content should still be scrollable */
+            .content-side {
+                overflow-y: auto;  /* Ensure content is scrollable on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- ===== LEFT SIDE - CONTENT ===== -->
+        <div class="content-side full-width">
+            <div class="scrollable-content">
+                <div class="container">
+                    <!-- ===== LECTURE TITLE ===== -->
+                    <h1>Methods Lecture 2</h1>
+                    <p style="text-align: center; color: #666; font-style: italic;">Convergence of Fourier Series</p>
+                    
+                    <!-- ===== INTRODUCTION ===== -->
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('0:07', 'Introduction to Fourier Series Convergence', 'default', this)">
+                            <span class="play-icon">▶</span>0:07
+                        </div>
+                        <h3>Introduction</h3>
+                        <p>Today's topic is the convergence of Fourier series. We define Fourier series for $L$-periodic functions by the infinite sum:</p>
+                        <p>$$f(\theta) \sim \sum_{n=-\infty}^{\infty} \hat{f}_n e^{2\pi i n \theta/L}$$</p>
+                        <p>At this point, we don't yet know if the infinite sum on the right corresponds to the function on the left. We need to establish what we mean by that squiggly line ($\sim$).</p>
+                    </div>
+
+                    <!-- ===== PARTIAL FOURIER SERIES DEFINITION ===== -->
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('2:22', 'Partial Fourier Series Definition', 'definition', this)">
+                            <span class="play-icon">▶</span>2:22
+                        </div>
+                        <h3>Partial Fourier Series</h3>
+                        <p>For an $L$-periodic function $f$, we define the <strong>partial Fourier series</strong> by:</p>
+                        <p>$$S_n(f)(\theta) = \sum_{|n| \leq N} \hat{f}_n e^{2\pi i n \theta/L}$$</p>
+                        <p>When written out in terms of sines and cosines, this becomes:</p>
+                        <p>$$S_n(f)(\theta) = \frac{a_0}{2} + \sum_{n=1}^{N} \left(a_n \cos\left(\frac{2\pi n \theta}{L}\right) + b_n \sin\left(\frac{2\pi n \theta}{L}\right)\right)$$</p>
+                        <p>This is the symmetric sum that corresponds exactly to the trigonometric form when written in terms of complex exponentials.</p>
+                    </div>
+
+                    <!-- ===== MODES OF CONVERGENCE ===== -->
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('4:35', 'Modes of Convergence', 'definition', this)">
+                            <span class="play-icon">▶</span>4:35
+                        </div>
+                        <h3>Modes of Convergence</h3>
+                        <p>When discussing convergence of a sequence of functions $f_n \to f$, we need to specify the mode of convergence:</p>
+                        
+                        <p><strong>1. Pointwise Convergence:</strong></p>
+                        <p>$$f_n(\theta) \to f(\theta) \text{ as } n \to \infty \text{ for each } \theta \in [0,L]$$</p>
+                        
+                        <p><strong>2. Uniform Convergence:</strong></p>
+                        <p>$$\sup_{\theta \in [0,L]} |f_n(\theta) - f(\theta)| \to 0 \text{ as } n \to \infty$$</p>
+                        
+                        <p><strong>3. Convergence in Mean (L²):</strong></p>
+                        <p>$$\|S_n(f) - f\|_2 = \sqrt{\int_0^L |S_n(f)(\theta) - f(\theta)|^2 d\theta} \to 0 \text{ as } n \to \infty$$</p>
+                        
+                        <p>Note that uniform convergence is stronger than pointwise convergence, and the proofs involved are very different depending on which mode we're interested in.</p>
+                    </div>
+
+                    <!-- ===== HILBERT SPACE COMMENT ===== -->
+                    <div class="non-examinable content-box">
+                        <div class="timestamp" onclick="openVideoSide('6:55', 'Hilbert Space Comment', 'non-examinable', this)">
+                            <span class="play-icon">▶</span>6:55
+                        </div>
+                        <h3>Hilbert Space Perspective</h3>
+                        <p><em>Non-examinable content:</em> The convergence in mean (L²) is actually the easiest mathematically because we're effectively dealing with a Hilbert space, which has lovely properties. However, this requires knowledge of Part II Linear Analysis, so we won't pursue this approach.</p>
+                    </div>
+
+                    <!-- ===== MAIN PROPOSITION ===== -->
+                    <div class="proposition content-box">
+                        <div class="timestamp" onclick="openVideoSide('7:35', 'Main Convergence Proposition', 'proposition', this)">
+                            <span class="play-icon">▶</span>7:35
+                        </div>
+                        <h3>Convergence of Fourier Series</h3>
+                        <p>Let $f$ be an $L$-periodic function with the following properties on $[0,L]$:</p>
+                        <ol>
+                            <li>It has finitely many discontinuities</li>
+                            <li>It has finitely many local maxima and minima</li>
+                        </ol>
+                        <p>Then for each $\theta \in [0,L]$ we have:</p>
+                        <p>$$\frac{f(\theta^+) + f(\theta^-)}{2} = \lim_{n \to \infty} S_n(f)(\theta) = \sum_{n=-\infty}^{\infty} \hat{f}_n e^{2\pi i n \theta/L}$$</p>
+                        <p>where $\theta^{\pm} = \lim_{\epsilon \to 0^+} f(\theta \pm \epsilon)$ are the left and right limits of $f$ at $\theta$.</p>
+                    </div>
+
+                    <!-- ===== INTERPRETATION ===== -->
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('11:14', 'Interpretation of Convergence Result', 'default', this)">
+                            <span class="play-icon">▶</span>11:14
+                        </div>
+                        <h3>Interpretation</h3>
+                        <p>The convergence result tells us that:</p>
+                        <ul>
+                            <li><strong>At points of continuity:</strong> The Fourier series gives back the original function $f(\theta)$</li>
+                            <li><strong>At points of discontinuity:</strong> The Fourier series gives back the average of the function at the discontinuity</li>
+                        </ul>
+                        <p>This is why it's crucial to draw a graph of your periodic function before computing Fourier coefficients. What looks like a nice function on one interval may have discontinuities when extended periodically.</p>
+                    </div>
+
+                    <!-- ===== EXAM WARNING ===== -->
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('14:05', 'Exam Warning', 'default', this)">
+                            <span class="play-icon">▶</span>14:05
+                        </div>
+                        <h3>Important Exam Warning</h3>
+                        <p>Examiners may ask you to compute the value of a Fourier series at a given point. Even if the function looks "nice" on its defining interval, remember that at points of discontinuity, the Fourier series evaluates to the average of the left and right limits, not the function value itself.</p>
+                        <p><strong>Example:</strong> If $f(\theta) = e^\theta$ on $[-\pi, \pi]$ and extended periodically, then at $\theta = \pi$, the Fourier series gives $\frac{e^\pi + e^{-\pi}}{2} = \cosh(\pi)$, not $e^\pi$.</p>
+                    </div>
+
+                    <!-- ===== DIRICHLET FUNCTIONS ===== -->
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('16:37', 'Dirichlet Functions', 'definition', this)">
+                            <span class="play-icon">▶</span>16:37
+                        </div>
+                        <h3>Dirichlet Functions</h3>
+                        <p>Functions with properties (1) and (2) above are called <strong>Dirichlet functions</strong>, named after the famous German mathematician Peter Gustav Lejeune Dirichlet.</p>
+                        <p>From now on, we will assume all functions we deal with are Dirichlet functions. This means the symbol $\sim$ now has a precise meaning:</p>
+                        <p>$$f(\theta) \sim \sum_{n=-\infty}^{\infty} \hat{f}_n e^{2\pi i n \theta/L}$$</p>
+                        <p>means the series on the right coincides with the function on the left at points of continuity, and converges to its average at points of discontinuity.</p>
+                    </div>
+
+                    <!-- ===== PROOF SETUP ===== -->
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('19:08', 'Proof Setup', 'default', this)">
+                            <span class="play-icon">▶</span>19:08
+                        </div>
+                        <h3>Proof Strategy</h3>
+                        <p>We will prove the convergence result assuming $f$ is smooth (infinitely differentiable). In fact, $C^1$ (continuously differentiable) would suffice. The proof can be modified to handle the more general Dirichlet functions.</p>
+                        <p>We'll examine the limit of $S_n(f)(\theta_0)$ as $n \to \infty$ for some $\theta_0$ in the interval. By replacing $f(\theta)$ with $f(\theta + \theta_0)$, we can assume $\theta_0 = 0$ without loss of generality.</p>
+                    </div>
+
+                    <!-- ===== DIRICHLET KERNEL ===== -->
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('25:27', 'Dirichlet Kernel', 'definition', this)">
+                            <span class="play-icon">▶</span>25:27
+                        </div>
+                        <h3>Dirichlet Kernel</h3>
+                        <p>The <strong>Dirichlet kernel</strong> is defined as:</p>
+                        <p>$$D_n(\theta) = \frac{\sin\left((n+\frac{1}{2})\theta\right)}{\sin(\theta/2)}$$</p>
+                        <p>for $\theta \neq 0, \pm 2\pi, \pm 4\pi, \ldots$ and $D_n(0) = 2n+1$.</p>
+                        <p>This function is crucial for understanding Fourier series convergence. It has the following properties:</p>
+                        <ol>
+                            <li>It is continuous</li>
+                            <li>It is even and periodic with period $2\pi$</li>
+                            <li>$\int_{-\pi}^{\pi} D_n(\theta) d\theta = 2\pi$ for all $n$</li>
+                        </ol>
+                    </div>
+
+                    <!-- ===== PROOF OF CONVERGENCE ===== -->
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('29:22', 'Proof of Convergence', 'proof', this)">
+                            <span class="play-icon">▶</span>29:22
+                        </div>
+                        <h3>Proof of Pointwise Convergence</h3>
+                        <p>We want to show that $S_n(f)(0) - f(0) \to 0$ as $n \to \infty$.</p>
+                        
+                        <p><strong>Step 1:</strong> Express the partial sum using the Dirichlet kernel:</p>
+                        <p>$$S_n(f)(0) = \frac{1}{2\pi} \int_{-\pi}^{\pi} f(\theta) D_n(\theta) d\theta$$</p>
+                        
+                        <p><strong>Step 2:</strong> Use the property that $f(0) = \frac{1}{2\pi} \int_{-\pi}^{\pi} f(0) D_n(\theta) d\theta$ to write:</p>
+                        <p>$$S_n(f)(0) - f(0) = \frac{1}{2\pi} \int_{-\pi}^{\pi} D_n(\theta) [f(\theta) - f(0)] d\theta$$</p>
+                        
+                        <p><strong>Step 3:</strong> Factor out the sine term and define:</p>
+                        <p>$$F(\theta) = \frac{f(\theta) - f(0)}{\sin(\theta/2)}$$</p>
+                        
+                        <p>This gives us:</p>
+                        <p>$$S_n(f)(0) - f(0) = \frac{1}{2\pi} \int_{-\pi}^{\pi} \sin\left((n+\frac{1}{2})\theta\right) F(\theta) d\theta$$</p>
+                        
+                        <p><strong>Step 4:</strong> Since $f$ is smooth, $F(\theta)$ is a well-behaved function. We can integrate by parts to get:</p>
+                        <p>$$S_n(f)(0) - f(0) = \frac{1}{n+\frac{1}{2}} \cdot \frac{1}{2\pi} \int_{-\pi}^{\pi} \cos\left((n+\frac{1}{2})\theta\right) F'(\theta) d\theta$$</p>
+                        
+                        <p><strong>Step 5:</strong> The integral is bounded, and the factor $\frac{1}{n+\frac{1}{2}} \to 0$ as $n \to \infty$, giving us pointwise convergence.</p>
+                        
+                        <p><strong>Note:</strong> The same proof works for any $\theta$ (not just 0), and actually gives uniform convergence for smooth functions.</p>
+                    </div>
+
+                    <!-- ===== PROOF DIFFICULTY ===== -->
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('35:01', 'Proof Difficulty Discussion', 'default', this)">
+                            <span class="play-icon">▶</span>35:01
+                        </div>
+                        <h3>Proof Difficulty</h3>
+                        <p>The tricky part of this proof was being able to integrate by parts, which required $f$ to be differentiable. If $f$ wasn't differentiable at some points, we would need more sophisticated techniques to handle the badly behaved points.</p>
+                        <p>For more general functions (Dirichlet functions), the proof becomes much harder and requires advanced analysis techniques. A good reference is Titchmarsh's "Theory of Functions" for the general case.</p>
+                    </div>
+
+                    <!-- ===== SQUARE WAVE EXAMPLE ===== -->
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('36:24', 'Square Wave Example', 'example', this)">
+                            <span class="play-icon">▶</span>36:24
+                        </div>
+                        <h3>Square Wave Example</h3>
+                        <p>Consider the $2\pi$-periodic function defined by:</p>
+                        <p>$$f(\theta) = \begin{cases} 
+                        +1 & \text{if } \theta \in (0, \pi) \\
+                        -1 & \text{if } \theta \in (-\pi, 0)
+                        \end{cases}$$</p>
+                        
+                        <p>This function has one jump discontinuity at $\theta = 0$ (and its periodic images), so it's a Dirichlet function.</p>
+                        
+                        <p><strong>Computing the Fourier coefficients:</strong></p>
+                        <p>Since $f$ is odd, all cosine coefficients $a_n = 0$. For the sine coefficients:</p>
+                        <p>$$b_n = \frac{2}{\pi} \int_0^{\pi} \sin(n\theta) d\theta = \frac{2}{n\pi} [1 - \cos(n\pi)]$$</p>
+                        
+                        <p>Since $\cos(n\pi) = (-1)^n$, we get:</p>
+                        <p>$$b_n = \frac{2}{n\pi} [1 - (-1)^n] = \begin{cases} 
+                        \frac{4}{n\pi} & \text{if } n \text{ is odd} \\
+                        0 & \text{if } n \text{ is even}
+                        \end{cases}$$</p>
+                        
+                        <p>Therefore, the Fourier series is:</p>
+                        <p>$$f(\theta) \sim \frac{4}{\pi} \sum_{n \text{ odd}} \frac{\sin(n\theta)}{n}$$</p>
+                        
+                        <p><strong>Verification at discontinuity:</strong></p>
+                        <p>At $\theta = 0$, the Fourier series gives $0$ (since all sine terms vanish). The left limit is $-1$ and right limit is $+1$, so the average is $\frac{(-1) + 1}{2} = 0$, which matches!</p>
+                    </div>
+
+                    <!-- ===== KOLMOGOROV STORY ===== -->
+                    <div class="non-examinable content-box">
+                        <div class="timestamp" onclick="openVideoSide('41:32', 'Kolmogorov Story', 'non-examinable', this)">
+                            <span class="play-icon">▶</span>41:32
+                        </div>
+                        <h3>Historical Story: Kolmogorov's Counterexample</h3>
+                        <p><em>Non-examinable content:</em> In the 1920s, there was a major open problem: how far can we push Fourier series convergence? What's the most general class of functions for which Fourier series converge?</p>
+                        
+                        <p>In 1922, at the age of 19, Andrey Kolmogorov constructed an integrable function whose Fourier series diverges almost everywhere (i.e., everywhere except on a set of measure zero). This shocked the mathematical community, which had believed that integrable functions would have convergent Fourier series.</p>
+                        
+                        <p>Later, Carleson and Hunt proved that if we strengthen the condition slightly (requiring the function to be in $L^p$ for some $p > 1$), then the Fourier series converges almost everywhere. This is now known as the Carleson-Hunt theorem.</p>
+                        
+                        <p>Kolmogorov's result shows that our assumption of Dirichlet functions (or bounded variation) is not just convenient—it's necessary for the convergence results we've proved.</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== RIGHT SIDE - VIDEO ===== -->
+        <div id="videoSide" class="video-side">
+            <div class="video-container">
+                <iframe 
+                    id="videoFrame"
+                    src="" 
+                    allowfullscreen 
+                    allow="autoplay">
+                </iframe>
+            </div>
+            
+            <!-- ===== CLOSE BUTTON ===== -->
+            <button class="close-button" onclick="closeVideoSide()">&times;</button>
+        </div>
+    </div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // ===== VIDEO CONFIGURATION =====
+        const PANOPTO_BASE_URL = "https://cambridgelectures.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=afa33769-0134-4816-bcbe-b33700b424eb&autoplay=false&offerviewer=true&showtitle=true&showbrand=false&captions=false&interactivity=all";
+        
+        // ===== OPEN VIDEO SIDE FUNCTION =====
+        // This function is called when a timestamp is clicked
+        // Parameters:
+        // - timestamp: The time in MM:SS format
+        // - title: The section title to display
+        // - contentType: The type of content ('default', 'definition', 'theorem', 'claim', 'corollary', 'proposition', 'example', 'proof', 'non-examinable')
+        // - timestampElement: The clicked timestamp element (used to find the parent content box)
+        function openVideoSide(timestamp, title, contentType, timestampElement) {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Convert timestamp to seconds for Panopto
+            const timeInSeconds = convertTimestampToSeconds(timestamp);
+            
+            // Set the video URL with the timestamp
+            const videoUrl = PANOPTO_BASE_URL + `&start=${timeInSeconds}`;
+            videoFrame.src = videoUrl;
+            
+            // Remove full-width class and show video
+            contentSide.classList.remove('full-width');
+            videoSide.style.display = 'block';
+        }
+        
+        // ===== CLOSE VIDEO SIDE FUNCTION =====
+        // This function closes the video side and stops video playback
+        function closeVideoSide() {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Hide the video side
+            videoSide.style.display = 'none';
+            
+            // Clear the video source to stop playback
+            videoFrame.src = '';
+            
+            // Add full-width class back
+            contentSide.classList.add('full-width');
+        }
+        
+        // ===== TIMESTAMP CONVERSION FUNCTION =====
+        // Converts MM:SS format to seconds for Panopto
+        function convertTimestampToSeconds(timestamp) {
+            const parts = timestamp.split(':');
+            const minutes = parseInt(parts[0]);
+            const seconds = parseInt(parts[1]);
+            return minutes * 60 + seconds;
+        }
+    </script>
+</body>
+</html>
