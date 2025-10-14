@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis II Lecture 3 Notes</title>
+    
+    <!-- MathJax for mathematical equations - renders LaTeX math notation -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],  // Inline math: $x^2$ or \(x^2\)
+                displayMath: [['$$', '$$'], ['\\[', '\\]']], // Display math: $$x^2$$ or \[x^2\]
+                processEscapes: true,  // Process backslash escapes
+                processEnvironments: true  // Process LaTeX environments
+            },
+            options: {
+                skipHtmlTags: ['script', 'style', 'textarea', 'pre']  // Skip these HTML tags
+            }
+        };
+    </script>
+    
+    <style>
+        /* ===== GLOBAL STYLES ===== */
+        body {
+            font-family: 'Times New Roman', serif;  /* Professional academic font */
+            line-height: 1.6;  /* Comfortable line spacing */
+            margin: 0;  /* Remove default margins */
+            padding: 0;  /* Remove default padding */
+            background-color: #f9f9f9;  /* Light background */
+            color: #333;  /* Dark text for readability */
+            font-size: 18px;
+            overflow-x: hidden;  /* Prevent horizontal scroll */
+        }
+        
+        /* ===== MAIN LAYOUT CONTAINER ===== */
+        .main-container {
+            display: flex;  /* Flexbox for side-by-side layout */
+            min-height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== LEFT SIDE - CONTENT ===== */
+        .content-side {
+            flex: 1;  /* Take up remaining space */
+            padding: 20px;  /* Page margins */
+            max-width: 50%;  /* Half the width */
+            display: flex;  /* Flexbox for centering */
+            justify-content: center;  /* Center horizontally */
+            position: relative;  /* For absolute positioning of scrollable content */
+        }
+        
+        /* When video is not open, take full width and center the content */
+        .content-side.full-width {
+            max-width: 100%;  /* Full width when no video */
+            justify-content: center;  /* Center the content */
+        }
+        
+        /* Scrollable content container when video is open */
+        .scrollable-content {
+            width: 100%;
+            max-width: 1000px;
+            overflow-y: auto;
+            max-height: 95vh;  /* 95% viewport height */
+            padding-right: 10px;  /* Space for scrollbar */
+        }
+        
+        /* When video is not open, no height restriction and center the container */
+        .content-side.full-width .scrollable-content {
+            max-height: none;
+        }
+        
+        /* ===== RIGHT SIDE - VIDEO ===== */
+        .video-side {
+            flex: 1;  /* Take up remaining space */
+            max-width: 50%;  /* Half the width */
+            background-color: #000;  /* Black background for video */
+            position: relative;  /* For absolute positioning of close button */
+            display: none;  /* Hidden by default */
+            overflow: hidden;  /* Prevent video from scrolling */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            background-color: white;  /* White content area */
+            padding: 40px;  /* Internal spacing */
+            border-radius: 8px;  /* Rounded corners */
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);  /* Subtle shadow */
+            max-width: 1000px;  /* Optimal reading width */
+            margin: 0 auto;  /* Center the content */
+        }
+        
+        /* ===== HEADINGS ===== */
+        h1 {
+            text-align: center;  /* Center the main title */
+            font-size: 2.2em;  /* Large title */
+            margin-bottom: 40px;  /* Space below title */
+            color: #2c3e50;  /* Dark blue color */
+            padding-bottom: 15px;  /* Space below title */
+        }
+        
+        h2, h3, h4, h5, h6 {
+            color: #2c3e50;  /* Dark blue for all headings */
+            padding-bottom: 8px;  /* Space below headings */
+            margin-top: 30px;  /* Space above headings */
+            font-size: 1.2em;  /* Slightly larger than body text */
+        }
+        
+        /* ===== CONTENT BOXES ===== */
+        /* Base styling for all content boxes */
+        .content-box {
+            padding: 20px;  /* Internal spacing */
+            margin: 20px 0;  /* Vertical spacing between boxes */
+            border-radius: 5px;  /* Rounded corners */
+            position: relative;  /* For absolute positioning of timestamps */
+            border-left: 5px solid;  /* Colored left border */
+            font-size: 18px;  /* Consistent text size */
+        }
+        
+        /* ===== CONTENT BOX TYPES ===== */
+        /* Definition boxes - Green theme for definitions */
+        .definition {
+            background-color: #f0f8f0;  /* Light green background */
+            border-left-color: #28a745;  /* Green left border */
+        }
+        
+        /* Theorem boxes - Purple theme for theorems */
+        .theorem {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Claim boxes - Light purple theme for claims */
+        .claim {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Corollary boxes - Medium purple theme for corollaries */
+        .corollary {
+            background-color: #f0e6ff;  /* Slightly darker purple background */
+            border-left-color: #8e44ad;  /* Darker purple left border */
+        }
+        
+        /* Proposition boxes - Dark purple theme for propositions */
+        .proposition {
+            background-color: #e8d5f2;  /* Even darker purple background */
+            border-left-color: #9b59b6;  /* Dark purple left border */
+        }
+        
+        /* Example boxes - Orange theme for examples */
+        .example {
+            background-color: #fff8f0;  /* Light orange background */
+            border-left-color: #fd7e14;  /* Orange left border */
+        }
+        
+        /* Proof boxes - Pink theme for proofs */
+        .proof {
+            background-color: #fff0f5;  /* Light pink background */
+            border-left-color: #e83e8c;  /* Pink left border */
+        }
+        
+        /* Default boxes - No special styling */
+        .default {
+            background-color: transparent;  /* No background */
+            border: none;  /* No border */
+            padding-left: 0;  /* No left padding */
+        }
+        
+        /* Non-examinable boxes - Gray theme for optional content */
+        .non-examinable {
+            background-color: #f8f9fa;  /* Light gray background */
+            border-left-color: #6c757d;  /* Gray left border */
+            opacity: 0.7;  /* Slightly faded to indicate optional nature */
+        }
+        
+        /* ===== TIMESTAMP STYLING ===== */
+        .timestamp {
+            position: absolute;  /* Positioned relative to content box */
+            top: 10px;  /* 10px from top of content box */
+            right: 15px;  /* 15px from right edge */
+            font-size: 0.8em;  /* Smaller text */
+            color: #666;  /* Gray color */
+            background-color: rgba(255,255,255,0.8);  /* Semi-transparent white background */
+            padding: 2px 6px;  /* Small padding */
+            border-radius: 3px;  /* Rounded corners */
+            cursor: pointer;  /* Indicates clickable */
+            transition: all 0.2s ease;  /* Smooth transitions */
+            display: flex;  /* Flexbox for icon alignment */
+            align-items: center;  /* Vertical center alignment */
+            gap: 3px;  /* Space between icon and text */
+        }
+        
+        /* Hover effect for timestamps */
+        .timestamp:hover {
+            background-color: rgba(255,255,255,0.95);  /* More opaque on hover */
+            color: #333;  /* Darker text on hover */
+            transform: scale(1.05);  /* Slight scale up */
+        }
+        
+        /* Play icon styling */
+        .play-icon {
+            font-size: 0.7em;  /* Smaller than timestamp text */
+        }
+        
+        /* ===== CONTENT BOX HEADINGS ===== */
+        .content-box h3 {
+            margin-top: 0;  /* No top margin for h3 in content boxes */
+            color: inherit;  /* Inherit color from parent */
+            border-bottom: none;  /* No bottom border */
+            padding-bottom: 0;  /* No bottom padding */
+        }
+        
+        /* Add prefixes to content box headings */
+        .content-box h3:before {
+            font-weight: bold;  /* Bold prefix text */
+        }
+        
+        .definition h3:before {
+            content: "Definition: ";  /* "Definition: " prefix */
+        }
+        
+        .theorem h3:before {
+            content: "Theorem: ";  /* "Theorem: " prefix */
+        }
+        
+        .claim h3:before {
+            content: "Claim: ";  /* "Claim: " prefix */
+        }
+        
+        .corollary h3:before {
+            content: "Corollary: ";  /* "Corollary: " prefix */
+        }
+        
+        .proposition h3:before {
+            content: "Proposition: ";  /* "Proposition: " prefix */
+        }
+        
+        .example h3:before {
+            content: "Example: ";  /* "Example: " prefix */
+        }
+        
+        .proof h3:before {
+            content: "Proof: ";  /* "Proof: " prefix */
+        }
+        
+        .default h3:before {
+            content: "";  /* No prefix for default boxes */
+        }
+        
+        /* ===== LISTS ===== */
+        ul, ol {
+            padding-left: 25px;  /* Indent lists */
+        }
+        
+        li {
+            margin: 8px 0;  /* Space between list items */
+        }
+        
+        /* ===== LINKS ===== */
+        a {
+            color: #3498db;  /* Blue link color */
+            text-decoration: none;  /* No underline by default */
+        }
+        
+        a:hover {
+            text-decoration: underline;  /* Underline on hover */
+        }
+        
+        /* ===== MATH EQUATIONS ===== */
+        .MathJax {
+            font-size: 1.1em !important;  /* Slightly larger math text */
+        }
+        
+        /* ===== VIDEO SIDE STYLES ===== */
+        .video-container {
+            position: relative;  /* For absolute positioning of iframe */
+            width: 100%;  /* Full width */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* Video iframe */
+        .video-container iframe {
+            position: absolute;  /* Absolute positioning within container */
+            top: 0;
+            left: 0;
+            width: 100%;  /* Full width */
+            height: 100%;  /* Full height */
+            border: none;  /* No border */
+        }
+        
+        /* ===== CLOSE BUTTON ===== */
+        .close-button {
+            position: absolute;  /* Absolute positioning */
+            top: 20px;  /* 20px from top */
+            right: 20px;  /* 20px from right */
+            background-color: rgba(0,0,0,0.7);  /* Semi-transparent black background */
+            color: white;  /* White text */
+            border: none;  /* No border */
+            font-size: 24px;  /* Large close button */
+            font-weight: bold;  /* Bold text */
+            cursor: pointer;  /* Indicates clickable */
+            line-height: 1;  /* Tight line height */
+            padding: 10px 15px;  /* Padding for button */
+            border-radius: 50%;  /* Circular button */
+            z-index: 10;  /* Above video */
+            transition: all 0.2s ease;  /* Smooth transitions */
+        }
+        
+        /* Close button hover effect */
+        .close-button:hover {
+            background-color: rgba(0,0,0,0.9);  /* More opaque on hover */
+            transform: scale(1.1);  /* Slight scale up */
+        }
+        
+        /* ===== RESPONSIVE DESIGN ===== */
+        /* Mobile and tablet styles */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;  /* Stack vertically on mobile */
+            }
+            
+            .content-side {
+                max-width: 100%;  /* Full width on mobile */
+                padding: 10px;  /* Smaller margins on mobile */
+            }
+            
+            .video-side {
+                max-width: 100%;  /* Full width on mobile */
+                height: 50vh;  /* Half viewport height on mobile */
+            }
+            
+            .video-container {
+                height: 100%;  /* Full height of video side */
+            }
+            
+            .container {
+                padding: 20px;  /* Smaller internal padding */
+            }
+            
+            h1 {
+                font-size: 1.8em;  /* Smaller title on mobile */
+            }
+            
+            /* Timestamps become static on mobile */
+            .timestamp {
+                position: static;  /* Normal flow instead of absolute */
+                display: block;  /* Block display */
+                margin-bottom: 10px;  /* Space below timestamp */
+            }
+            
+            /* On mobile, when video is open, content should still be scrollable */
+            .content-side {
+                overflow-y: auto;  /* Ensure content is scrollable on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- ===== LEFT SIDE - CONTENT ===== -->
+        <div class="content-side full-width">
+            <div class="scrollable-content">
+                <div class="container">
+                    <!-- ===== LECTURE TITLE ===== -->
+                    <h1>Analysis II Lecture 3</h1>
+                    <p style="text-align: center; color: #666; font-style: italic;">Uniform Convergence and Differentiation</p>
+                    
+                    <!-- ===== CONTENT BOXES ===== -->
+                    
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('0:52', 'Introduction', 'default', this)">
+                            <span class="play-icon">▶</span>0:52
+                        </div>
+                        <h3>Introduction</h3>
+                        <p>This lecture continues our study of uniform convergence, focusing on its relationship with integration and differentiation. We'll see that while uniform convergence preserves continuity and allows us to interchange limits with integrals, the situation with differentiation is more subtle and requires additional assumptions.</p>
+                    </div>
+                    
+                    <div class="theorem content-box">
+                        <div class="timestamp" onclick="openVideoSide('1:39', 'Uniform Convergence and Integration', 'theorem', this)">
+                            <span class="play-icon">▶</span>1:39
+                        </div>
+                        <h3>Uniform Convergence and Integration</h3>
+                        <p>Let $(f_n)$ be a sequence of integrable functions on a bounded interval $[a,b]$ that converges uniformly to $f$. Then $f$ is integrable and</p>
+                        <p>$$\lim_{n \to \infty} \int_a^b f_n(x) \, dx = \int_a^b f(x) \, dx$$</p>
+                        <p><strong>Remark:</strong> The assumption that $f$ is integrable is actually redundant - uniform convergence of integrable functions automatically implies that the limit is integrable.</p>
+                    </div>
+                    
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('5:13', 'Proof of Integration Theorem', 'proof', this)">
+                            <span class="play-icon">▶</span>5:13
+                        </div>
+                        <h3>Proof of Integration Theorem</h3>
+                        <p>We need to show that $\left| \int_a^b f_n(x) \, dx - \int_a^b f(x) \, dx \right| \to 0$ as $n \to \infty$.</p>
+                        <p>By properties of integrals:</p>
+                        <p>$$\left| \int_a^b f_n(x) \, dx - \int_a^b f(x) \, dx \right| = \left| \int_a^b (f_n(x) - f(x)) \, dx \right| \leq \int_a^b |f_n(x) - f(x)| \, dx$$</p>
+                        <p>Since $f_n \to f$ uniformly, we have $\sup_{x \in [a,b]} |f_n(x) - f(x)| \to 0$. Therefore:</p>
+                        <p>$$\int_a^b |f_n(x) - f(x)| \, dx \leq \sup_{x \in [a,b]} |f_n(x) - f(x)| \cdot (b-a) \to 0$$</p>
+                        <p>This completes the proof.</p>
+                    </div>
+                    
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('7:03', 'Differentiation Question', 'default', this)">
+                            <span class="play-icon">▶</span>7:03
+                        </div>
+                        <h3>Differentiation Question</h3>
+                        <p>Now we turn to the question: if $(f_n)$ is a sequence of differentiable functions that converges uniformly to $f$, what can we say about differentiability of $f$ and convergence of the derivatives?</p>
+                        <p>Ideally, we would like to say that:
+                        <ul>
+                            <li>$f$ is differentiable</li>
+                            <li>$f_n'(x) \to f'(x)$ for each $x$</li>
+                        </ul>
+                        However, uniform convergence alone is <strong>not sufficient</strong> to guarantee either of these conclusions.</p>
+                    </div>
+                    
+                    <div class="claim content-box">
+                        <div class="timestamp" onclick="openVideoSide('8:27', 'Uniform Convergence Insufficient', 'claim', this)">
+                            <span class="play-icon">▶</span>8:27
+                        </div>
+                        <h3>Uniform Convergence Alone is Insufficient</h3>
+                        <p>If $f_n \to f$ uniformly on some interval and each $f_n$ is differentiable, it does <strong>not</strong> follow that:</p>
+                        <p>(a) $f$ is differentiable, or</p>
+                        <p>(b) even if $f$ is differentiable, that $f_n'(x) \to f'(x)$ pointwise.</p>
+                        <p>We need additional assumptions beyond uniform convergence.</p>
+                    </div>
+                    
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('10:19', 'Example 1: Non-differentiable Limit', 'example', this)">
+                            <span class="play-icon">▶</span>10:19
+                        </div>
+                        <h3>Example 1: Non-differentiable Limit</h3>
+                        <p>Consider the sequence $f_n(x) = |x|^{1 + 1/n}$ on the interval $[-1,1]$.</p>
+                        <p><strong>Properties of $f_n$:</strong></p>
+                        <ul>
+                            <li>Each $f_n$ is differentiable everywhere (including at $x = 0$)</li>
+                            <li>At $x = 0$: $f_n'(0) = 0$ (using difference quotient)</li>
+                            <li>For $x \neq 0$: $f_n'(x) = \pm (1 + 1/n)|x|^{1/n}$ (sign depends on $x$)</li>
+                        </ul>
+                        <p><strong>Limit behavior:</strong></p>
+                        <p>$f_n(x) \to |x|$ uniformly on $[-1,1]$, but $|x|$ is not differentiable at $x = 0$.</p>
+                        <p>This shows that uniform convergence of differentiable functions does not guarantee a differentiable limit.</p>
+                    </div>
+                    
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('14:34', 'Example 2: Derivatives Don\'t Converge', 'example', this)">
+                            <span class="play-icon">▶</span>14:34
+                        </div>
+                        <h3>Example 2: Derivatives Don't Converge</h3>
+                        <p>Consider $f_n(x) = \frac{\sin(nx)}{\sqrt{n}}$ on $\mathbb{R}$.</p>
+                        <p><strong>Function convergence:</strong></p>
+                        <p>$f_n(x) \to 0$ uniformly because $|f_n(x)| \leq \frac{1}{\sqrt{n}} \to 0$.</p>
+                        <p><strong>Derivative behavior:</strong></p>
+                        <p>$f_n'(x) = \sqrt{n} \cos(nx)$, which does not converge (e.g., at $x = 0$, $f_n'(0) = \sqrt{n} \to \infty$).</p>
+                        <p>This shows that even when the limit function is differentiable (constant function), the derivatives need not converge.</p>
+                    </div>
+                    
+                    <div class="theorem content-box">
+                        <div class="timestamp" onclick="openVideoSide('17:45', 'Main Theorem: Interchanging Limits and Derivatives', 'theorem', this)">
+                            <span class="play-icon">▶</span>17:45
+                        </div>
+                        <h3>Main Theorem: Interchanging Limits and Derivatives</h3>
+                        <p>Let $(f_n)$ be a sequence of differentiable functions on a closed interval $[a,b]$ with the following two assumptions:</p>
+                        <p><strong>Assumption 1:</strong> $f_n' \to g$ uniformly on $[a,b]$ for some function $g$</p>
+                        <p><strong>Assumption 2:</strong> There exists $c \in [a,b]$ such that $(f_n(c))$ converges</p>
+                        <p><strong>Then:</strong></p>
+                        <p>(a) $f_n \to f$ uniformly on $[a,b]$ for some function $f$</p>
+                        <p>(b) $f$ is differentiable on $[a,b]$ and $f' = g$</p>
+                        <p><strong>Key insight:</strong> This allows us to interchange differentiation and taking limits: $\frac{d}{dx}\left(\lim_{n \to \infty} f_n(x)\right) = \lim_{n \to \infty} \frac{d}{dx}f_n(x)$</p>
+                    </div>
+                    
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('20:21', 'Why These Assumptions?', 'default', this)">
+                            <span class="play-icon">▶</span>20:21
+                        </div>
+                        <h3>Why These Assumptions?</h3>
+                        <p><strong>Assumption 1 (uniform convergence of derivatives):</strong> This gives us control over the derivatives, allowing us to use the Mean Value Theorem to connect function values to derivative values.</p>
+                        <p><strong>Assumption 2 (convergence at one point):</strong> This prevents the sequence from "escaping to infinity" by anchoring it at one point. Without this, we could have $f_n(x) = n$ with $f_n'(x) = 0$ - the derivatives converge uniformly to 0, but the functions don't converge.</p>
+                        <p>Together, these assumptions are sufficient to guarantee both uniform convergence of the functions and differentiability of the limit.</p>
+                    </div>
+                    
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('25:40', 'Importance of Interchanging Operations', 'default', this)">
+                            <span class="play-icon">▶</span>25:40
+                        </div>
+                        <h3>Importance of Interchanging Operations</h3>
+                        <p>This theorem is crucial because it allows us to safely interchange two infinite processes:</p>
+                        <ul>
+                            <li><strong>Taking limits</strong> (as $n \to \infty$)</li>
+                            <li><strong>Differentiation</strong> (which is itself a limiting process)</li>
+                        </ul>
+                        <p>In general, we must be extremely careful when interchanging limiting operations. This theorem provides the precise conditions under which such interchange is valid.</p>
+                    </div>
+                    
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('26:15', 'Simpler Case: Continuous Derivatives', 'default', this)">
+                            <span class="play-icon">▶</span>26:15
+                        </div>
+                        <h3>Simpler Case: Continuous Derivatives</h3>
+                        <p>If we had the luxury of assuming that each $f_n'$ is continuous, the proof would be much more straightforward using the Fundamental Theorem of Calculus:</p>
+                        <p>$$f_n(x) = f_n(c) + \int_c^x f_n'(t) \, dt$$</p>
+                        <p>However, the theorem makes no such assumption - it only requires differentiability, not continuity of the derivatives. This makes the proof more subtle and requires clever use of the Mean Value Theorem.</p>
+                    </div>
+                    
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('28:53', 'Proof Strategy', 'proof', this)">
+                            <span class="play-icon">▶</span>28:53
+                        </div>
+                        <h3>Proof Strategy</h3>
+                        <p>The proof has two main parts:</p>
+                        <p><strong>Part A:</strong> Show that $f_n \to f$ uniformly using the Mean Value Theorem and Cauchy criterion.</p>
+                        <p><strong>Part B:</strong> Show that $f$ is differentiable with $f' = g$ by interpreting differentiability as a continuity question.</p>
+                        <p><strong>Key insight for Part A:</strong> Apply the Mean Value Theorem to the difference $f_n - f_m$ rather than to individual functions. This clever trick allows us to use our assumption about uniform convergence of derivatives.</p>
+                    </div>
+                    
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('33:33', 'Proof of Part A', 'proof', this)">
+                            <span class="play-icon">▶</span>33:33
+                        </div>
+                        <h3>Proof of Part A: Uniform Convergence</h3>
+                        <p>By the Mean Value Theorem applied to $f_n - f_m$:</p>
+                        <p>$$f_n(x) - f_m(x) = f_n(c) - f_m(c) + (x-c) \cdot (f_n' - f_m')(\xi_{n,m})$$</p>
+                        <p>for some $\xi_{n,m}$ between $x$ and $c$.</p>
+                        <p>Taking absolute values and using the triangle inequality:</p>
+                        <p>$$|f_n(x) - f_m(x)| \leq |f_n(c) - f_m(c)| + |x-c| \cdot |(f_n' - f_m')(\xi_{n,m})|$$</p>
+                        <p>$$\leq |f_n(c) - f_m(c)| + (b-a) \cdot \sup_{t \in [a,b]} |f_n'(t) - f_m'(t)|$$</p>
+                        <p>Taking the supremum over $x$:</p>
+                        <p>$$\sup_{x \in [a,b]} |f_n(x) - f_m(x)| \leq |f_n(c) - f_m(c)| + (b-a) \cdot \sup_{t \in [a,b]} |f_n'(t) - f_m'(t)|$$</p>
+                        <p>Both terms on the right tend to 0 as $n,m \to \infty$ (first by Assumption 2, second by Assumption 1), so $(f_n)$ is uniformly Cauchy and hence uniformly convergent.</p>
+                    </div>
+                    
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('39:48', 'Proof of Part B: Differentiability', 'proof', this)">
+                            <span class="play-icon">▶</span>39:48
+                        </div>
+                        <h3>Proof of Part B: Differentiability</h3>
+                        <p><strong>Clever idea:</strong> Instead of directly checking the difference quotient, we interpret differentiability as a continuity question.</p>
+                        <p>For fixed $y$, define:</p>
+                        <p>$$h(x) = \begin{cases} 
+                        \frac{f(x) - f(y)}{x-y} & \text{if } x \neq y \\
+                        g(y) & \text{if } x = y
+                        \end{cases}$$</p>
+                        <p>Then $f$ is differentiable at $y$ with $f'(y) = g(y)$ if and only if $h$ is continuous at $y$.</p>
+                        <p>Similarly, define $h_n(x)$ by replacing $f$ with $f_n$ and $g(y)$ with $f_n'(y)$.</p>
+                        <p>Each $h_n$ is continuous (since $f_n$ is differentiable), and $h_n \to h$ pointwise. If we can show $h_n \to h$ uniformly, then $h$ is continuous by our previous theorem.</p>
+                    </div>
+                    
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('47:53', 'Completing the Proof', 'proof', this)">
+                            <span class="play-icon">▶</span>47:53
+                        </div>
+                        <h3>Completing the Proof</h3>
+                        <p>To show $h_n \to h$ uniformly, we use the Cauchy criterion again. For $x \neq y$:</p>
+                        <p>$$h_n(x) - h_m(x) = \frac{(f_n - f_m)(x) - (f_n - f_m)(y)}{x-y}$$</p>
+                        <p>By the Mean Value Theorem applied to $f_n - f_m$:</p>
+                        <p>$$= (f_n' - f_m')(\xi)$$</p>
+                        <p>for some $\xi$ between $x$ and $y$.</p>
+                        <p>For $x = y$: $h_n(y) - h_m(y) = f_n'(y) - f_m'(y)$.</p>
+                        <p>In both cases: $|h_n(x) - h_m(x)| \leq \sup_{t \in [a,b]} |f_n'(t) - f_m'(t)| \to 0$</p>
+                        <p>Therefore $h_n \to h$ uniformly, so $h$ is continuous, so $f$ is differentiable with $f' = g$.</p>
+                    </div>
+                    
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('54:13', 'Conclusion', 'default', this)">
+                            <span class="play-icon">▶</span>54:13
+                        </div>
+                        <h3>Conclusion</h3>
+                        <p>This theorem provides the precise conditions under which we can safely interchange differentiation and taking limits. The key requirements are:</p>
+                        <ul>
+                            <li>Uniform convergence of the derivatives</li>
+                            <li>Convergence of the sequence at at least one point</li>
+                        </ul>
+                        <p>This completes our study of uniform convergence and its relationship with the fundamental operations of calculus: continuity, integration, and differentiation.</p>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== RIGHT SIDE - VIDEO ===== -->
+        <div id="videoSide" class="video-side">
+            <div class="video-container">
+                <iframe 
+                    id="videoFrame"
+                    src="" 
+                    allowfullscreen 
+                    allow="autoplay">
+                </iframe>
+            </div>
+            
+            <!-- ===== CLOSE BUTTON ===== -->
+            <button class="close-button" onclick="closeVideoSide()">&times;</button>
+        </div>
+    </div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // ===== VIDEO CONFIGURATION =====
+        // Replace this URL with your actual Panopto video URL
+        const PANOPTO_BASE_URL = "https://cambridgelectures.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=323de09f-e3f1-450f-a540-b33700b560c1&autoplay=false&offerviewer=true&showtitle=true&showbrand=false&captions=false&interactivity=all";
+        
+        // ===== OPEN VIDEO SIDE FUNCTION =====
+        // This function is called when a timestamp is clicked
+        // Parameters:
+        // - timestamp: The time in MM:SS format
+        // - title: The section title to display
+        // - contentType: The type of content ('default', 'definition', 'theorem', 'claim', 'corollary', 'proposition', 'example', 'proof', 'non-examinable')
+        // - timestampElement: The clicked timestamp element (used to find the parent content box)
+        function openVideoSide(timestamp, title, contentType, timestampElement) {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Convert timestamp to seconds for Panopto
+            const timeInSeconds = convertTimestampToSeconds(timestamp);
+            
+            // Set the video URL with the timestamp
+            const videoUrl = PANOPTO_BASE_URL + `&start=${timeInSeconds}`;
+            videoFrame.src = videoUrl;
+            
+            // Remove full-width class and show video
+            contentSide.classList.remove('full-width');
+            videoSide.style.display = 'block';
+        }
+        
+        // ===== CLOSE VIDEO SIDE FUNCTION =====
+        // This function closes the video side and stops video playback
+        function closeVideoSide() {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Hide the video side
+            videoSide.style.display = 'none';
+            
+            // Clear the video source to stop playback
+            videoFrame.src = '';
+            
+            // Add full-width class back
+            contentSide.classList.add('full-width');
+        }
+        
+        // ===== TIMESTAMP CONVERSION FUNCTION =====
+        // Converts MM:SS format to seconds for Panopto
+        function convertTimestampToSeconds(timestamp) {
+            const parts = timestamp.split(':');
+            const minutes = parseInt(parts[0]);
+            const seconds = parseInt(parts[1]);
+            return minutes * 60 + seconds;
+        }
+    </script>
+</body>
+</html>
