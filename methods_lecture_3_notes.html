@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Methods Lecture 3 Notes</title>
+    
+    <!-- MathJax for mathematical equations - renders LaTeX math notation -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],  // Inline math: $x^2$ or \(x^2\)
+                displayMath: [['$$', '$$'], ['\\[', '\\]']], // Display math: $$x^2$$ or \[x^2\]
+                processEscapes: true,  // Process backslash escapes
+                processEnvironments: true  // Process LaTeX environments
+            },
+            options: {
+                skipHtmlTags: ['script', 'style', 'textarea', 'pre']  // Skip these HTML tags
+            }
+        };
+    </script>
+    
+    <style>
+        /* ===== GLOBAL STYLES ===== */
+        body {
+            font-family: 'Times New Roman', serif;  /* Professional academic font */
+            line-height: 1.6;  /* Comfortable line spacing */
+            margin: 0;  /* Remove default margins */
+            padding: 0;  /* Remove default padding */
+            background-color: #f9f9f9;  /* Light background */
+            color: #333;  /* Dark text for readability */
+            font-size: 18px;
+            overflow-x: hidden;  /* Prevent horizontal scroll */
+        }
+        
+        /* ===== MAIN LAYOUT CONTAINER ===== */
+        .main-container {
+            display: flex;  /* Flexbox for side-by-side layout */
+            min-height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== LEFT SIDE - CONTENT ===== */
+        .content-side {
+            flex: 1;  /* Take up remaining space */
+            padding: 20px;  /* Page margins */
+            max-width: 50%;  /* Half the width */
+            display: flex;  /* Flexbox for centering */
+            justify-content: center;  /* Center horizontally */
+            position: relative;  /* For absolute positioning of scrollable content */
+        }
+        
+        /* When video is not open, take full width and center the content */
+        .content-side.full-width {
+            max-width: 100%;  /* Full width when no video */
+            justify-content: center;  /* Center the content */
+        }
+        
+        /* Scrollable content container when video is open */
+        .scrollable-content {
+            width: 100%;
+            max-width: 1000px;
+            overflow-y: auto;
+            max-height: 95vh;  /* 95% viewport height */
+            padding-right: 10px;  /* Space for scrollbar */
+        }
+        
+        /* When video is not open, no height restriction and center the container */
+        .content-side.full-width .scrollable-content {
+            max-height: none;
+        }
+        
+        /* ===== RIGHT SIDE - VIDEO ===== */
+        .video-side {
+            flex: 1;  /* Take up remaining space */
+            max-width: 50%;  /* Half the width */
+            background-color: #000;  /* Black background for video */
+            position: relative;  /* For absolute positioning of close button */
+            display: none;  /* Hidden by default */
+            overflow: hidden;  /* Prevent video from scrolling */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            background-color: white;  /* White content area */
+            padding: 40px;  /* Internal spacing */
+            border-radius: 8px;  /* Rounded corners */
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);  /* Subtle shadow */
+            max-width: 1000px;  /* Optimal reading width */
+            margin: 0 auto;  /* Center the content */
+        }
+        
+        /* ===== HEADINGS ===== */
+        h1 {
+            text-align: center;  /* Center the main title */
+            font-size: 2.2em;  /* Large title */
+            margin-bottom: 40px;  /* Space below title */
+            color: #2c3e50;  /* Dark blue color */
+            padding-bottom: 15px;  /* Space below title */
+        }
+        
+        h2, h3, h4, h5, h6 {
+            color: #2c3e50;  /* Dark blue for all headings */
+            padding-bottom: 8px;  /* Space below headings */
+            margin-top: 30px;  /* Space above headings */
+            font-size: 1.2em;  /* Slightly larger than body text */
+        }
+        
+        /* ===== CONTENT BOXES ===== */
+        /* Base styling for all content boxes */
+        .content-box {
+            padding: 20px;  /* Internal spacing */
+            margin: 20px 0;  /* Vertical spacing between boxes */
+            border-radius: 5px;  /* Rounded corners */
+            position: relative;  /* For absolute positioning of timestamps */
+            border-left: 5px solid;  /* Colored left border */
+            font-size: 18px;  /* Consistent text size */
+        }
+        
+        /* ===== CONTENT BOX TYPES ===== */
+        /* Definition boxes - Green theme for definitions */
+        .definition {
+            background-color: #f0f8f0;  /* Light green background */
+            border-left-color: #28a745;  /* Green left border */
+        }
+        
+        /* Theorem boxes - Purple theme for theorems */
+        .theorem {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Claim boxes - Light purple theme for claims */
+        .claim {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Corollary boxes - Medium purple theme for corollaries */
+        .corollary {
+            background-color: #f0e6ff;  /* Slightly darker purple background */
+            border-left-color: #8e44ad;  /* Darker purple left border */
+        }
+        
+        /* Proposition boxes - Dark purple theme for propositions */
+        .proposition {
+            background-color: #e8d5f2;  /* Even darker purple background */
+            border-left-color: #9b59b6;  /* Dark purple left border */
+        }
+        
+        /* Example boxes - Orange theme for examples */
+        .example {
+            background-color: #fff8f0;  /* Light orange background */
+            border-left-color: #fd7e14;  /* Orange left border */
+        }
+        
+        /* Proof boxes - Pink theme for proofs */
+        .proof {
+            background-color: #fff0f5;  /* Light pink background */
+            border-left-color: #e83e8c;  /* Pink left border */
+        }
+        
+        /* Default boxes - No special styling */
+        .default {
+            background-color: transparent;  /* No background */
+            border: none;  /* No border */
+            padding-left: 0;  /* No left padding */
+        }
+        
+        /* Non-examinable boxes - Gray theme for optional content */
+        .non-examinable {
+            background-color: #f8f9fa;  /* Light gray background */
+            border-left-color: #6c757d;  /* Gray left border */
+            opacity: 0.7;  /* Slightly faded to indicate optional nature */
+        }
+        
+        /* ===== TIMESTAMP STYLING ===== */
+        .timestamp {
+            position: absolute;  /* Positioned relative to content box */
+            top: 10px;  /* 10px from top of content box */
+            right: 15px;  /* 15px from right edge */
+            font-size: 0.8em;  /* Smaller text */
+            color: #666;  /* Gray color */
+            background-color: rgba(255,255,255,0.8);  /* Semi-transparent white background */
+            padding: 2px 6px;  /* Small padding */
+            border-radius: 3px;  /* Rounded corners */
+            cursor: pointer;  /* Indicates clickable */
+            transition: all 0.2s ease;  /* Smooth transitions */
+            display: flex;  /* Flexbox for icon alignment */
+            align-items: center;  /* Vertical center alignment */
+            gap: 3px;  /* Space between icon and text */
+        }
+        
+        /* Hover effect for timestamps */
+        .timestamp:hover {
+            background-color: rgba(255,255,255,0.95);  /* More opaque on hover */
+            color: #333;  /* Darker text on hover */
+            transform: scale(1.05);  /* Slight scale up */
+        }
+        
+        /* Play icon styling */
+        .play-icon {
+            font-size: 0.7em;  /* Smaller than timestamp text */
+        }
+        
+        /* ===== CONTENT BOX HEADINGS ===== */
+        .content-box h3 {
+            margin-top: 0;  /* No top margin for h3 in content boxes */
+            color: inherit;  /* Inherit color from parent */
+            border-bottom: none;  /* No bottom border */
+            padding-bottom: 0;  /* No bottom padding */
+        }
+        
+        /* Add prefixes to content box headings */
+        .content-box h3:before {
+            font-weight: bold;  /* Bold prefix text */
+        }
+        
+        .definition h3:before {
+            content: "Definition: ";  /* "Definition: " prefix */
+        }
+        
+        .theorem h3:before {
+            content: "Theorem: ";  /* "Theorem: " prefix */
+        }
+        
+        .claim h3:before {
+            content: "Claim: ";  /* "Claim: " prefix */
+        }
+        
+        .corollary h3:before {
+            content: "Corollary: ";  /* "Corollary: " prefix */
+        }
+        
+        .proposition h3:before {
+            content: "Proposition: ";  /* "Proposition: " prefix */
+        }
+        
+        .example h3:before {
+            content: "Example: ";  /* "Example: " prefix */
+        }
+        
+        .proof h3:before {
+            content: "Proof: ";  /* "Proof: " prefix */
+        }
+        
+        .default h3:before {
+            content: "";  /* No prefix for default boxes */
+        }
+        
+        /* ===== LISTS ===== */
+        ul, ol {
+            padding-left: 25px;  /* Indent lists */
+        }
+        
+        li {
+            margin: 8px 0;  /* Space between list items */
+        }
+        
+        /* ===== LINKS ===== */
+        a {
+            color: #3498db;  /* Blue link color */
+            text-decoration: none;  /* No underline by default */
+        }
+        
+        a:hover {
+            text-decoration: underline;  /* Underline on hover */
+        }
+        
+        /* ===== MATH EQUATIONS ===== */
+        .MathJax {
+            font-size: 1.1em !important;  /* Slightly larger math text */
+        }
+        
+        /* ===== VIDEO SIDE STYLES ===== */
+        .video-container {
+            position: relative;  /* For absolute positioning of iframe */
+            width: 100%;  /* Full width */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* Video iframe */
+        .video-container iframe {
+            position: absolute;  /* Absolute positioning within container */
+            top: 0;
+            left: 0;
+            width: 100%;  /* Full width */
+            height: 100%;  /* Full height */
+            border: none;  /* No border */
+        }
+        
+        /* ===== CLOSE BUTTON ===== */
+        .close-button {
+            position: absolute;  /* Absolute positioning */
+            top: 20px;  /* 20px from top */
+            right: 20px;  /* 20px from right */
+            background-color: rgba(0,0,0,0.7);  /* Semi-transparent black background */
+            color: white;  /* White text */
+            border: none;  /* No border */
+            font-size: 24px;  /* Large close button */
+            font-weight: bold;  /* Bold text */
+            cursor: pointer;  /* Indicates clickable */
+            line-height: 1;  /* Tight line height */
+            padding: 10px 15px;  /* Padding for button */
+            border-radius: 50%;  /* Circular button */
+            z-index: 10;  /* Above video */
+            transition: all 0.2s ease;  /* Smooth transitions */
+        }
+        
+        /* Close button hover effect */
+        .close-button:hover {
+            background-color: rgba(0,0,0,0.9);  /* More opaque on hover */
+            transform: scale(1.1);  /* Slight scale up */
+        }
+        
+        /* ===== RESPONSIVE DESIGN ===== */
+        /* Mobile and tablet styles */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;  /* Stack vertically on mobile */
+            }
+            
+            .content-side {
+                max-width: 100%;  /* Full width on mobile */
+                padding: 10px;  /* Smaller margins on mobile */
+            }
+            
+            .video-side {
+                max-width: 100%;  /* Full width on mobile */
+                height: 50vh;  /* Half viewport height on mobile */
+            }
+            
+            .video-container {
+                height: 100%;  /* Full height of video side */
+            }
+            
+            .container {
+                padding: 20px;  /* Smaller internal padding */
+            }
+            
+            h1 {
+                font-size: 1.8em;  /* Smaller title on mobile */
+            }
+            
+            /* Timestamps become static on mobile */
+            .timestamp {
+                position: static;  /* Normal flow instead of absolute */
+                display: block;  /* Block display */
+                margin-bottom: 10px;  /* Space below timestamp */
+            }
+            
+            /* On mobile, when video is open, content should still be scrollable */
+            .content-side {
+                overflow-y: auto;  /* Ensure content is scrollable on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- ===== LEFT SIDE - CONTENT ===== -->
+        <div class="content-side full-width">
+            <div class="scrollable-content">
+                <div class="container">
+                    <!-- ===== LECTURE TITLE ===== -->
+                    <h1>Methods Lecture 3</h1>
+                    <p style="text-align: center; color: #666; font-style: italic;">Periodic Extensions, Regularity and Decay of Fourier Coefficients, and Differentiation</p>
+                    
+                    <!-- ===== CONTENT BOXES ===== -->
+                    
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('0:34', 'Section 1.4 Introduction', 'default', this)">
+                            <span class="play-icon">▶</span>0:34
+                        </div>
+                        <h3>Section 1.4: Periodic Extensions</h3>
+                        <p>We move on to section 1.4 about periodic extensions, building on the basics of Fourier series and convergence that we've established. We've shown that for functions that aren't too wild (with finitely many discontinuities and finitely many maxima and minima), the Fourier series converges to the function itself at points of continuity and to the average at points of discontinuity.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('1:13', 'Even and Odd Extensions Definition', 'definition', this)">
+                            <span class="play-icon">▶</span>1:13
+                        </div>
+                        <h3>Even and Odd Extensions</h3>
+                        <p>Given a function $f: [0,L] \to \mathbb{R}$ (or $\mathbb{C}$), we can define two $2L$-periodic extensions:</p>
+                        <p><strong>Even extension:</strong> $f_{\text{even}}(\theta) = \begin{cases} 
+                        f(\theta) & \text{if } \theta \in [0,L] \\
+                        f(-\theta) & \text{if } \theta \in [-L,0]
+                        \end{cases}$</p>
+                        <p><strong>Odd extension:</strong> $f_{\text{odd}}(\theta) = \begin{cases} 
+                        f(\theta) & \text{if } \theta \in [0,L] \\
+                        -f(-\theta) & \text{if } \theta \in [-L,0]
+                        \end{cases}$</p>
+                        <p>These extensions are then continued periodically with period $2L$.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('4:51', 'Relationship to Original Function', 'default', this)">
+                            <span class="play-icon">▶</span>4:51
+                        </div>
+                        <h3>Relationship to Original Function</h3>
+                        <p>Note that $f(\theta) = f_{\text{even}}(\theta) = f_{\text{odd}}(\theta)$ when we restrict to the original interval $[0,L]$. This is the key insight: we now have periodic functions that we can express as Fourier series, and these Fourier series will give us our original function when restricted to the interval $[0,L]$.</p>
+                    </div>
+
+                    <div class="theorem content-box">
+                        <div class="timestamp" onclick="openVideoSide('5:13', 'Cosine Series Formula', 'theorem', this)">
+                            <span class="play-icon">▶</span>5:13
+                        </div>
+                        <h3>Cosine Series</h3>
+                        <p>For the even extension, since it's an even function, the Fourier series contains only cosine terms:</p>
+                        <p>$$f_{\text{even}}(\theta) = \frac{a_0}{2} + \sum_{n=1}^{\infty} a_n \cos\left(\frac{n\pi\theta}{L}\right)$$</p>
+                        <p>where the coefficients are:</p>
+                        <p>$$a_n = \frac{2}{L} \int_0^L f(\theta) \cos\left(\frac{n\pi\theta}{L}\right) \, d\theta$$</p>
+                        <p>This follows from the standard Fourier coefficient formula, using the fact that the even function and cosine are both even, allowing us to integrate only over $[0,L]$ and multiply by 2.</p>
+                    </div>
+
+                    <div class="theorem content-box">
+                        <div class="timestamp" onclick="openVideoSide('7:32', 'Sine Series Formula', 'theorem', this)">
+                            <span class="play-icon">▶</span>7:32
+                        </div>
+                        <h3>Sine Series</h3>
+                        <p>For the odd extension, the Fourier series contains only sine terms:</p>
+                        <p>$$f_{\text{odd}}(\theta) = \sum_{n=1}^{\infty} b_n \sin\left(\frac{n\pi\theta}{L}\right)$$</p>
+                        <p>where the coefficients are:</p>
+                        <p>$$b_n = \frac{2}{L} \int_0^L f(\theta) \sin\left(\frac{n\pi\theta}{L}\right) \, d\theta$$</p>
+                        <p>This is analogous to the cosine series, using the same integration trick.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('9:04', 'Cosine and Sine Series Definition', 'definition', this)">
+                            <span class="play-icon">▶</span>9:04
+                        </div>
+                        <h3>Cosine and Sine Series</h3>
+                        <p>For a function $f: [0,L] \to \mathbb{R}$, we define:</p>
+                        <p><strong>Cosine series:</strong> $\frac{a_0}{2} + \sum_{n=1}^{\infty} a_n \cos\left(\frac{n\pi\theta}{L}\right)$</p>
+                        <p><strong>Sine series:</strong> $\sum_{n=1}^{\infty} b_n \sin\left(\frac{n\pi\theta}{L}\right)$</p>
+                        <p>where $a_n$ and $b_n$ are defined as above. These series represent the even and odd periodic extensions of $f$, respectively.</p>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('10:30', 'Constant Function Example', 'example', this)">
+                            <span class="play-icon">▶</span>10:30
+                        </div>
+                        <h3>Example: Constant Function</h3>
+                        <p>Consider $f(\theta) = 1$ on $[0,\pi]$.</p>
+                        <p><strong>Odd extension:</strong> This creates a square wave pattern: $+1$ on $(0,\pi)$, $-1$ on $(-\pi,0)$, etc.</p>
+                        <p><strong>Even extension:</strong> This simply extends the constant function: $+1$ everywhere.</p>
+                        <p>For the sine series coefficients:</p>
+                        <p>$$b_n = \frac{2}{\pi} \int_0^{\pi} \sin(n\theta) \, d\theta = \frac{2}{n\pi}(1 - (-1)^n)$$</p>
+                        <p>This gives us the sine series representation of the constant function when restricted to $(0,\pi)$.</p>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('14:35', 'Cosine Series for Constant', 'example', this)">
+                            <span class="play-icon">▶</span>14:35
+                        </div>
+                        <h3>Example: Cosine Series for Constant Function</h3>
+                        <p>For the cosine series of $f(\theta) = 1$ on $[0,\pi]$:</p>
+                        <p>We can verify that $a_0 = 2$ and $a_n = 0$ for $n \geq 1$.</p>
+                        <p>This gives us the trivial cosine series: $1 = 1$ (since $\frac{a_0}{2} = 1$).</p>
+                        <p>The even extension is continuous everywhere, so the Fourier series converges to the function everywhere on the interval.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('16:15', 'Advantage of Even/Odd Extensions', 'default', this)">
+                            <span class="play-icon">▶</span>16:15
+                        </div>
+                        <h3>Why Even and Odd Extensions?</h3>
+                        <p>The advantage of using even or odd extensions rather than a general periodic extension is that it reduces the computational work by half. With even extensions, we get only cosine terms; with odd extensions, only sine terms. A general periodic extension would require both sine and cosine terms, making the calculations more complex.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('16:25', 'Section 1.5 Introduction', 'default', this)">
+                            <span class="play-icon">▶</span>16:25
+                        </div>
+                        <h3>Section 1.5: Regularity and Decay of Fourier Coefficients</h3>
+                        <p>We now turn to understanding how the smoothness (regularity) of a function relates to how quickly its Fourier coefficients decay as $n \to \infty$.</p>
+                    </div>
+
+                    <div class="non-examinable content-box">
+                        <div class="timestamp" onclick="openVideoSide('17:06', 'Riemann-Lebesgue Lemma', 'non-examinable', this)">
+                            <span class="play-icon">▶</span>17:06
+                        </div>
+                        <h3>Riemann-Lebesgue Lemma</h3>
+                        <p><em>This result is on the edge of being examinable but contains complex analysis: Non-examinable in detail.</em></p>
+                        <p>Let $g: [a,b] \to \mathbb{C}$ be integrable and $\lambda \in \mathbb{R}$. Then:</p>
+                        <p>$$\int_a^b e^{-i\lambda\theta} g(\theta) \, d\theta \to 0 \quad \text{as } |\lambda| \to \infty$$</p>
+                        <p>This is the famous <strong>Riemann-Lebesgue Lemma</strong>.</p>
+                    </div>
+
+                    <div class="corollary content-box">
+                        <div class="timestamp" onclick="openVideoSide('18:35', 'Fourier Coefficient Decay', 'corollary', this)">
+                            <span class="play-icon">▶</span>18:35
+                        </div>
+                        <h3>Fourier Coefficients Decay</h3>
+                        <p>If $f$ is an $L$-periodic integrable function, then the Fourier coefficients satisfy:</p>
+                        <p>$$\hat{f}_n \to 0 \quad \text{as } |n| \to \infty$$</p>
+                        <p>This follows from the Riemann-Lebesgue Lemma by taking $\lambda = \frac{2\pi n}{L}$ and noting that $\hat{f}_n = \frac{1}{L} \int_0^L f(\theta) e^{-2\pi i n \theta / L} \, d\theta$.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('21:35', 'Regularity and Decay Connection', 'default', this)">
+                            <span class="play-icon">▶</span>21:35
+                        </div>
+                        <h3>Regularity and Decay Connection</h3>
+                        <p>There's a beautiful two-way relationship between function regularity and Fourier coefficient decay:</p>
+                        <ul>
+                            <li><strong>Forward direction:</strong> If you tell me how smooth your function is (how many continuous derivatives it has), I can predict how fast the Fourier coefficients decay.</li>
+                            <li><strong>Converse direction:</strong> If you tell me how fast the Fourier coefficients go to zero, I can determine how smooth the function is.</li>
+                        </ul>
+                        <p>This is why we use harmonic analysis in PDEs - it's much easier to analyze decay rates than to zoom in and take limits to check smoothness.</p>
+                    </div>
+
+                    <div class="non-examinable content-box">
+                        <div class="timestamp" onclick="openVideoSide('23:26', 'Riemann-Lebesgue Intuition', 'non-examinable', this)">
+                            <span class="play-icon">▶</span>23:26
+                        </div>
+                        <h3>Riemann-Lebesgue Lemma: Intuitive Explanation</h3>
+                        <p><em>Non-examinable detailed explanation</em></p>
+                        <p>The integral $\int e^{-i\lambda\theta} g(\theta) \, d\theta$ represents the integral of $g(\theta)$ multiplied by rapidly oscillating terms $\cos(\lambda\theta)$ and $\sin(\lambda\theta)$.</p>
+                        <p>As $\lambda \to \infty$, the oscillations become very rapid. The positive and negative contributions cancel out due to the rapid oscillation, leading to the integral tending to zero. This is a cancellation argument - high-frequency oscillations average out to zero when integrated against a nice function.</p>
+                    </div>
+
+                    <div class="theorem content-box">
+                        <div class="timestamp" onclick="openVideoSide('26:27', 'Decay Rate for Smooth Functions', 'theorem', this)">
+                            <span class="play-icon">▶</span>26:27
+                        </div>
+                        <h3>Decay Rate for Smooth Functions</h3>
+                        <p>Suppose $f$ is $L$-periodic and $f \in C^k(\mathbb{R})$ (meaning $f, f', f'', \ldots, f^{(k)}$ are all continuous on $\mathbb{R}$).</p>
+                        <p>Then the Fourier coefficients satisfy:</p>
+                        <p>$$|\hat{f}_n| = O\left(\frac{1}{|n|^k}\right) \quad \text{as } |n| \to \infty$$</p>
+                        <p>That is, the smoother the function, the faster the Fourier coefficients decay.</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('27:41', 'Proof of Decay Rate', 'proof', this)">
+                            <span class="play-icon">▶</span>27:41
+                        </div>
+                        <h3>Proof of Decay Rate</h3>
+                        <p>We use integration by parts repeatedly. Starting with:</p>
+                        <p>$$\hat{f}_n = \frac{1}{L} \int_0^L f(\theta) e^{-2\pi i n \theta / L} \, d\theta$$</p>
+                        <p>Integrate by parts: integrate the exponential, differentiate $f$:</p>
+                        <p>$$\hat{f}_n = \frac{L}{2\pi i n} \left[ f(\theta) e^{-2\pi i n \theta / L} \right]_0^L + \frac{L}{2\pi i n} \int_0^L f'(\theta) e^{-2\pi i n \theta / L} \, d\theta$$</p>
+                        <p>Due to periodicity and continuity: $f(L) = f(0)$, so the boundary term vanishes. We get:</p>
+                        <p>$$\hat{f}_n = \frac{L}{2\pi i n} \hat{f'}_n$$</p>
+                        <p>Continuing this process $k$ times:</p>
+                        <p>$$\hat{f}_n = \left(\frac{L}{2\pi i n}\right)^k \hat{f^{(k)}}_n$$</p>
+                        <p>Since $f^{(k)}$ is continuous (hence integrable), $\hat{f^{(k)}}_n = O(1)$ by the Riemann-Lebesgue Lemma. Therefore $|\hat{f}_n| = O(1/|n|^k)$.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('35:14', 'Section 1.6 Introduction', 'default', this)">
+                            <span class="play-icon">▶</span>35:14
+                        </div>
+                        <h3>Section 1.6: Differentiation of Fourier Series</h3>
+                        <p>We now consider: if $f$ has Fourier series, what is the Fourier series of its derivative $f'$?</p>
+                    </div>
+
+                    <div class="theorem content-box">
+                        <div class="timestamp" onclick="openVideoSide('35:39', 'Differentiation of Fourier Series', 'theorem', this)">
+                            <span class="play-icon">▶</span>35:39
+                        </div>
+                        <h3>Differentiation of Fourier Series</h3>
+                        <p>Suppose $f$ is $L$-periodic and continuously differentiable on $\mathbb{R}$ with $f' = g$.</p>
+                        <p>Then we can differentiate the Fourier series term by term:</p>
+                        <p>$$\frac{d}{d\theta}\left(\sum_{n \in \mathbb{Z}} \hat{f}_n e^{2\pi i n \theta / L}\right) = \sum_{n \in \mathbb{Z}} \frac{2\pi i n}{L} \hat{f}_n e^{2\pi i n \theta / L}$$</p>
+                        <p><strong>Key condition:</strong> This works only if $f$ is continuous on $\mathbb{R}$ (not just on one period).</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('37:00', 'Proof of Differentiation Rule', 'proof', this)">
+                            <span class="play-icon">▶</span>37:00
+                        </div>
+                        <h3>Proof of Differentiation Rule</h3>
+                        <p>The Fourier coefficient of the derivative is:</p>
+                        <p>$$\hat{g}_n = \frac{1}{L} \int_0^L g(\theta) e^{-2\pi i n \theta / L} \, d\theta = \frac{1}{L} \int_0^L f'(\theta) e^{-2\pi i n \theta / L} \, d\theta$$</p>
+                        <p>Using integration by parts (integrate the exponential, differentiate $f$):</p>
+                        <p>$$\hat{g}_n = \frac{1}{L} \left[ f(\theta) e^{-2\pi i n \theta / L} \right]_0^L + \frac{2\pi i n}{L^2} \int_0^L f(\theta) e^{-2\pi i n \theta / L} \, d\theta$$</p>
+                        <p>The boundary term becomes $f(L) - f(0)$. If $f$ is continuous on $\mathbb{R}$, then by periodicity $f(0) = f(L)$, so the boundary term vanishes and we get:</p>
+                        <p>$$\hat{g}_n = \frac{2\pi i n}{L} \hat{f}_n$$</p>
+                        <p>This shows that $\hat{f'}_n = \frac{2\pi i n}{L} \hat{f}_n$, which is exactly what we get by differentiating the Fourier series term by term.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('41:39', 'Section 1.7 Introduction', 'default', this)">
+                            <span class="play-icon">▶</span>41:39
+                        </div>
+                        <h3>Section 1.7: Parseval's Theorem</h3>
+                        <p>A very short section on Parseval's theorem, which relates the inner product of two functions to their Fourier coefficients.</p>
+                    </div>
+
+                    <div class="theorem content-box">
+                        <div class="timestamp" onclick="openVideoSide('42:32', 'Parseval\'s Theorem', 'theorem', this)">
+                            <span class="play-icon">▶</span>42:32
+                        </div>
+                        <h3>Parseval's Theorem</h3>
+                        <p>For two $L$-periodic functions $f$ and $g$ with Fourier series, we have:</p>
+                        <p>$$\langle f, g \rangle = L \sum_{n \in \mathbb{Z}} \hat{f}_n \overline{\hat{g}_n}$$</p>
+                        <p>where $\langle f, g \rangle = \int_0^L f(\theta) \overline{g(\theta)} \, d\theta$ is the inner product.</p>
+                        <p>In the special case when $f = g$, this becomes:</p>
+                        <p>$$\int_0^L |f(\theta)|^2 \, d\theta = L \sum_{n \in \mathbb{Z}} |\hat{f}_n|^2$$</p>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('46:13', 'Parseval Example: zeta(2)', 'example', this)">
+                            <span class="play-icon">▶</span>46:13
+                        </div>
+                        <h3>Example: Computing $\zeta(2)$ using Parseval's Theorem</h3>
+                        <p>Consider the $2\pi$-periodic function $f(\theta) = \theta$ on $[-\pi, \pi]$. This function is not continuous on $\mathbb{R}$ (it has jump discontinuities at $(2k+1)\pi$).</p>
+                        <p>It can be shown (left as exercise) that the Fourier series is:</p>
+                        <p>$$f(\theta) \sim \sum_{n \neq 0} \frac{i(-1)^n}{n} e^{in\theta}$$</p>
+                        <p>By Parseval's theorem:</p>
+                        <p>$$\frac{1}{2\pi} \int_{-\pi}^{\pi} \theta^2 \, d\theta = \sum_{n \neq 0} \left|\frac{i(-1)^n}{n}\right|^2 = 2\sum_{n=1}^{\infty} \frac{1}{n^2}$$</p>
+                        <p>Computing the left side: $\int_{-\pi}^{\pi} \theta^2 \, d\theta = 2\int_0^{\pi} \theta^2 \, d\theta = 2\frac{\pi^3}{3} = \frac{2\pi^3}{3}$, so:</p>
+                        <p>$$\frac{1}{2\pi} \cdot \frac{2\pi^3}{3} = \frac{\pi^2}{3} = 2\sum_{n=1}^{\infty} \frac{1}{n^2}$$</p>
+                        <p>Therefore: $\sum_{n=1}^{\infty} \frac{1}{n^2} = \frac{\pi^2}{6} = \zeta(2)$.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('49:00', 'Challenge Problems', 'default', this)">
+                            <span class="play-icon">▶</span>49:00
+                        </div>
+                        <h3>Challenge Problems</h3>
+                        <p>Two challenging problems are set:</p>
+                        <p><strong>Challenge 1 (*):</strong> It is possible to prove that $\zeta(2n)/\pi^{2n}$ is always rational for positive integers $n$.</p>
+                        <p><strong>Challenge 2 (**):</strong> Is $\zeta(2n+1)$ rational for any odd positive integer $n$? (This is a very difficult open problem - collaboration opportunity offered!)</p>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== RIGHT SIDE - VIDEO ===== -->
+        <div id="videoSide" class="video-side">
+            <div class="video-container">
+                <iframe 
+                    id="videoFrame"
+                    src="" 
+                    allowfullscreen 
+                    allow="autoplay">
+                </iframe>
+            </div>
+            
+            <!-- ===== CLOSE BUTTON ===== -->
+            <button class="close-button" onclick="closeVideoSide()">&times;</button>
+        </div>
+    </div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // ===== VIDEO CONFIGURATION =====
+        const PANOPTO_BASE_URL = "https://cambridgelectures.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=8642bf8e-845f-4d52-8c6d-b33700b42848&autoplay=false&offerviewer=true&showtitle=true&showbrand=false&captions=false&interactivity=all";
+        
+        // ===== OPEN VIDEO SIDE FUNCTION =====
+        // This function is called when a timestamp is clicked
+        // Parameters:
+        // - timestamp: The time in MM:SS format
+        // - title: The section title to display
+        // - contentType: The type of content ('default', 'definition', 'theorem', 'claim', 'corollary', 'proposition', 'example', 'proof', 'non-examinable')
+        // - timestampElement: The clicked timestamp element (used to find the parent content box)
+        function openVideoSide(timestamp, title, contentType, timestampElement) {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Convert timestamp to seconds for Panopto
+            const timeInSeconds = convertTimestampToSeconds(timestamp);
+            
+            // Set the video URL with the timestamp
+            const videoUrl = PANOPTO_BASE_URL + `&start=${timeInSeconds}`;
+            videoFrame.src = videoUrl;
+            
+            // Remove full-width class and show video
+            contentSide.classList.remove('full-width');
+            videoSide.style.display = 'block';
+        }
+        
+        // ===== CLOSE VIDEO SIDE FUNCTION =====
+        // This function closes the video side and stops video playback
+        function closeVideoSide() {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Hide the video side
+            videoSide.style.display = 'none';
+            
+            // Clear the video source to stop playback
+            videoFrame.src = '';
+            
+            // Add full-width class back
+            contentSide.classList.add('full-width');
+        }
+        
+        // ===== TIMESTAMP CONVERSION FUNCTION =====
+        // Converts MM:SS format to seconds for Panopto
+        function convertTimestampToSeconds(timestamp) {
+            const parts = timestamp.split(':');
+            const minutes = parseInt(parts[0]);
+            const seconds = parseInt(parts[1]);
+            return minutes * 60 + seconds;
+        }
+    </script>
+</body>
+</html>
