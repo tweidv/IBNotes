@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis II Lecture 4 Notes</title>
+    
+    <!-- MathJax for mathematical equations - renders LaTeX math notation -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],  // Inline math: $x^2$ or \(x^2\)
+                displayMath: [['$$', '$$'], ['\\[', '\\]']], // Display math: $$x^2$$ or \[x^2\]
+                processEscapes: true,  // Process backslash escapes
+                processEnvironments: true  // Process LaTeX environments
+            },
+            options: {
+                skipHtmlTags: ['script', 'style', 'textarea', 'pre']  // Skip these HTML tags
+            }
+        };
+    </script>
+    
+    <style>
+        /* ===== GLOBAL STYLES ===== */
+        body {
+            font-family: 'Times New Roman', serif;  /* Professional academic font */
+            line-height: 1.6;  /* Comfortable line spacing */
+            margin: 0;  /* Remove default margins */
+            padding: 0;  /* Remove default padding */
+            background-color: #f9f9f9;  /* Light background */
+            color: #333;  /* Dark text for readability */
+            font-size: 18px;
+            overflow-x: hidden;  /* Prevent horizontal scroll */
+        }
+        
+        /* ===== MAIN LAYOUT CONTAINER ===== */
+        .main-container {
+            display: flex;  /* Flexbox for side-by-side layout */
+            min-height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== LEFT SIDE - CONTENT ===== */
+        .content-side {
+            flex: 1;  /* Take up remaining space */
+            padding: 20px;  /* Page margins */
+            max-width: 50%;  /* Half the width */
+            display: flex;  /* Flexbox for centering */
+            justify-content: center;  /* Center horizontally */
+            position: relative;  /* For absolute positioning of scrollable content */
+        }
+        
+        /* When video is not open, take full width and center the content */
+        .content-side.full-width {
+            max-width: 100%;  /* Full width when no video */
+            justify-content: center;  /* Center the content */
+        }
+        
+        /* Scrollable content container when video is open */
+        .scrollable-content {
+            width: 100%;
+            max-width: 1000px;
+            overflow-y: auto;
+            max-height: 95vh;  /* 95% viewport height */
+            padding-right: 10px;  /* Space for scrollbar */
+        }
+        
+        /* When video is not open, no height restriction and center the container */
+        .content-side.full-width .scrollable-content {
+            max-height: none;
+        }
+        
+        /* ===== RIGHT SIDE - VIDEO ===== */
+        .video-side {
+            flex: 1;  /* Take up remaining space */
+            max-width: 50%;  /* Half the width */
+            background-color: #000;  /* Black background for video */
+            position: relative;  /* For absolute positioning of close button */
+            display: none;  /* Hidden by default */
+            overflow: hidden;  /* Prevent video from scrolling */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            background-color: white;  /* White content area */
+            padding: 40px;  /* Internal spacing */
+            border-radius: 8px;  /* Rounded corners */
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);  /* Subtle shadow */
+            max-width: 1000px;  /* Optimal reading width */
+            margin: 0 auto;  /* Center the content */
+        }
+        
+        /* ===== HEADINGS ===== */
+        h1 {
+            text-align: center;  /* Center the main title */
+            font-size: 2.2em;  /* Large title */
+            margin-bottom: 40px;  /* Space below title */
+            color: #2c3e50;  /* Dark blue color */
+            padding-bottom: 15px;  /* Space below title */
+        }
+        
+        h2, h3, h4, h5, h6 {
+            color: #2c3e50;  /* Dark blue for all headings */
+            padding-bottom: 8px;  /* Space below headings */
+            margin-top: 30px;  /* Space above headings */
+            font-size: 1.2em;  /* Slightly larger than body text */
+        }
+        
+        /* ===== CONTENT BOXES ===== */
+        /* Base styling for all content boxes */
+        .content-box {
+            padding: 20px;  /* Internal spacing */
+            margin: 20px 0;  /* Vertical spacing between boxes */
+            border-radius: 5px;  /* Rounded corners */
+            position: relative;  /* For absolute positioning of timestamps */
+            border-left: 5px solid;  /* Colored left border */
+            font-size: 18px;  /* Consistent text size */
+        }
+        
+        /* ===== CONTENT BOX TYPES ===== */
+        /* Definition boxes - Green theme for definitions */
+        .definition {
+            background-color: #f0f8f0;  /* Light green background */
+            border-left-color: #28a745;  /* Green left border */
+        }
+        
+        /* Theorem boxes - Purple theme for theorems */
+        .theorem {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Claim boxes - Light purple theme for claims */
+        .claim {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Corollary boxes - Medium purple theme for corollaries */
+        .corollary {
+            background-color: #f0e6ff;  /* Slightly darker purple background */
+            border-left-color: #8e44ad;  /* Darker purple left border */
+        }
+        
+        /* Proposition boxes - Dark purple theme for propositions */
+        .proposition {
+            background-color: #e8d5f2;  /* Even darker purple background */
+            border-left-color: #9b59b6;  /* Dark purple left border */
+        }
+        
+        /* Example boxes - Orange theme for examples */
+        .example {
+            background-color: #fff8f0;  /* Light orange background */
+            border-left-color: #fd7e14;  /* Orange left border */
+        }
+        
+        /* Proof boxes - Pink theme for proofs */
+        .proof {
+            background-color: #fff0f5;  /* Light pink background */
+            border-left-color: #e83e8c;  /* Pink left border */
+        }
+        
+        /* Default boxes - No special styling */
+        .default {
+            background-color: transparent;  /* No background */
+            border: none;  /* No border */
+            padding-left: 0;  /* No left padding */
+        }
+        
+        /* Non-examinable boxes - Gray theme for optional content */
+        .non-examinable {
+            background-color: #f8f9fa;  /* Light gray background */
+            border-left-color: #6c757d;  /* Gray left border */
+            opacity: 0.7;  /* Slightly faded to indicate optional nature */
+        }
+        
+        /* ===== TIMESTAMP STYLING ===== */
+        .timestamp {
+            position: absolute;  /* Positioned relative to content box */
+            top: 10px;  /* 10px from top of content box */
+            right: 15px;  /* 15px from right edge */
+            font-size: 0.8em;  /* Smaller text */
+            color: #666;  /* Gray color */
+            background-color: rgba(255,255,255,0.8);  /* Semi-transparent white background */
+            padding: 2px 6px;  /* Small padding */
+            border-radius: 3px;  /* Rounded corners */
+            cursor: pointer;  /* Indicates clickable */
+            transition: all 0.2s ease;  /* Smooth transitions */
+            display: flex;  /* Flexbox for icon alignment */
+            align-items: center;  /* Vertical center alignment */
+            gap: 3px;  /* Space between icon and text */
+        }
+        
+        /* Hover effect for timestamps */
+        .timestamp:hover {
+            background-color: rgba(255,255,255,0.95);  /* More opaque on hover */
+            color: #333;  /* Darker text on hover */
+            transform: scale(1.05);  /* Slight scale up */
+        }
+        
+        /* Play icon styling */
+        .play-icon {
+            font-size: 0.7em;  /* Smaller than timestamp text */
+        }
+        
+        /* ===== CONTENT BOX HEADINGS ===== */
+        .content-box h3 {
+            margin-top: 0;  /* No top margin for h3 in content boxes */
+            color: inherit;  /* Inherit color from parent */
+            border-bottom: none;  /* No bottom border */
+            padding-bottom: 0;  /* No bottom padding */
+        }
+        
+        /* Add prefixes to content box headings */
+        .content-box h3:before {
+            font-weight: bold;  /* Bold prefix text */
+        }
+        
+        .definition h3:before {
+            content: "Definition: ";  /* "Definition: " prefix */
+        }
+        
+        .theorem h3:before {
+            content: "Theorem: ";  /* "Theorem: " prefix */
+        }
+        
+        .claim h3:before {
+            content: "Claim: ";  /* "Claim: " prefix */
+        }
+        
+        .corollary h3:before {
+            content: "Corollary: ";  /* "Corollary: " prefix */
+        }
+        
+        .proposition h3:before {
+            content: "Proposition: ";  /* "Proposition: " prefix */
+        }
+        
+        .example h3:before {
+            content: "Example: ";  /* "Example: " prefix */
+        }
+        
+        .proof h3:before {
+            content: "Proof: ";  /* "Proof: " prefix */
+        }
+        
+        .default h3:before {
+            content: "";  /* No prefix for default boxes */
+        }
+        
+        /* ===== LISTS ===== */
+        ul, ol {
+            padding-left: 25px;  /* Indent lists */
+        }
+        
+        li {
+            margin: 8px 0;  /* Space between list items */
+        }
+        
+        /* ===== LINKS ===== */
+        a {
+            color: #3498db;  /* Blue link color */
+            text-decoration: none;  /* No underline by default */
+        }
+        
+        a:hover {
+            text-decoration: underline;  /* Underline on hover */
+        }
+        
+        /* ===== MATH EQUATIONS ===== */
+        .MathJax {
+            font-size: 1.1em !important;  /* Slightly larger math text */
+        }
+        
+        /* ===== VIDEO SIDE STYLES ===== */
+        .video-container {
+            position: relative;  /* For absolute positioning of iframe */
+            width: 100%;  /* Full width */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* Video iframe */
+        .video-container iframe {
+            position: absolute;  /* Absolute positioning within container */
+            top: 0;
+            left: 0;
+            width: 100%;  /* Full width */
+            height: 100%;  /* Full height */
+            border: none;  /* No border */
+        }
+        
+        /* ===== CLOSE BUTTON ===== */
+        .close-button {
+            position: absolute;  /* Absolute positioning */
+            top: 20px;  /* 20px from top */
+            right: 20px;  /* 20px from right */
+            background-color: rgba(0,0,0,0.7);  /* Semi-transparent black background */
+            color: white;  /* White text */
+            border: none;  /* No border */
+            font-size: 24px;  /* Large close button */
+            font-weight: bold;  /* Bold text */
+            cursor: pointer;  /* Indicates clickable */
+            line-height: 1;  /* Tight line height */
+            padding: 10px 15px;  /* Padding for button */
+            border-radius: 50%;  /* Circular button */
+            z-index: 10;  /* Above video */
+            transition: all 0.2s ease;  /* Smooth transitions */
+        }
+        
+        /* Close button hover effect */
+        .close-button:hover {
+            background-color: rgba(0,0,0,0.9);  /* More opaque on hover */
+            transform: scale(1.1);  /* Slight scale up */
+        }
+        
+        /* ===== RESPONSIVE DESIGN ===== */
+        /* Mobile and tablet styles */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;  /* Stack vertically on mobile */
+            }
+            
+            .content-side {
+                max-width: 100%;  /* Full width on mobile */
+                padding: 10px;  /* Smaller margins on mobile */
+            }
+            
+            .video-side {
+                max-width: 100%;  /* Full width on mobile */
+                height: 50vh;  /* Half viewport height on mobile */
+            }
+            
+            .video-container {
+                height: 100%;  /* Full height of video side */
+            }
+            
+            .container {
+                padding: 20px;  /* Smaller internal padding */
+            }
+            
+            h1 {
+                font-size: 1.8em;  /* Smaller title on mobile */
+            }
+            
+            /* Timestamps become static on mobile */
+            .timestamp {
+                position: static;  /* Normal flow instead of absolute */
+                display: block;  /* Block display */
+                margin-bottom: 10px;  /* Space below timestamp */
+            }
+            
+            /* On mobile, when video is open, content should still be scrollable */
+            .content-side {
+                overflow-y: auto;  /* Ensure content is scrollable on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- ===== LEFT SIDE - CONTENT ===== -->
+        <div class="content-side full-width">
+            <div class="scrollable-content">
+                <div class="container">
+                    <!-- ===== LECTURE TITLE ===== -->
+                    <h1>Analysis II Lecture 4</h1>
+                    <p style="text-align: center; color: #666; font-style: italic;">Uniform Convergence and Series of Functions</p>
+                    
+                    <!-- ===== CONTENT BOXES ===== -->
+                    
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('0:09', 'Lecture Introduction', 'default', this)">
+                            <span class="play-icon">▶</span>0:09
+                        </div>
+                        <h3>Review of Previous Theorem</h3>
+                        <p>We proved a theorem last time which stated that for a sequence of functions $(f_n)$ on some interval, if:</p>
+                        <ul>
+                            <li>The sequence of derivatives $(f_n')$ converges uniformly to some function $g$</li>
+                            <li>The original sequence $(f_n)$ converges at one point</li>
+                        </ul>
+                        <p>Then the sequence $(f_n)$ converges uniformly to some function $f$, and moreover $f$ is differentiable with $f' = g$.</p>
+                    </div>
+
+                    <div class="claim content-box">
+                        <div class="timestamp" onclick="openVideoSide('2:43', 'Derivative Continuity', 'claim', this)">
+                            <span class="play-icon">▶</span>2:43
+                        </div>
+                        <h3>Derivatives Need Not Be Continuous</h3>
+                        <p>Note that $f'$ need not be continuous. Just because a function is differentiable doesn't mean that the derivative needs to be continuous.</p>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('3:18', 'Discontinuous Derivative Example', 'example', this)">
+                            <span class="play-icon">▶</span>3:18
+                        </div>
+                        <h3>Function with Discontinuous Derivative</h3>
+                        <p>Consider the function defined by:</p>
+                        <p>$$f(x) = \begin{cases} x^2 \sin(1/x) & \text{if } x \neq 0 \\ 0 & \text{if } x = 0 \end{cases}$$</p>
+                        <p>on the interval $[-1,1]$. You can check that this function is differentiable everywhere, but the derivative is not continuous at $x = 0$. The derivative is given by:</p>
+                        <p>$$f'(x) = \begin{cases} 2x\sin(1/x) - \cos(1/x) & \text{if } x \neq 0 \\ 0 & \text{if } x = 0 \end{cases}$$</p>
+                        <p>This derivative is not continuous at $x = 0$.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('6:31', 'Intermediate Value Property', 'default', this)">
+                            <span class="play-icon">▶</span>6:31
+                        </div>
+                        <h3>Intermediate Value Property for Derivatives</h3>
+                        <p>However, it's interesting to note that if $f$ is differentiable on some interval, then $f'$ satisfies the intermediate value property. This means that for any $c$ between $f'(a)$ and $f'(b)$, there exists a point $y$ in the interval $(a,b)$ such that $f'(y) = c$.</p>
+                        <p>This is a nice fact - even though the derivative might not be continuous, it still satisfies this familiar property of continuous functions. This provides some measure of continuity for derivatives.</p>
+                    </div>
+
+                    <div class="non-examinable content-box">
+                        <div class="timestamp" onclick="openVideoSide('9:12', 'Non-examinable Material', 'non-examinable', this)">
+                            <span class="play-icon">▶</span>9:12
+                        </div>
+                        <h3>Advanced Examples (Non-examinable)</h3>
+                        <p>There are examples where derivatives can have large sets of discontinuities. For instance, the Volterra function gives you a big set of points of discontinuity for the derivative. However, this is beyond the scope of the course.</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('10:47', 'Alternative Proof Using FTC', 'proof', this)">
+                            <span class="play-icon">▶</span>10:47
+                        </div>
+                        <h3>Alternative Proof Using Fundamental Theorem of Calculus</h3>
+                        <p>If we assume that $f_n'$ is continuous (in addition to the other hypotheses), then we can give a much more straightforward proof based on the fundamental theorem of calculus rather than the mean value theorem.</p>
+                        <p>Since $f_n'$ is continuous, we have by the fundamental theorem of calculus:</p>
+                        <p>$$f_n(x) = f_n(c) + \int_c^x f_n'(t) \, dt$$</p>
+                        <p>Now, to show uniform convergence, we consider:</p>
+                        <p>$$|f_n(x) - f_m(x)| \leq |f_n(c) - f_m(c)| + \left|\int_c^x (f_n'(t) - f_m'(t)) \, dt\right|$$</p>
+                        <p>Using the triangle inequality and uniform convergence of derivatives:</p>
+                        <p>$$\leq |f_n(c) - f_m(c)| + \sup_{t \in [a,b]} |f_n'(t) - f_m'(t)| \cdot |x - c|$$</p>
+                        <p>Both terms go to zero as $n, m \to \infty$, so $f_n$ is uniformly Cauchy and hence converges uniformly.</p>
+                        <p>To prove that $f$ is differentiable with $f' = g$, we take the limit in the fundamental theorem identity:</p>
+                        <p>$$f(x) = f(c) + \int_c^x g(t) \, dt$$</p>
+                        <p>Since $g$ is continuous (being the uniform limit of continuous functions), we can apply the fundamental theorem again to get $f'(x) = g(x)$.</p>
+                    </div>
+
+                    <div class="proposition content-box">
+                        <div class="timestamp" onclick="openVideoSide('20:32', 'Algebraic Properties of Uniform Convergence', 'proposition', this)">
+                            <span class="play-icon">▶</span>20:32
+                        </div>
+                        <h3>Algebraic Properties of Uniform Convergence</h3>
+                        <p>Suppose we have two sequences of functions $(f_n)$ and $(g_n)$ on some set $E$, and:</p>
+                        <ul>
+                            <li>$f_n \to f$ uniformly on $E$</li>
+                            <li>$g_n \to g$ uniformly on $E$</li>
+                        </ul>
+                        <p>Then:</p>
+                        <p><strong>(a)</strong> $f_n + g_n \to f + g$ uniformly on $E$</p>
+                        <p><strong>(b)</strong> If $h$ is a bounded function on $E$, then $h \cdot f_n \to h \cdot f$ uniformly on $E$</p>
+                        <p><em>Proof omitted - this is typically covered in example sheets.</em></p>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('22:39', 'Boundedness Requirement Example', 'example', this)">
+                            <span class="play-icon">▶</span>22:39
+                        </div>
+                        <h3>Why Boundedness is Required</h3>
+                        <p>Note that boundedness of $h$ is essential in part (b). A simple example to show this is false without boundedness:</p>
+                        <p>Take $f_n(x) = \frac{1}{n}$ (constant function) and $h(x) = x$ on $\mathbb{R}$. Then $f_n \to 0$ uniformly, but $h \cdot f_n = \frac{x}{n}$ does not converge uniformly to $0$ on $\mathbb{R}$ because $\sup_{x \in \mathbb{R}} \left|\frac{x}{n}\right| = \infty$ for every $n$.</p>
+                        <p>Even on a bounded interval like $[0,1]$, if we take $h(x) = \frac{1}{x}$ on $(0,1]$, then $h$ is unbounded and the product $h \cdot f_n = \frac{1}{nx}$ doesn't converge uniformly.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('26:46', 'Series of Functions Definition', 'definition', this)">
+                            <span class="play-icon">▶</span>26:46
+                        </div>
+                        <h3>Series of Functions</h3>
+                        <p>We now extend the notion of series from real numbers to functions. Given a sequence of functions $(g_n)$ defined on some set $E$, we define the partial sums:</p>
+                        <p>$$f_n(x) = \sum_{j=1}^n g_j(x)$$</p>
+                        <p>The series $\sum_{j=1}^\infty g_j(x)$ converges <strong>pointwise</strong> at a point $x \in E$ if the sequence of partial sums $(f_n(x))$ converges.</p>
+                        <p>The series converges <strong>uniformly</strong> on $E$ if the sequence of partial sums $(f_n)$ converges uniformly on $E$.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('31:17', 'Absolute Convergence for Series', 'definition', this)">
+                            <span class="play-icon">▶</span>31:17
+                        </div>
+                        <h3>Absolute Convergence for Series of Functions</h3>
+                        <p>We can also define absolute convergence for series of functions:</p>
+                        <ul>
+                            <li><strong>Pointwise absolute convergence:</strong> The series $\sum_{j=1}^\infty g_j(x)$ converges absolutely at a point $x$ if $\sum_{j=1}^\infty |g_j(x)|$ converges.</li>
+                            <li><strong>Absolute uniform convergence:</strong> The series converges absolutely and uniformly on $E$ if both $\sum_{j=1}^\infty g_j$ and $\sum_{j=1}^\infty |g_j|$ converge uniformly on $E$.</li>
+                        </ul>
+                    </div>
+
+                    <div class="proposition content-box">
+                        <div class="timestamp" onclick="openVideoSide('36:14', 'Absolute Implies Uniform', 'proposition', this)">
+                            <span class="play-icon">▶</span>36:14
+                        </div>
+                        <h3>Absolute Uniform Convergence Implies Uniform Convergence</h3>
+                        <p>If the series $\sum_{j=1}^\infty g_j$ converges absolutely and uniformly on $E$, then it converges uniformly on $E$.</p>
+                        <p><strong>Proof:</strong> We need to show that the partial sums are uniformly Cauchy. For $n > m$:</p>
+                        <p>$$\sup_{x \in E} \left|\sum_{j=m+1}^n g_j(x)\right| \leq \sup_{x \in E} \sum_{j=m+1}^n |g_j(x)|$$</p>
+                        <p>Since $\sum |g_j|$ converges uniformly, the right-hand side tends to zero as $n, m \to \infty$. Therefore, the partial sums are uniformly Cauchy and hence converge uniformly.</p>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('42:27', 'Counterexample for Converse', 'example', this)">
+                            <span class="play-icon">▶</span>42:27
+                        </div>
+                        <h3>Counterexample: Uniform + Pointwise Absolute ≠ Absolute Uniform</h3>
+                        <p>The converse is false. Consider the series $\sum_{n=1}^\infty \frac{(-1)^n}{n} x^n$ on the interval $(0,1)$.</p>
+                        <p>This series:</p>
+                        <ul>
+                            <li>Converges absolutely at each point $x$ (since $|x| < 1$, so $|x|^n/n$ is dominated by a convergent geometric series)</li>
+                            <li>Converges uniformly on $(0,1)$</li>
+                        </ul>
+                        <p>However, it does <strong>not</strong> converge absolutely uniformly. The series of absolute values is $\sum_{n=1}^\infty \frac{x^n}{n}$.</p>
+                        <p>To see why this doesn't converge uniformly, consider the difference between partial sums:</p>
+                        <p>$$\left|\sum_{j=m+1}^n \frac{x^j}{j}\right| \geq \sum_{j=m+1}^n \frac{x^n}{j}$$</p>
+                        <p>Taking the supremum over $x \in (0,1)$, we get $\sup_{x \in (0,1)} \left|\sum_{j=m+1}^n \frac{x^j}{j}\right| \geq \sum_{j=m+1}^n \frac{1}{j}$, which tends to infinity as $n \to \infty$ for any fixed $m$.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('49:24', 'Next Lecture Preview', 'default', this)">
+                            <span class="play-icon">▶</span>49:24
+                        </div>
+                        <h3>Next Lecture: Weierstrass M-Test and Power Series</h3>
+                        <p>Next time we'll discuss the Weierstrass M-test, which provides an easy way to check for absolute uniform convergence. This will allow us to revisit power series and show how the theory we've developed makes many results much more streamlined.</p>
+                        <p>We'll also prove new results about differentiability of power series, which becomes much easier once we understand how to differentiate uniform limits of sequences of functions.</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== RIGHT SIDE - VIDEO ===== -->
+        <div id="videoSide" class="video-side">
+            <div class="video-container">
+                <iframe 
+                    id="videoFrame"
+                    src="" 
+                    allowfullscreen 
+                    allow="autoplay">
+                </iframe>
+            </div>
+            
+            <!-- ===== CLOSE BUTTON ===== -->
+            <button class="close-button" onclick="closeVideoSide()">&times;</button>
+        </div>
+    </div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // ===== VIDEO CONFIGURATION =====
+        // Replace this URL with your actual Panopto video URL
+        const PANOPTO_BASE_URL = "https://cambridgelectures.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=7f017b82-cf4f-42c8-8c92-b33700b564f2&autoplay=false&offerviewer=true&showtitle=true&showbrand=false&captions=false&interactivity=all";
+        
+        // ===== OPEN VIDEO SIDE FUNCTION =====
+        // This function is called when a timestamp is clicked
+        // Parameters:
+        // - timestamp: The time in MM:SS format
+        // - title: The section title to display
+        // - contentType: The type of content ('default', 'definition', 'theorem', 'claim', 'corollary', 'proposition', 'example', 'proof', 'non-examinable')
+        // - timestampElement: The clicked timestamp element (used to find the parent content box)
+        function openVideoSide(timestamp, title, contentType, timestampElement) {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Convert timestamp to seconds for Panopto
+            const timeInSeconds = convertTimestampToSeconds(timestamp);
+            
+            // Set the video URL with the timestamp
+            const videoUrl = PANOPTO_BASE_URL + `&start=${timeInSeconds}`;
+            videoFrame.src = videoUrl;
+            
+            // Remove full-width class and show video
+            contentSide.classList.remove('full-width');
+            videoSide.style.display = 'block';
+        }
+        
+        // ===== CLOSE VIDEO SIDE FUNCTION =====
+        // This function closes the video side and stops video playback
+        function closeVideoSide() {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Hide the video side
+            videoSide.style.display = 'none';
+            
+            // Clear the video source to stop playback
+            videoFrame.src = '';
+            
+            // Add full-width class back
+            contentSide.classList.add('full-width');
+        }
+        
+        // ===== TIMESTAMP CONVERSION FUNCTION =====
+        // Converts MM:SS format to seconds for Panopto
+        function convertTimestampToSeconds(timestamp) {
+            const parts = timestamp.split(':');
+            const minutes = parseInt(parts[0]);
+            const seconds = parseInt(parts[1]);
+            return minutes * 60 + seconds;
+        }
+    </script>
+</body>
+</html>
