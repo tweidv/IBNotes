@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Methods Lecture 4 Notes</title>
+    
+    <!-- MathJax for mathematical equations - renders LaTeX math notation -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],  // Inline math: $x^2$ or \(x^2\)
+                displayMath: [['$$', '$$'], ['\\[', '\\]']], // Display math: $$x^2$$ or \[x^2\]
+                processEscapes: true,  // Process backslash escapes
+                processEnvironments: true  // Process LaTeX environments
+            },
+            options: {
+                skipHtmlTags: ['script', 'style', 'textarea', 'pre']  // Skip these HTML tags
+            }
+        };
+    </script>
+    
+    <style>
+        /* ===== GLOBAL STYLES ===== */
+        body {
+            font-family: 'Times New Roman', serif;  /* Professional academic font */
+            line-height: 1.6;  /* Comfortable line spacing */
+            margin: 0;  /* Remove default margins */
+            padding: 0;  /* Remove default padding */
+            background-color: #f9f9f9;  /* Light background */
+            color: #333;  /* Dark text for readability */
+            font-size: 18px;
+            overflow-x: hidden;  /* Prevent horizontal scroll */
+        }
+        
+        /* ===== MAIN LAYOUT CONTAINER ===== */
+        .main-container {
+            display: flex;  /* Flexbox for side-by-side layout */
+            min-height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== LEFT SIDE - CONTENT ===== */
+        .content-side {
+            flex: 1;  /* Take up remaining space */
+            padding: 20px;  /* Page margins */
+            max-width: 50%;  /* Half the width */
+            display: flex;  /* Flexbox for centering */
+            justify-content: center;  /* Center horizontally */
+            position: relative;  /* For absolute positioning of scrollable content */
+        }
+        
+        /* When video is not open, take full width and center the content */
+        .content-side.full-width {
+            max-width: 100%;  /* Full width when no video */
+            justify-content: center;  /* Center the content */
+        }
+        
+        /* Scrollable content container when video is open */
+        .scrollable-content {
+            width: 100%;
+            max-width: 1000px;
+            overflow-y: auto;
+            max-height: 95vh;  /* 95% viewport height */
+            padding-right: 10px;  /* Space for scrollbar */
+        }
+        
+        /* When video is not open, no height restriction and center the container */
+        .content-side.full-width .scrollable-content {
+            max-height: none;
+        }
+        
+        /* ===== RIGHT SIDE - VIDEO ===== */
+        .video-side {
+            flex: 1;  /* Take up remaining space */
+            max-width: 50%;  /* Half the width */
+            background-color: #000;  /* Black background for video */
+            position: relative;  /* For absolute positioning of close button */
+            display: none;  /* Hidden by default */
+            overflow: hidden;  /* Prevent video from scrolling */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            background-color: white;  /* White content area */
+            padding: 40px;  /* Internal spacing */
+            border-radius: 8px;  /* Rounded corners */
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);  /* Subtle shadow */
+            max-width: 1000px;  /* Optimal reading width */
+            margin: 0 auto;  /* Center the content */
+        }
+        
+        /* ===== HEADINGS ===== */
+        h1 {
+            text-align: center;  /* Center the main title */
+            font-size: 2.2em;  /* Large title */
+            margin-bottom: 40px;  /* Space below title */
+            color: #2c3e50;  /* Dark blue color */
+            padding-bottom: 15px;  /* Space below title */
+        }
+        
+        h2, h3, h4, h5, h6 {
+            color: #2c3e50;  /* Dark blue for all headings */
+            padding-bottom: 8px;  /* Space below headings */
+            margin-top: 30px;  /* Space above headings */
+            font-size: 1.2em;  /* Slightly larger than body text */
+        }
+        
+        /* ===== CONTENT BOXES ===== */
+        /* Base styling for all content boxes */
+        .content-box {
+            padding: 20px;  /* Internal spacing */
+            margin: 20px 0;  /* Vertical spacing between boxes */
+            border-radius: 5px;  /* Rounded corners */
+            position: relative;  /* For absolute positioning of timestamps */
+            border-left: 5px solid;  /* Colored left border */
+            font-size: 18px;  /* Consistent text size */
+        }
+        
+        /* ===== CONTENT BOX TYPES ===== */
+        /* Definition boxes - Green theme for definitions */
+        .definition {
+            background-color: #f0f8f0;  /* Light green background */
+            border-left-color: #28a745;  /* Green left border */
+        }
+        
+        /* Theorem boxes - Purple theme for theorems */
+        .theorem {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Claim boxes - Light purple theme for claims */
+        .claim {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Corollary boxes - Medium purple theme for corollaries */
+        .corollary {
+            background-color: #f0e6ff;  /* Slightly darker purple background */
+            border-left-color: #8e44ad;  /* Darker purple left border */
+        }
+        
+        /* Proposition boxes - Dark purple theme for propositions */
+        .proposition {
+            background-color: #e8d5f2;  /* Even darker purple background */
+            border-left-color: #9b59b6;  /* Dark purple left border */
+        }
+        
+        /* Example boxes - Orange theme for examples */
+        .example {
+            background-color: #fff8f0;  /* Light orange background */
+            border-left-color: #fd7e14;  /* Orange left border */
+        }
+        
+        /* Proof boxes - Pink theme for proofs */
+        .proof {
+            background-color: #fff0f5;  /* Light pink background */
+            border-left-color: #e83e8c;  /* Pink left border */
+        }
+        
+        /* Default boxes - No special styling */
+        .default {
+            background-color: transparent;  /* No background */
+            border: none;  /* No border */
+            padding-left: 0;  /* No left padding */
+        }
+        
+        /* Non-examinable boxes - Gray theme for optional content */
+        .non-examinable {
+            background-color: #f8f9fa;  /* Light gray background */
+            border-left-color: #6c757d;  /* Gray left border */
+            opacity: 0.7;  /* Slightly faded to indicate optional nature */
+        }
+        
+        /* ===== TIMESTAMP STYLING ===== */
+        .timestamp {
+            position: absolute;  /* Positioned relative to content box */
+            top: 10px;  /* 10px from top of content box */
+            right: 15px;  /* 15px from right edge */
+            font-size: 0.8em;  /* Smaller text */
+            color: #666;  /* Gray color */
+            background-color: rgba(255,255,255,0.8);  /* Semi-transparent white background */
+            padding: 2px 6px;  /* Small padding */
+            border-radius: 3px;  /* Rounded corners */
+            cursor: pointer;  /* Indicates clickable */
+            transition: all 0.2s ease;  /* Smooth transitions */
+            display: flex;  /* Flexbox for icon alignment */
+            align-items: center;  /* Vertical center alignment */
+            gap: 3px;  /* Space between icon and text */
+        }
+        
+        /* Hover effect for timestamps */
+        .timestamp:hover {
+            background-color: rgba(255,255,255,0.95);  /* More opaque on hover */
+            color: #333;  /* Darker text on hover */
+            transform: scale(1.05);  /* Slight scale up */
+        }
+        
+        /* Play icon styling */
+        .play-icon {
+            font-size: 0.7em;  /* Smaller than timestamp text */
+        }
+        
+        /* ===== CONTENT BOX HEADINGS ===== */
+        .content-box h3 {
+            margin-top: 0;  /* No top margin for h3 in content boxes */
+            color: inherit;  /* Inherit color from parent */
+            border-bottom: none;  /* No bottom border */
+            padding-bottom: 0;  /* No bottom padding */
+        }
+        
+        /* Add prefixes to content box headings */
+        .content-box h3:before {
+            font-weight: bold;  /* Bold prefix text */
+        }
+        
+        .definition h3:before {
+            content: "Definition: ";  /* "Definition: " prefix */
+        }
+        
+        .theorem h3:before {
+            content: "Theorem: ";  /* "Theorem: " prefix */
+        }
+        
+        .claim h3:before {
+            content: "Claim: ";  /* "Claim: " prefix */
+        }
+        
+        .corollary h3:before {
+            content: "Corollary: ";  /* "Corollary: " prefix */
+        }
+        
+        .proposition h3:before {
+            content: "Proposition: ";  /* "Proposition: " prefix */
+        }
+        
+        .example h3:before {
+            content: "Example: ";  /* "Example: " prefix */
+        }
+        
+        .proof h3:before {
+            content: "Proof: ";  /* "Proof: " prefix */
+        }
+        
+        .default h3:before {
+            content: "";  /* No prefix for default boxes */
+        }
+        
+        /* ===== LISTS ===== */
+        ul, ol {
+            padding-left: 25px;  /* Indent lists */
+        }
+        
+        li {
+            margin: 8px 0;  /* Space between list items */
+        }
+        
+        /* ===== LINKS ===== */
+        a {
+            color: #3498db;  /* Blue link color */
+            text-decoration: none;  /* No underline by default */
+        }
+        
+        a:hover {
+            text-decoration: underline;  /* Underline on hover */
+        }
+        
+        /* ===== MATH EQUATIONS ===== */
+        .MathJax {
+            font-size: 1.1em !important;  /* Slightly larger math text */
+        }
+        
+        /* ===== VIDEO SIDE STYLES ===== */
+        .video-container {
+            position: relative;  /* For absolute positioning of iframe */
+            width: 100%;  /* Full width */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* Video iframe */
+        .video-container iframe {
+            position: absolute;  /* Absolute positioning within container */
+            top: 0;
+            left: 0;
+            width: 100%;  /* Full width */
+            height: 100%;  /* Full height */
+            border: none;  /* No border */
+        }
+        
+        /* ===== CLOSE BUTTON ===== */
+        .close-button {
+            position: absolute;  /* Absolute positioning */
+            top: 20px;  /* 20px from top */
+            right: 20px;  /* 20px from right */
+            background-color: rgba(0,0,0,0.7);  /* Semi-transparent black background */
+            color: white;  /* White text */
+            border: none;  /* No border */
+            font-size: 24px;  /* Large close button */
+            font-weight: bold;  /* Bold text */
+            cursor: pointer;  /* Indicates clickable */
+            line-height: 1;  /* Tight line height */
+            padding: 10px 15px;  /* Padding for button */
+            border-radius: 50%;  /* Circular button */
+            z-index: 10;  /* Above video */
+            transition: all 0.2s ease;  /* Smooth transitions */
+        }
+        
+        /* Close button hover effect */
+        .close-button:hover {
+            background-color: rgba(0,0,0,0.9);  /* More opaque on hover */
+            transform: scale(1.1);  /* Slight scale up */
+        }
+        
+        /* ===== RESPONSIVE DESIGN ===== */
+        /* Mobile and tablet styles */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;  /* Stack vertically on mobile */
+            }
+            
+            .content-side {
+                max-width: 100%;  /* Full width on mobile */
+                padding: 10px;  /* Smaller margins on mobile */
+            }
+            
+            .video-side {
+                max-width: 100%;  /* Full width on mobile */
+                height: 50vh;  /* Half viewport height on mobile */
+            }
+            
+            .video-container {
+                height: 100%;  /* Full height of video side */
+            }
+            
+            .container {
+                padding: 20px;  /* Smaller internal padding */
+            }
+            
+            h1 {
+                font-size: 1.8em;  /* Smaller title on mobile */
+            }
+            
+            /* Timestamps become static on mobile */
+            .timestamp {
+                position: static;  /* Normal flow instead of absolute */
+                display: block;  /* Block display */
+                margin-bottom: 10px;  /* Space below timestamp */
+            }
+            
+            /* On mobile, when video is open, content should still be scrollable */
+            .content-side {
+                overflow-y: auto;  /* Ensure content is scrollable on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- ===== LEFT SIDE - CONTENT ===== -->
+        <div class="content-side full-width">
+            <div class="scrollable-content">
+                <div class="container">
+                    <!-- ===== LECTURE TITLE ===== -->
+                    <h1>Methods Lecture 4</h1>
+                    <p style="text-align: center; color: #666; font-style: italic;">Sturm-Liouville Theory and Abstract Eigenvalue Problems</p>
+                    
+                    <!-- ===== CONTENT BOXES ===== -->
+                    
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('00:15', 'Course Announcements', 'default', this)">
+                            <span class="play-icon">▶</span>00:15
+                        </div>
+                        <h3>Course Announcements</h3>
+                        <p>Lecture notes for lectures 1, 2, and 3 are available on Moodle, along with a crib sheet containing the most important facts for the series. The new sections on Sturm-Liouville theory and abstract eigenvalue problems should be included in the crib sheet.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('01:01', 'Review of Finite Dimensional Linear Algebra', 'default', this)">
+                            <span class="play-icon">▶</span>01:01
+                        </div>
+                        <h3>Review of Finite Dimensional Linear Algebra</h3>
+                        <p>Recall from 1A Vectors and Matrices: A linear map $A$ from an $n$-dimensional vector space to itself is called <strong>Hermitian</strong> if $A^\dagger = A$, or equivalently, if $\mathbf{x} \cdot A\mathbf{y} = A\mathbf{x} \cdot \mathbf{y}$ for all $\mathbf{x}, \mathbf{y} \in V_n$.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('02:16', 'Properties of Hermitian Operators', 'default', this)">
+                            <span class="play-icon">▶</span>02:16
+                        </div>
+                        <h3>Properties of Hermitian Operators</h3>
+                        <p>Hermitian operators have several nice properties:</p>
+                        <ol>
+                            <li><strong>Eigenvalues are real</strong></li>
+                            <li><strong>Eigenvectors with distinct eigenvalues are orthogonal</strong></li>
+                            <li><strong>Spectral theorem:</strong> You can pick an orthogonal set of eigenvectors $\{v_i\}$ such that for each $\mathbf{x} \in V_n$, we can write $\mathbf{x} = \sum_{i=1}^N \hat{x}_i v_i$ where $\hat{x}_i = \frac{\mathbf{x} \cdot v_i}{\|v_i\|^2}$</li>
+                        </ol>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('04:49', 'Complex Inner Product Space', 'default', this)">
+                            <span class="play-icon">▶</span>04:49
+                        </div>
+                        <h3>Complex Inner Product Space</h3>
+                        <p>We assume a complex inner product space where the inner product is defined as $\mathbf{x} \cdot \mathbf{y} = \sum_{i=1}^n x_i \overline{y_i}$ (complex conjugated). All discussions of orthogonality refer to this complex inner product.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('05:11', 'Infinite Dimensional Extension', 'default', this)">
+                            <span class="play-icon">▶</span>05:11
+                        </div>
+                        <h3>Infinite Dimensional Extension</h3>
+                        <p>Today's question: <strong>What if $n$ is infinite?</strong> How much of this finite-dimensional theory carries over to infinite-dimensional vector spaces? The infinite is not just "finite but very big" - it's fundamentally different, and unfortunately, some properties from finite-dimensional linear algebra don't carry over.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('05:45', 'Function Space Definition', 'definition', this)">
+                            <span class="play-icon">▶</span>05:45
+                        </div>
+                        <h3>Function Space</h3>
+                        <p>We introduce a vector space of "nice" functions $f$ from some closed interval $[a,b]$ to $\mathbb{C}$. The term "nice" will be elaborated on later, but for now, it means functions with sufficient regularity properties.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('06:30', 'Weighted Inner Product', 'definition', this)">
+                            <span class="play-icon">▶</span>06:30
+                        </div>
+                        <h3>Weighted Inner Product</h3>
+                        <p>We introduce an inner product on our function space, denoted with subscript $w$:</p>
+                        <p>$$\langle f, g \rangle_w = \int_a^b f(x) \overline{g(x)} w(x) \, dx$$</p>
+                        <p>where $w$ is real-valued and positive on the open interval $(a,b)$. We call $w$ the <strong>weight function</strong> associated with the inner product.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('08:02', 'Associated Norm', 'definition', this)">
+                            <span class="play-icon">▶</span>08:02
+                        </div>
+                        <h3>Associated Norm</h3>
+                        <p>With the inner product comes an associated norm:</p>
+                        <p>$$\|f\|_w = \sqrt{\langle f, f \rangle_w}$$</p>
+                        <p>When the weight function is identically 1, we simply write $\langle f, g \rangle$ and $\|f\|$ without the subscript.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('09:04', 'Self-Adjoint Differential Operator', 'definition', this)">
+                            <span class="play-icon">▶</span>09:04
+                        </div>
+                        <h3>Self-Adjoint Differential Operator</h3>
+                        <p>A linear differential operator $L$ is said to be <strong>self-adjoint</strong> on $V$ with its inner product if:</p>
+                        <p>$$\langle L y_1, y_2 \rangle_w = \langle y_1, L y_2 \rangle_w$$</p>
+                        <p>for all $y_1, y_2 \in V$.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('10:33', 'Eigenfunction-Eigenvalue Pair', 'definition', this)">
+                            <span class="play-icon">▶</span>10:33
+                        </div>
+                        <h3>Eigenfunction-Eigenvalue Pair</h3>
+                        <p>We say that $(y, \lambda)$ where $y \in V$ (non-zero) and $\lambda \in \mathbb{C}$ is an <strong>eigenfunction-eigenvalue pair</strong> for $L$ if:</p>
+                        <p>$$L y = \lambda y$$</p>
+                    </div>
+
+                    <div class="proposition content-box">
+                        <div class="timestamp" onclick="openVideoSide('12:00', 'Properties of Self-Adjoint Operators', 'proposition', this)">
+                            <span class="play-icon">▶</span>12:00
+                        </div>
+                        <h3>Properties of Self-Adjoint Operators</h3>
+                        <p>If $L$ is self-adjoint on $V$ with the inner product, then:</p>
+                        <ol>
+                            <li><strong>Eigenvalues are all real</strong></li>
+                            <li><strong>Eigenfunctions with distinct eigenvalues are orthogonal</strong> (with respect to the inner product)</li>
+                            <li><strong>There exists a complete orthogonal set of eigenfunctions</strong> $\{y_n\}_{n=1}^{\infty}$ such that for each $f \in V$, we can write $f = \sum_{n=1}^{\infty} \hat{f}_n y_n$ where $\hat{f}_n = \frac{\langle f, y_n \rangle_w}{\|y_n\|^2}$</li>
+                        </ol>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('14:58', 'Infinite Sum Convergence', 'default', this)">
+                            <span class="play-icon">▶</span>14:58
+                        </div>
+                        <h3>Infinite Sum Convergence</h3>
+                        <p>The infinite sum in the spectral theorem implicitly means the limit of partial sums. The convergence here should be understood as convergence in norm (though for practical purposes in this course, it will likely work out pointwise as well).</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('15:38', 'Proof of Real Eigenvalues', 'proof', this)">
+                            <span class="play-icon">▶</span>15:38
+                        </div>
+                        <h3>Proof of Real Eigenvalues</h3>
+                        <p><strong>Proof of (1):</strong> If $L y = \lambda y$ with $y \neq 0$, then:</p>
+                        <p>$$(\lambda - \overline{\lambda}) \langle y, y \rangle_w = \langle L y, y \rangle_w - \langle y, L y \rangle_w = 0$$</p>
+                        <p>Since $L$ is self-adjoint, the right-hand side is zero. Since $\langle y, y \rangle_w \neq 0$, we have $\lambda = \overline{\lambda}$, so $\lambda$ is real.</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('17:00', 'Proof of Orthogonality', 'proof', this)">
+                            <span class="play-icon">▶</span>17:00
+                        </div>
+                        <h3>Proof of Orthogonality</h3>
+                        <p><strong>Proof of (2):</strong> If $L y_1 = \lambda_1 y_1$ and $L y_2 = \lambda_2 y_2$ with $\lambda_1 \neq \lambda_2$, then:</p>
+                        <p>$$(\lambda_1 - \lambda_2) \langle y_1, y_2 \rangle_w = \langle L y_1, y_2 \rangle_w - \langle y_1, L y_2 \rangle_w = 0$$</p>
+                        <p>Since $L$ is self-adjoint and $\lambda_1 \neq \lambda_2$, we have $\langle y_1, y_2 \rangle_w = 0$, so the eigenfunctions are orthogonal.</p>
+                    </div>
+
+                    <div class="non-examinable content-box">
+                        <div class="timestamp" onclick="openVideoSide('18:49', 'Proof by Authority', 'non-examinable', this)">
+                            <span class="play-icon">▶</span>18:49
+                        </div>
+                        <h3>Proof by Authority</h3>
+                        <p><strong>Proof of (3):</strong> This is a proof by authority - David Hilbert said it was true, which implies it was true. This is not admissible in Tripos exams, but it's completely acceptable in Methods. The rigorous proof requires the spectral theorem for compact self-adjoint operators on Hilbert space (covered in Part II Linear Analysis).</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('20:15', 'Sturm-Liouville Operators', 'default', this)">
+                            <span class="play-icon">▶</span>20:15
+                        </div>
+                        <h3>Sturm-Liouville Operators and Boundary Values</h3>
+                        <p>We will study eigenvalue problems of the form $L y = \lambda y$ where $L$ is a differential operator, solved inside some interval $x \in [a,b]$ with boundary conditions at $x = a$ and $x = b$. Here $L$ will be self-adjoint and of a particular type: a <strong>Sturm-Liouville operator</strong>.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('22:27', 'Sturm-Liouville Operator', 'definition', this)">
+                            <span class="play-icon">▶</span>22:27
+                        </div>
+                        <h3>Sturm-Liouville Operator</h3>
+                        <p>A differential operator $L$ is a <strong>Sturm-Liouville operator</strong> on $[a,b]$ if it has the form:</p>
+                        <p>$$L = \frac{1}{w(x)} \left[ -\frac{d}{dx}\left(p(x)\frac{d}{dx}\right) + q(x) \right]$$</p>
+                        <p>where $p$, $q$, and $w$ are real-valued, and $p$ and $w$ are both positive on the open interval $(a,b)$. The function $w$ is called the <strong>weight function</strong>.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('25:26', 'Eigenvalue Problem Form', 'default', this)">
+                            <span class="play-icon">▶</span>25:26
+                        </div>
+                        <h3>Eigenvalue Problem Form</h3>
+                        <p>If we multiply $L y = \lambda y$ by $w(x)$, we get:</p>
+                        <p>$$-\frac{d}{dx}\left(p(x)\frac{dy}{dx}\right) + q(x) y = \lambda w(x) y$$</p>
+                        <p>This looks like a differential equation, but we don't know what $\lambda$ is - we're trying to find both the eigenfunctions $y$ and eigenvalues $\lambda$ that satisfy this equation.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('28:35', 'Singular Endpoint', 'definition', this)">
+                            <span class="play-icon">▶</span>28:35
+                        </div>
+                        <h3>Singular Endpoint</h3>
+                        <p>For a Sturm-Liouville operator on $[a,b]$, an endpoint $c$ (either $a$ or $b$) is <strong>singular</strong> if $p(c) = 0$, and <strong>non-singular</strong> otherwise.</p>
+                        <p>We will only impose boundary conditions at non-singular endpoints.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('29:56', 'Real Homogeneous Boundary Conditions', 'definition', this)">
+                            <span class="play-icon">▶</span>29:56
+                        </div>
+                        <h3>Real Homogeneous Boundary Conditions</h3>
+                        <p>At each non-singular endpoint $c$, we impose boundary conditions of the form:</p>
+                        <p>$$\alpha_c y(c) + \beta_c y'(c) = 0$$</p>
+                        <p>where $\alpha_c$ and $\beta_c$ are real numbers (not both zero).</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('32:26', 'Function Space V', 'definition', this)">
+                            <span class="play-icon">▶</span>32:26
+                        </div>
+                        <h3>Function Space V</h3>
+                        <p>We work on the vector space $V$ consisting of functions $y$ that are:</p>
+                        <ul>
+                            <li>Twice continuously differentiable on the closed interval $[a,b]$</li>
+                            <li>Bounded on the closed interval with bounded derivatives</li>
+                            <li>Such that $y$ satisfies real homogeneous boundary conditions at each non-singular endpoint</li>
+                        </ul>
+                        <p>We equip $V$ with the inner product $\langle f, g \rangle_w = \int_a^b f(x) \overline{g(x)} w(x) \, dx$.</p>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('34:55', 'Example 1: Cosine Weight Function', 'example', this)">
+                            <span class="play-icon">▶</span>34:55
+                        </div>
+                        <h3>Example 1: Cosine Weight Function</h3>
+                        <p>Consider the problem:</p>
+                        <p>$$-\frac{d}{dx}\left(\cos\left(\frac{x}{2}\right)\frac{dy}{dx}\right) + \sin\left(\frac{x}{2}\right) y = \lambda x y$$</p>
+                        <p>on the interval $[0, \pi]$ with boundary condition $y(0) = 0$.</p>
+                        <p>Here: $p(x) = \cos(x/2)$, $q(x) = \sin(x/2)$, $w(x) = x$.</p>
+                        <p>At $x = \pi$: $p(\pi) = \cos(\pi/2) = 0$, so $x = \pi$ is a singular endpoint. We only need boundary conditions at the non-singular endpoint $x = 0$.</p>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('37:48', 'Example 2: Legendre Polynomials', 'example', this)">
+                            <span class="play-icon">▶</span>37:48
+                        </div>
+                        <h3>Example 2: Legendre Polynomials</h3>
+                        <p>Consider the problem:</p>
+                        <p>$$-\frac{d}{dx}\left((1-x^2)\frac{dy}{dx}\right) = \lambda y$$</p>
+                        <p>on the interval $[-1, 1]$.</p>
+                        <p>Here: $p(x) = 1-x^2$, $q(x) = 0$, $w(x) = 1$.</p>
+                        <p>At $x = \pm 1$: $p(\pm 1) = 0$, so both endpoints are singular. No boundary conditions are needed!</p>
+                        <p>The associated inner product is $\langle f, g \rangle = \int_{-1}^1 f(x) \overline{g(x)} \, dx$.</p>
+                    </div>
+
+                    <div class="proposition content-box">
+                        <div class="timestamp" onclick="openVideoSide('39:34', 'Self-Adjointness of Sturm-Liouville Operators', 'proposition', this)">
+                            <span class="play-icon">▶</span>39:34
+                        </div>
+                        <h3>Self-Adjointness of Sturm-Liouville Operators</h3>
+                        <p>If $L$ is a Sturm-Liouville operator on $[a,b]$ with weight function $w$, and $y_1, y_2$ are twice continuously differentiable functions on the interval, then:</p>
+                        <p>$$\langle L y_1, y_2 \rangle_w - \langle y_1, L y_2 \rangle_w = [p(x) W(y_1, y_2)]_{x=a}^{x=b}$$</p>
+                        <p>where $W(y_1, y_2) = y_1 y_2' - y_2 y_1'$ is the Wronskian.</p>
+                        <p>In particular, if $y_1, y_2 \in V$ (the function space with appropriate boundary conditions), then $L$ is self-adjoint on $V$ with the inner product specified by the weight function.</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('42:13', 'Proof of Self-Adjointness', 'proof', this)">
+                            <span class="play-icon">▶</span>42:13
+                        </div>
+                        <h3>Proof of Self-Adjointness</h3>
+                        <p>The proof involves expanding the left-hand side using the definition of $L$ and integrating by parts. After cancellation of terms involving $q(x)$, we obtain:</p>
+                        <p>$$\int_a^b \left[ y_1 \frac{d}{dx}(p y_2') - y_2 \frac{d}{dx}(p y_1') \right] dx = [p(x) W(y_1, y_2)]_{x=a}^{x=b}$$</p>
+                        <p>This follows from the fundamental theorem of calculus and the fact that $\frac{d}{dx}[p(x) W(y_1, y_2)] = y_1 \frac{d}{dx}(p y_2') - y_2 \frac{d}{dx}(p y_1')$.</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('46:21', 'Boundary Term Analysis', 'proof', this)">
+                            <span class="play-icon">▶</span>46:21
+                        </div>
+                        <h3>Boundary Term Analysis</h3>
+                        <p>For the boundary terms to vanish (making $L$ self-adjoint):</p>
+                        <ul>
+                            <li><strong>At singular endpoints:</strong> Since $p(c) = 0$, the boundary term automatically vanishes.</li>
+                            <li><strong>At non-singular endpoints:</strong> Since both $y_1$ and $y_2$ satisfy the same real homogeneous boundary condition $\alpha_c y(c) + \beta_c y'(c) = 0$, and $\alpha_c, \beta_c$ are real, we can show that the Wronskian $W(y_1, y_2)$ evaluated at $c$ is zero.</li>
+                        </ul>
+                        <p>This is because the boundary conditions form a linear system with a non-zero determinant, forcing the Wronskian to be zero.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('51:43', 'Historical Context', 'default', this)">
+                            <span class="play-icon">▶</span>51:43
+                        </div>
+                        <h3>Historical Context</h3>
+                        <p>The history of Sturm-Liouville operators is fascinating - this is where analysis really started to get going. Before Cauchy and Weierstrass, it was "a jungle out there" with no rigorous foundations. The development of this theory shows how functional analysis was effectively born from these concrete problems.</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== RIGHT SIDE - VIDEO ===== -->
+        <div id="videoSide" class="video-side">
+            <div class="video-container">
+                <iframe 
+                    id="videoFrame"
+                    src="" 
+                    allowfullscreen 
+                    allow="autoplay">
+                </iframe>
+            </div>
+            
+            <!-- ===== CLOSE BUTTON ===== -->
+            <button class="close-button" onclick="closeVideoSide()">&times;</button>
+        </div>
+    </div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // ===== VIDEO CONFIGURATION =====
+        // Replace this URL with your actual Panopto video URL
+        const PANOPTO_BASE_URL = "https://cambridgelectures.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=80b0cd1c-47e3-4786-a80a-b33700b42b91";
+        
+        // ===== OPEN VIDEO SIDE FUNCTION =====
+        // This function is called when a timestamp is clicked
+        // Parameters:
+        // - timestamp: The time in MM:SS format
+        // - title: The section title to display
+        // - contentType: The type of content ('default', 'definition', 'theorem', 'claim', 'corollary', 'proposition', 'example', 'proof', 'non-examinable')
+        // - timestampElement: The clicked timestamp element (used to find the parent content box)
+        function openVideoSide(timestamp, title, contentType, timestampElement) {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Convert timestamp to seconds for Panopto
+            const timeInSeconds = convertTimestampToSeconds(timestamp);
+            
+            // Set the video URL with the timestamp
+            const videoUrl = PANOPTO_BASE_URL + `&start=${timeInSeconds}`;
+            videoFrame.src = videoUrl;
+            
+            // Remove full-width class and show video
+            contentSide.classList.remove('full-width');
+            videoSide.style.display = 'block';
+        }
+        
+        // ===== CLOSE VIDEO SIDE FUNCTION =====
+        // This function closes the video side and stops video playback
+        function closeVideoSide() {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Hide the video side
+            videoSide.style.display = 'none';
+            
+            // Clear the video source to stop playback
+            videoFrame.src = '';
+            
+            // Add full-width class back
+            contentSide.classList.add('full-width');
+        }
+        
+        // ===== TIMESTAMP CONVERSION FUNCTION =====
+        // Converts MM:SS format to seconds for Panopto
+        function convertTimestampToSeconds(timestamp) {
+            const parts = timestamp.split(':');
+            const minutes = parseInt(parts[0]);
+            const seconds = parseInt(parts[1]);
+            return minutes * 60 + seconds;
+        }
+    </script>
+</body>
+</html>

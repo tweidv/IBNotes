@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analysis II Lecture 5 Notes</title>
+    
+    <!-- MathJax for mathematical equations - renders LaTeX math notation -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],  // Inline math: $x^2$ or \(x^2\)
+                displayMath: [['$$', '$$'], ['\\[', '\\]']], // Display math: $$x^2$$ or \[x^2\]
+                processEscapes: true,  // Process backslash escapes
+                processEnvironments: true  // Process LaTeX environments
+            },
+            options: {
+                skipHtmlTags: ['script', 'style', 'textarea', 'pre']  // Skip these HTML tags
+            }
+        };
+    </script>
+    
+    <style>
+        /* ===== GLOBAL STYLES ===== */
+        body {
+            font-family: 'Times New Roman', serif;  /* Professional academic font */
+            line-height: 1.6;  /* Comfortable line spacing */
+            margin: 0;  /* Remove default margins */
+            padding: 0;  /* Remove default padding */
+            background-color: #f9f9f9;  /* Light background */
+            color: #333;  /* Dark text for readability */
+            font-size: 18px;
+            overflow-x: hidden;  /* Prevent horizontal scroll */
+        }
+        
+        /* ===== MAIN LAYOUT CONTAINER ===== */
+        .main-container {
+            display: flex;  /* Flexbox for side-by-side layout */
+            min-height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== LEFT SIDE - CONTENT ===== */
+        .content-side {
+            flex: 1;  /* Take up remaining space */
+            padding: 20px;  /* Page margins */
+            max-width: 50%;  /* Half the width */
+            display: flex;  /* Flexbox for centering */
+            justify-content: center;  /* Center horizontally */
+            position: relative;  /* For absolute positioning of scrollable content */
+        }
+        
+        /* When video is not open, take full width and center the content */
+        .content-side.full-width {
+            max-width: 100%;  /* Full width when no video */
+            justify-content: center;  /* Center the content */
+        }
+        
+        /* Scrollable content container when video is open */
+        .scrollable-content {
+            width: 100%;
+            max-width: 1000px;
+            overflow-y: auto;
+            max-height: 95vh;  /* 95% viewport height */
+            padding-right: 10px;  /* Space for scrollbar */
+        }
+        
+        /* When video is not open, no height restriction and center the container */
+        .content-side.full-width .scrollable-content {
+            max-height: none;
+        }
+        
+        /* ===== RIGHT SIDE - VIDEO ===== */
+        .video-side {
+            flex: 1;  /* Take up remaining space */
+            max-width: 50%;  /* Half the width */
+            background-color: #000;  /* Black background for video */
+            position: relative;  /* For absolute positioning of close button */
+            display: none;  /* Hidden by default */
+            overflow: hidden;  /* Prevent video from scrolling */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            background-color: white;  /* White content area */
+            padding: 40px;  /* Internal spacing */
+            border-radius: 8px;  /* Rounded corners */
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);  /* Subtle shadow */
+            max-width: 1000px;  /* Optimal reading width */
+            margin: 0 auto;  /* Center the content */
+        }
+        
+        /* ===== HEADINGS ===== */
+        h1 {
+            text-align: center;  /* Center the main title */
+            font-size: 2.2em;  /* Large title */
+            margin-bottom: 40px;  /* Space below title */
+            color: #2c3e50;  /* Dark blue color */
+            padding-bottom: 15px;  /* Space below title */
+        }
+        
+        h2, h3, h4, h5, h6 {
+            color: #2c3e50;  /* Dark blue for all headings */
+            padding-bottom: 8px;  /* Space below headings */
+            margin-top: 30px;  /* Space above headings */
+            font-size: 1.2em;  /* Slightly larger than body text */
+        }
+        
+        /* ===== CONTENT BOXES ===== */
+        /* Base styling for all content boxes */
+        .content-box {
+            padding: 20px;  /* Internal spacing */
+            margin: 20px 0;  /* Vertical spacing between boxes */
+            border-radius: 5px;  /* Rounded corners */
+            position: relative;  /* For absolute positioning of timestamps */
+            border-left: 5px solid;  /* Colored left border */
+            font-size: 18px;  /* Consistent text size */
+        }
+        
+        /* ===== CONTENT BOX TYPES ===== */
+        /* Definition boxes - Green theme for definitions */
+        .definition {
+            background-color: #f0f8f0;  /* Light green background */
+            border-left-color: #28a745;  /* Green left border */
+        }
+        
+        /* Theorem boxes - Purple theme for theorems */
+        .theorem {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Claim boxes - Light purple theme for claims */
+        .claim {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Corollary boxes - Medium purple theme for corollaries */
+        .corollary {
+            background-color: #f0e6ff;  /* Slightly darker purple background */
+            border-left-color: #8e44ad;  /* Darker purple left border */
+        }
+        
+        /* Proposition boxes - Dark purple theme for propositions */
+        .proposition {
+            background-color: #e8d5f2;  /* Even darker purple background */
+            border-left-color: #9b59b6;  /* Dark purple left border */
+        }
+        
+        /* Example boxes - Orange theme for examples */
+        .example {
+            background-color: #fff8f0;  /* Light orange background */
+            border-left-color: #fd7e14;  /* Orange left border */
+        }
+        
+        /* Proof boxes - Pink theme for proofs */
+        .proof {
+            background-color: #fff0f5;  /* Light pink background */
+            border-left-color: #e83e8c;  /* Pink left border */
+        }
+        
+        /* Default boxes - No special styling */
+        .default {
+            background-color: transparent;  /* No background */
+            border: none;  /* No border */
+            padding-left: 0;  /* No left padding */
+        }
+        
+        /* Non-examinable boxes - Gray theme for optional content */
+        .non-examinable {
+            background-color: #f8f9fa;  /* Light gray background */
+            border-left-color: #6c757d;  /* Gray left border */
+            opacity: 0.7;  /* Slightly faded to indicate optional nature */
+        }
+        
+        /* ===== TIMESTAMP STYLING ===== */
+        .timestamp {
+            position: absolute;  /* Positioned relative to content box */
+            top: 10px;  /* 10px from top of content box */
+            right: 15px;  /* 15px from right edge */
+            font-size: 0.8em;  /* Smaller text */
+            color: #666;  /* Gray color */
+            background-color: rgba(255,255,255,0.8);  /* Semi-transparent white background */
+            padding: 2px 6px;  /* Small padding */
+            border-radius: 3px;  /* Rounded corners */
+            cursor: pointer;  /* Indicates clickable */
+            transition: all 0.2s ease;  /* Smooth transitions */
+            display: flex;  /* Flexbox for icon alignment */
+            align-items: center;  /* Vertical center alignment */
+            gap: 3px;  /* Space between icon and text */
+        }
+        
+        /* Hover effect for timestamps */
+        .timestamp:hover {
+            background-color: rgba(255,255,255,0.95);  /* More opaque on hover */
+            color: #333;  /* Darker text on hover */
+            transform: scale(1.05);  /* Slight scale up */
+        }
+        
+        /* Play icon styling */
+        .play-icon {
+            font-size: 0.7em;  /* Smaller than timestamp text */
+        }
+        
+        /* ===== CONTENT BOX HEADINGS ===== */
+        .content-box h3 {
+            margin-top: 0;  /* No top margin for h3 in content boxes */
+            color: inherit;  /* Inherit color from parent */
+            border-bottom: none;  /* No bottom border */
+            padding-bottom: 0;  /* No bottom padding */
+        }
+        
+        /* Add prefixes to content box headings */
+        .content-box h3:before {
+            font-weight: bold;  /* Bold prefix text */
+        }
+        
+        .definition h3:before {
+            content: "Definition: ";  /* "Definition: " prefix */
+        }
+        
+        .theorem h3:before {
+            content: "Theorem: ";  /* "Theorem: " prefix */
+        }
+        
+        .claim h3:before {
+            content: "Claim: ";  /* "Claim: " prefix */
+        }
+        
+        .corollary h3:before {
+            content: "Corollary: ";  /* "Corollary: " prefix */
+        }
+        
+        .proposition h3:before {
+            content: "Proposition: ";  /* "Proposition: " prefix */
+        }
+        
+        .example h3:before {
+            content: "Example: ";  /* "Example: " prefix */
+        }
+        
+        .proof h3:before {
+            content: "Proof: ";  /* "Proof: " prefix */
+        }
+        
+        .default h3:before {
+            content: "";  /* No prefix for default boxes */
+        }
+        
+        /* ===== LISTS ===== */
+        ul, ol {
+            padding-left: 25px;  /* Indent lists */
+        }
+        
+        li {
+            margin: 8px 0;  /* Space between list items */
+        }
+        
+        /* ===== LINKS ===== */
+        a {
+            color: #3498db;  /* Blue link color */
+            text-decoration: none;  /* No underline by default */
+        }
+        
+        a:hover {
+            text-decoration: underline;  /* Underline on hover */
+        }
+        
+        /* ===== MATH EQUATIONS ===== */
+        .MathJax {
+            font-size: 1.1em !important;  /* Slightly larger math text */
+        }
+        
+        /* ===== VIDEO SIDE STYLES ===== */
+        .video-container {
+            position: relative;  /* For absolute positioning of iframe */
+            width: 100%;  /* Full width */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* Video iframe */
+        .video-container iframe {
+            position: absolute;  /* Absolute positioning within container */
+            top: 0;
+            left: 0;
+            width: 100%;  /* Full width */
+            height: 100%;  /* Full height */
+            border: none;  /* No border */
+        }
+        
+        /* ===== CLOSE BUTTON ===== */
+        .close-button {
+            position: absolute;  /* Absolute positioning */
+            top: 20px;  /* 20px from top */
+            right: 20px;  /* 20px from right */
+            background-color: rgba(0,0,0,0.7);  /* Semi-transparent black background */
+            color: white;  /* White text */
+            border: none;  /* No border */
+            font-size: 24px;  /* Large close button */
+            font-weight: bold;  /* Bold text */
+            cursor: pointer;  /* Indicates clickable */
+            line-height: 1;  /* Tight line height */
+            padding: 10px 15px;  /* Padding for button */
+            border-radius: 50%;  /* Circular button */
+            z-index: 10;  /* Above video */
+            transition: all 0.2s ease;  /* Smooth transitions */
+        }
+        
+        /* Close button hover effect */
+        .close-button:hover {
+            background-color: rgba(0,0,0,0.9);  /* More opaque on hover */
+            transform: scale(1.1);  /* Slight scale up */
+        }
+        
+        /* ===== RESPONSIVE DESIGN ===== */
+        /* Mobile and tablet styles */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;  /* Stack vertically on mobile */
+            }
+            
+            .content-side {
+                max-width: 100%;  /* Full width on mobile */
+                padding: 10px;  /* Smaller margins on mobile */
+            }
+            
+            .video-side {
+                max-width: 100%;  /* Full width on mobile */
+                height: 50vh;  /* Half viewport height on mobile */
+            }
+            
+            .video-container {
+                height: 100%;  /* Full height of video side */
+            }
+            
+            .container {
+                padding: 20px;  /* Smaller internal padding */
+            }
+            
+            h1 {
+                font-size: 1.8em;  /* Smaller title on mobile */
+            }
+            
+            /* Timestamps become static on mobile */
+            .timestamp {
+                position: static;  /* Normal flow instead of absolute */
+                display: block;  /* Block display */
+                margin-bottom: 10px;  /* Space below timestamp */
+            }
+            
+            /* On mobile, when video is open, content should still be scrollable */
+            .content-side {
+                overflow-y: auto;  /* Ensure content is scrollable on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- ===== LEFT SIDE - CONTENT ===== -->
+        <div class="content-side full-width">
+            <div class="scrollable-content">
+                <div class="container">
+                    <!-- ===== LECTURE TITLE ===== -->
+                    <h1>Analysis II Lecture 5</h1>
+                    <p style="text-align: center; color: #666; font-style: italic;">Power Series and Convergence</p>
+                    
+                    <!-- ===== CONTENT BOXES ===== -->
+                    
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('00:31', 'Review of Convergence Types', 'default', this)">
+                            <span class="play-icon">▶</span>00:31
+                        </div>
+                        <h3>Review of Convergence Types</h3>
+                        <p>From the previous lecture, we defined several notions of convergence for series of functions:</p>
+                        <ul>
+                            <li><strong>Convergence at a point:</strong> The series converges at a specific point</li>
+                            <li><strong>Uniform convergence:</strong> The series converges uniformly on some domain</li>
+                            <li><strong>Absolute convergence at a point:</strong> The series of absolute values converges at a point</li>
+                            <li><strong>Absolute uniform convergence:</strong> The strongest notion - both absolute and uniform convergence</li>
+                        </ul>
+                    </div>
+
+                    <div class="theorem content-box">
+                        <div class="timestamp" onclick="openVideoSide('02:28', 'Weierstrass M-Test', 'theorem', this)">
+                            <span class="play-icon">▶</span>02:28
+                        </div>
+                        <h3>Weierstrass M-Test</h3>
+                        <p>Let $(g_n)$ be a sequence of functions defined on a subset $E$ of $\mathbb{R}$, and suppose that for every $n$, there exists a number $M_n$ such that:</p>
+                        <p>$$\sup_{x \in E} |g_n(x)| \leq M_n$$</p>
+                        <p>Suppose further that the series $\sum_{n=1}^{\infty} M_n$ converges. Then the series $\sum_{n=1}^{\infty} g_n(x)$ converges absolutely uniformly on $E$.</p>
+                        <p><em>This test provides a practical criterion for determining absolute uniform convergence.</em></p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('06:06', 'Proof of Weierstrass M-Test', 'proof', this)">
+                            <span class="play-icon">▶</span>06:06
+                        </div>
+                        <h3>Proof of Weierstrass M-Test</h3>
+                        <p>We want to show that the series of absolute value functions converges uniformly. Let $S_n(x) = \sum_{j=1}^n |g_j(x)|$ be the partial sums.</p>
+                        <p>For $n > m$, consider the difference:</p>
+                        <p>$$|S_n(x) - S_m(x)| = \left|\sum_{j=m+1}^n |g_j(x)|\right| = \sum_{j=m+1}^n |g_j(x)|$$</p>
+                        <p>By the hypothesis, $|g_j(x)| \leq M_j$ for all $x \in E$, so:</p>
+                        <p>$$\sum_{j=m+1}^n |g_j(x)| \leq \sum_{j=m+1}^n M_j$$</p>
+                        <p>Since $\sum M_j$ converges, $\sum_{j=m+1}^n M_j \to 0$ as $m, n \to \infty$. Therefore:</p>
+                        <p>$$\sup_{x \in E} |S_n(x) - S_m(x)| \leq \sum_{j=m+1}^n M_j \to 0$$</p>
+                        <p>This shows that $(S_n)$ is uniformly Cauchy, hence uniformly convergent.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('11:03', 'Power Series Definition', 'definition', this)">
+                            <span class="play-icon">▶</span>11:03
+                        </div>
+                        <h3>Power Series</h3>
+                        <p>A <strong>power series</strong> centered at $a$ is a series of the form:</p>
+                        <p>$$\sum_{n=0}^{\infty} c_n(x-a)^n$$</p>
+                        <p>where $c_n$ and $a$ are real numbers. The terms are:</p>
+                        <ul>
+                            <li>$n=0$: $c_0$ (constant term)</li>
+                            <li>$n=1$: $c_1(x-a)$</li>
+                            <li>$n=2$: $c_2(x-a)^2$</li>
+                            <li>And so on...</li>
+                        </ul>
+                        <p>The coefficients $c_n$ are fixed constants independent of $x$.</p>
+                    </div>
+
+                    <div class="theorem content-box">
+                        <div class="timestamp" onclick="openVideoSide('15:26', 'Radius of Convergence Theorem', 'theorem', this)">
+                            <span class="play-icon">▶</span>15:26
+                        </div>
+                        <h3>Radius of Convergence Theorem</h3>
+                        <p>For any power series $\sum_{n=0}^{\infty} c_n(x-a)^n$, there exists a number $R$ (which may be $0$ or $\infty$) called the <strong>radius of convergence</strong>, such that:</p>
+                        <p><strong>Part A:</strong> If $|x-a| < R$, then the power series converges absolutely at $x$.</p>
+                        <p><strong>Part B:</strong> If $|x-a| > R$, then the power series diverges.</p>
+                        <p>The radius of convergence is given by:</p>
+                        <p>$$R = \frac{1}{\limsup_{n \to \infty} |c_n|^{1/n}}$$</p>
+                        <p>where we interpret $1/0 = \infty$ and $1/\infty = 0$.</p>
+                    </div>
+
+                    <div class="corollary content-box">
+                        <div class="timestamp" onclick="openVideoSide('21:29', 'Uniform Convergence in Interior', 'corollary', this)">
+                            <span class="play-icon">▶</span>21:29
+                        </div>
+                        <h3>Uniform Convergence in Interior</h3>
+                        <p>For any $r$ with $0 < r < R$, the power series converges uniformly on the closed interval $[a-r, a+r]$.</p>
+                        <p>Moreover, the function $f(x) = \sum_{n=0}^{\infty} c_n(x-a)^n$ is continuous on the entire open interval $(a-R, a+R)$.</p>
+                        <p><em>Note: At every point in the interval of convergence, we get pointwise convergence, but for uniform convergence, we need to stay strictly in the interior.</em></p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('26:10', 'Proof of Uniform Convergence', 'proof', this)">
+                            <span class="play-icon">▶</span>26:10
+                        </div>
+                        <h3>Proof of Uniform Convergence</h3>
+                        <p>For part B of the theorem, we use the Weierstrass M-test. Consider a point $x = a + r$ where $0 < r < R$.</p>
+                        <p>Since $x = a + r$ is in the interval of convergence, the series $\sum_{n=0}^{\infty} |c_n|r^n$ converges absolutely.</p>
+                        <p>For any $x$ in $[a-r, a+r]$, we have $|x - a| \leq r$, so:</p>
+                        <p>$$|c_n(x-a)^n| = |c_n| \cdot |x-a|^n \leq |c_n| \cdot r^n = M_n$$</p>
+                        <p>Since $\sum M_n = \sum |c_n|r^n$ converges, the Weierstrass M-test applies, showing that the power series converges absolutely uniformly on $[a-r, a+r]$.</p>
+                        <p>Since each partial sum is a polynomial (hence continuous), and we have uniform convergence, the limit function $f$ is continuous on this interval.</p>
+                    </div>
+
+                    <div class="non-examinable content-box">
+                        <div class="timestamp" onclick="openVideoSide('31:30', 'Boundary Behavior', 'non-examinable', this)">
+                            <span class="play-icon">▶</span>31:30
+                        </div>
+                        <h3>Boundary Behavior of Power Series</h3>
+                        <p><em>This is largely an exercise topic, but important to understand.</em></p>
+                        <p>If a power series with radius of convergence $R$ (finite and positive) converges at one of the boundary points, say at $x = a + R$, then:</p>
+                        <p>$$\lim_{x \to (a+R)^-} f(x) = f(a+R)$$</p>
+                        <p>This means the function can be extended continuously to include that boundary point.</p>
+                        <p>Moreover, under this condition, the series converges uniformly on intervals of the form $[a-r, a+R]$ for any $0 < r < R$.</p>
+                        <p><em>This is relevant for solving boundary value problems in partial differential equations, where we need solutions continuous up to the boundary.</em></p>
+                    </div>
+
+                    <div class="theorem content-box">
+                        <div class="timestamp" onclick="openVideoSide('42:22', 'Differentiation of Power Series', 'theorem', this)">
+                            <span class="play-icon">▶</span>42:22
+                        </div>
+                        <h3>Differentiation of Power Series</h3>
+                        <p>Let $f(x) = \sum_{n=0}^{\infty} c_n(x-a)^n$ be a power series with radius of convergence $R > 0$.</p>
+                        <p><strong>Part 1:</strong> The derived series $\sum_{n=1}^{\infty} n c_n(x-a)^{n-1}$ has the same radius of convergence $R$.</p>
+                        <p><strong>Part 2:</strong> The function $f$ is differentiable on $(a-R, a+R)$, and:</p>
+                        <p>$$f'(x) = \sum_{n=1}^{\infty} n c_n(x-a)^{n-1}$$</p>
+                        <p>This means we can differentiate power series term by term, and the result has the same radius of convergence.</p>
+                    </div>
+
+                    <div class="corollary content-box">
+                        <div class="timestamp" onclick="openVideoSide('43:17', 'Infinitely Differentiable Functions', 'corollary', this)">
+                            <span class="play-icon">▶</span>43:17
+                        </div>
+                        <h3>Power Series are Infinitely Differentiable</h3>
+                        <p>Functions defined by power series are infinitely often differentiable on their interval of convergence. We can repeatedly apply the differentiation theorem:</p>
+                        <p>$$f'(x) = \sum_{n=1}^{\infty} n c_n(x-a)^{n-1}$$</p>
+                        <p>$$f''(x) = \sum_{n=2}^{\infty} n(n-1) c_n(x-a)^{n-2}$$</p>
+                        <p>$$f^{(k)}(x) = \sum_{n=k}^{\infty} \frac{n!}{(n-k)!} c_n(x-a)^{n-k}$$</p>
+                        <p>Each derived series has the same radius of convergence as the original.</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('47:40', 'Proof of Differentiation Theorem', 'proof', this)">
+                            <span class="play-icon">▶</span>47:40
+                        </div>
+                        <h3>Proof of Differentiation Theorem</h3>
+                        <p><strong>Part 1:</strong> To show the derived series has the same radius of convergence, we use the formula:</p>
+                        <p>$$\limsup_{n \to \infty} |n c_n|^{1/(n-1)} = \limsup_{n \to \infty} |c_n|^{1/n} \cdot \lim_{n \to \infty} n^{1/(n-1)}$$</p>
+                        <p>Since $\lim_{n \to \infty} n^{1/n} = 1$, the radius of convergence is unchanged.</p>
+                        <p><strong>Part 2:</strong> We apply the theorem from Lecture 3 about interchanging limits and derivatives. The partial sums $f_n(x) = \sum_{j=0}^n c_j(x-a)^j$ are polynomials, hence differentiable everywhere.</p>
+                        <p>The derivatives $f_n'(x) = \sum_{j=1}^n j c_j(x-a)^{j-1}$ converge uniformly on any closed interval $[a-r, a+r]$ with $0 < r < R$ (by Part 1 and the radius of convergence theorem).</p>
+                        <p>Since $f_n(a) = c_0$ converges, we have the anchor point condition. Therefore, by the interchange theorem:</p>
+                        <p>$$f'(x) = \lim_{n \to \infty} f_n'(x) = \sum_{n=1}^{\infty} n c_n(x-a)^{n-1}$$</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== RIGHT SIDE - VIDEO ===== -->
+        <div id="videoSide" class="video-side">
+            <div class="video-container">
+                <iframe 
+                    id="videoFrame"
+                    src="" 
+                    allowfullscreen 
+                    allow="autoplay">
+                </iframe>
+            </div>
+            
+            <!-- ===== CLOSE BUTTON ===== -->
+            <button class="close-button" onclick="closeVideoSide()">&times;</button>
+        </div>
+    </div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // ===== VIDEO CONFIGURATION =====
+        // Replace this URL with your actual Panopto video URL
+        const PANOPTO_BASE_URL = "https://cambridgelectures.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=30457204-fced-4244-b031-b33700b5687b";
+        
+        // ===== OPEN VIDEO SIDE FUNCTION =====
+        // This function is called when a timestamp is clicked
+        // Parameters:
+        // - timestamp: The time in MM:SS format
+        // - title: The section title to display
+        // - contentType: The type of content ('default', 'definition', 'theorem', 'claim', 'corollary', 'proposition', 'example', 'proof', 'non-examinable')
+        // - timestampElement: The clicked timestamp element (used to find the parent content box)
+        function openVideoSide(timestamp, title, contentType, timestampElement) {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Convert timestamp to seconds for Panopto
+            const timeInSeconds = convertTimestampToSeconds(timestamp);
+            
+            // Set the video URL with the timestamp
+            const videoUrl = PANOPTO_BASE_URL + `&start=${timeInSeconds}`;
+            videoFrame.src = videoUrl;
+            
+            // Remove full-width class and show video
+            contentSide.classList.remove('full-width');
+            videoSide.style.display = 'block';
+        }
+        
+        // ===== CLOSE VIDEO SIDE FUNCTION =====
+        // This function closes the video side and stops video playback
+        function closeVideoSide() {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Hide the video side
+            videoSide.style.display = 'none';
+            
+            // Clear the video source to stop playback
+            videoFrame.src = '';
+            
+            // Add full-width class back
+            contentSide.classList.add('full-width');
+        }
+        
+        // ===== TIMESTAMP CONVERSION FUNCTION =====
+        // Converts MM:SS format to seconds for Panopto
+        function convertTimestampToSeconds(timestamp) {
+            const parts = timestamp.split(':');
+            const minutes = parseInt(parts[0]);
+            const seconds = parseInt(parts[1]);
+            return minutes * 60 + seconds;
+        }
+    </script>
+</body>
+</html>
