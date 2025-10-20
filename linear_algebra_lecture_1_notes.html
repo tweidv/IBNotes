@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear Algebra Lecture 1 Notes</title>
+    
+    <!-- MathJax for mathematical equations - renders LaTeX math notation -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],  // Inline math: $x^2$ or \(x^2\)
+                displayMath: [['$$', '$$'], ['\\[', '\\]']], // Display math: $$x^2$$ or \[x^2\]
+                processEscapes: true,  // Process backslash escapes
+                processEnvironments: true  // Process LaTeX environments
+            },
+            options: {
+                skipHtmlTags: ['script', 'style', 'textarea', 'pre']  // Skip these HTML tags
+            }
+        };
+    </script>
+    
+    <style>
+        /* ===== GLOBAL STYLES ===== */
+        body {
+            font-family: 'Times New Roman', serif;  /* Professional academic font */
+            line-height: 1.6;  /* Comfortable line spacing */
+            margin: 0;  /* Remove default margins */
+            padding: 0;  /* Remove default padding */
+            background-color: #f9f9f9;  /* Light background */
+            color: #333;  /* Dark text for readability */
+            font-size: 18px;
+            overflow-x: hidden;  /* Prevent horizontal scroll */
+        }
+        
+        /* ===== MAIN LAYOUT CONTAINER ===== */
+        .main-container {
+            display: flex;  /* Flexbox for side-by-side layout */
+            min-height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== LEFT SIDE - CONTENT ===== */
+        .content-side {
+            flex: 1;  /* Take up remaining space */
+            padding: 20px;  /* Page margins */
+            max-width: 50%;  /* Half the width */
+            display: flex;  /* Flexbox for centering */
+            justify-content: center;  /* Center horizontally */
+            position: relative;  /* For absolute positioning of scrollable content */
+        }
+        
+        /* When video is not open, take full width and center the content */
+        .content-side.full-width {
+            max-width: 100%;  /* Full width when no video */
+            justify-content: center;  /* Center the content */
+        }
+        
+        /* Scrollable content container when video is open */
+        .scrollable-content {
+            width: 100%;
+            max-width: 1000px;
+            overflow-y: auto;
+            max-height: 95vh;  /* 95% viewport height */
+            padding-right: 10px;  /* Space for scrollbar */
+        }
+        
+        /* When video is not open, no height restriction and center the container */
+        .content-side.full-width .scrollable-content {
+            max-height: none;
+        }
+        
+        /* ===== RIGHT SIDE - VIDEO ===== */
+        .video-side {
+            flex: 1;  /* Take up remaining space */
+            max-width: 50%;  /* Half the width */
+            background-color: #000;  /* Black background for video */
+            position: relative;  /* For absolute positioning of close button */
+            display: none;  /* Hidden by default */
+            overflow: hidden;  /* Prevent video from scrolling */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            background-color: white;  /* White content area */
+            padding: 40px;  /* Internal spacing */
+            border-radius: 8px;  /* Rounded corners */
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);  /* Subtle shadow */
+            max-width: 1000px;  /* Optimal reading width */
+            margin: 0 auto;  /* Center the content */
+        }
+        
+        /* ===== HEADINGS ===== */
+        h1 {
+            text-align: center;  /* Center the main title */
+            font-size: 2.2em;  /* Large title */
+            margin-bottom: 40px;  /* Space below title */
+            color: #2c3e50;  /* Dark blue color */
+            padding-bottom: 15px;  /* Space below title */
+        }
+        
+        h2, h3, h4, h5, h6 {
+            color: #2c3e50;  /* Dark blue for all headings */
+            padding-bottom: 8px;  /* Space below headings */
+            margin-top: 30px;  /* Space above headings */
+            font-size: 1.2em;  /* Slightly larger than body text */
+        }
+        
+        /* ===== CONTENT BOXES ===== */
+        /* Base styling for all content boxes */
+        .content-box {
+            padding: 20px;  /* Internal spacing */
+            margin: 20px 0;  /* Vertical spacing between boxes */
+            border-radius: 5px;  /* Rounded corners */
+            position: relative;  /* For absolute positioning of timestamps */
+            border-left: 5px solid;  /* Colored left border */
+            font-size: 18px;  /* Consistent text size */
+        }
+        
+        /* ===== CONTENT BOX TYPES ===== */
+        /* Definition boxes - Green theme for definitions */
+        .definition {
+            background-color: #f0f8f0;  /* Light green background */
+            border-left-color: #28a745;  /* Green left border */
+        }
+        
+        /* Theorem boxes - Purple theme for theorems */
+        .theorem {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Claim boxes - Light purple theme for claims */
+        .claim {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Corollary boxes - Medium purple theme for corollaries */
+        .corollary {
+            background-color: #f0e6ff;  /* Slightly darker purple background */
+            border-left-color: #8e44ad;  /* Darker purple left border */
+        }
+        
+        /* Proposition boxes - Dark purple theme for propositions */
+        .proposition {
+            background-color: #e8d5f2;  /* Even darker purple background */
+            border-left-color: #9b59b6;  /* Dark purple left border */
+        }
+        
+        /* Example boxes - Orange theme for examples */
+        .example {
+            background-color: #fff8f0;  /* Light orange background */
+            border-left-color: #fd7e14;  /* Orange left border */
+        }
+        
+        /* Proof boxes - Pink theme for proofs */
+        .proof {
+            background-color: #fff0f5;  /* Light pink background */
+            border-left-color: #e83e8c;  /* Pink left border */
+        }
+        
+        /* Default boxes - No special styling */
+        .default {
+            background-color: transparent;  /* No background */
+            border: none;  /* No border */
+            padding-left: 0;  /* No left padding */
+        }
+        
+        /* Non-examinable boxes - Gray theme for optional content */
+        .non-examinable {
+            background-color: #f8f9fa;  /* Light gray background */
+            border-left-color: #6c757d;  /* Gray left border */
+            opacity: 0.7;  /* Slightly faded to indicate optional nature */
+        }
+        
+        /* ===== TIMESTAMP STYLING ===== */
+        .timestamp {
+            position: absolute;  /* Positioned relative to content box */
+            top: 10px;  /* 10px from top of content box */
+            right: 15px;  /* 15px from right edge */
+            font-size: 0.8em;  /* Smaller text */
+            color: #666;  /* Gray color */
+            background-color: rgba(255,255,255,0.8);  /* Semi-transparent white background */
+            padding: 2px 6px;  /* Small padding */
+            border-radius: 3px;  /* Rounded corners */
+            cursor: pointer;  /* Indicates clickable */
+            transition: all 0.2s ease;  /* Smooth transitions */
+            display: flex;  /* Flexbox for icon alignment */
+            align-items: center;  /* Vertical center alignment */
+            gap: 3px;  /* Space between icon and text */
+        }
+        
+        /* Hover effect for timestamps */
+        .timestamp:hover {
+            background-color: rgba(255,255,255,0.95);  /* More opaque on hover */
+            color: #333;  /* Darker text on hover */
+            transform: scale(1.05);  /* Slight scale up */
+        }
+        
+        /* Play icon styling */
+        .play-icon {
+            font-size: 0.7em;  /* Smaller than timestamp text */
+        }
+        
+        /* ===== CONTENT BOX HEADINGS ===== */
+        .content-box h3 {
+            margin-top: 0;  /* No top margin for h3 in content boxes */
+            color: inherit;  /* Inherit color from parent */
+            border-bottom: none;  /* No bottom border */
+            padding-bottom: 0;  /* No bottom padding */
+        }
+        
+        /* Add prefixes to content box headings */
+        .content-box h3:before {
+            font-weight: bold;  /* Bold prefix text */
+        }
+        
+        .definition h3:before {
+            content: "Definition: ";  /* "Definition: " prefix */
+        }
+        
+        .theorem h3:before {
+            content: "Theorem: ";  /* "Theorem: " prefix */
+        }
+        
+        .claim h3:before {
+            content: "Claim: ";  /* "Claim: " prefix */
+        }
+        
+        .corollary h3:before {
+            content: "Corollary: ";  /* "Corollary: " prefix */
+        }
+        
+        .proposition h3:before {
+            content: "Proposition: ";  /* "Proposition: " prefix */
+        }
+        
+        .example h3:before {
+            content: "Example: ";  /* "Example: " prefix */
+        }
+        
+        .proof h3:before {
+            content: "Proof: ";  /* "Proof: " prefix */
+        }
+        
+        .default h3:before {
+            content: "";  /* No prefix for default boxes */
+        }
+        
+        /* ===== LISTS ===== */
+        ul, ol {
+            padding-left: 25px;  /* Indent lists */
+        }
+        
+        li {
+            margin: 8px 0;  /* Space between list items */
+        }
+        
+        /* ===== LINKS ===== */
+        a {
+            color: #3498db;  /* Blue link color */
+            text-decoration: none;  /* No underline by default */
+        }
+        
+        a:hover {
+            text-decoration: underline;  /* Underline on hover */
+        }
+        
+        /* ===== MATH EQUATIONS ===== */
+        .MathJax {
+            font-size: 1.1em !important;  /* Slightly larger math text */
+        }
+        
+        /* ===== VIDEO SIDE STYLES ===== */
+        .video-container {
+            position: relative;  /* For absolute positioning of iframe */
+            width: 100%;  /* Full width */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* Video iframe */
+        .video-container iframe {
+            position: absolute;  /* Absolute positioning within container */
+            top: 0;
+            left: 0;
+            width: 100%;  /* Full width */
+            height: 100%;  /* Full height */
+            border: none;  /* No border */
+        }
+        
+        /* ===== CLOSE BUTTON ===== */
+        .close-button {
+            position: absolute;  /* Absolute positioning */
+            top: 20px;  /* 20px from top */
+            right: 20px;  /* 20px from right */
+            background-color: rgba(0,0,0,0.7);  /* Semi-transparent black background */
+            color: white;  /* White text */
+            border: none;  /* No border */
+            font-size: 24px;  /* Large close button */
+            font-weight: bold;  /* Bold text */
+            cursor: pointer;  /* Indicates clickable */
+            line-height: 1;  /* Tight line height */
+            padding: 10px 15px;  /* Padding for button */
+            border-radius: 50%;  /* Circular button */
+            z-index: 10;  /* Above video */
+            transition: all 0.2s ease;  /* Smooth transitions */
+        }
+        
+        /* Close button hover effect */
+        .close-button:hover {
+            background-color: rgba(0,0,0,0.9);  /* More opaque on hover */
+            transform: scale(1.1);  /* Slight scale up */
+        }
+        
+        /* ===== RESPONSIVE DESIGN ===== */
+        /* Mobile and tablet styles */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;  /* Stack vertically on mobile */
+            }
+            
+            .content-side {
+                max-width: 100%;  /* Full width on mobile */
+                padding: 10px;  /* Smaller margins on mobile */
+            }
+            
+            .video-side {
+                max-width: 100%;  /* Full width on mobile */
+                height: 50vh;  /* Half viewport height on mobile */
+            }
+            
+            .video-container {
+                height: 100%;  /* Full height of video side */
+            }
+            
+            .container {
+                padding: 20px;  /* Smaller internal padding */
+            }
+            
+            h1 {
+                font-size: 1.8em;  /* Smaller title on mobile */
+            }
+            
+            /* Timestamps become static on mobile */
+            .timestamp {
+                position: static;  /* Normal flow instead of absolute */
+                display: block;  /* Block display */
+                margin-bottom: 10px;  /* Space below timestamp */
+            }
+            
+            /* On mobile, when video is open, content should still be scrollable */
+            .content-side {
+                overflow-y: auto;  /* Ensure content is scrollable on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- ===== LEFT SIDE - CONTENT ===== -->
+        <div class="content-side full-width">
+            <div class="scrollable-content">
+                <div class="container">
+                    <!-- ===== LECTURE TITLE ===== -->
+                    <h1>Linear Algebra Lecture 1</h1>
+                    <p style="text-align: center; color: #666; font-style: italic;">Basic Algebra of Vector Spaces</p>
+                    
+                    <!-- ===== CONTENT BOXES ===== -->
+                    
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('3:02', 'Course Introduction', 'default', this)">
+                            <span class="play-icon">▶</span>3:02
+                        </div>
+                        <h3>Course Overview</h3>
+                        <p>This course revisits familiar concepts from first year vectors and matrices, but with a very different approach. The emphasis shifts from concrete objects (column vectors, arrays of numbers) to the abstract algebraic perspective that pure mathematicians use.</p>
+                        <p>We'll develop the language of abstract algebra to discuss these concepts, preparing for more advanced courses like representation theory and algebraic geometry. The course is also highly applicable, particularly for infinite dimensional vector spaces and function spaces.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('6:40', 'Vector Space Definition', 'definition', this)">
+                            <span class="play-icon">▶</span>6:40
+                        </div>
+                        <h3>Vector Space</h3>
+                        <p>An <strong>F-vector space</strong> (or vector space over F) consists of:</p>
+                        <ol>
+                            <li>An abelian group $(V, +)$ with underlying set $V$ and operation written as addition</li>
+                            <li>The identity element written as $\underline{0}$ (zero vector)</li>
+                            <li>A function $F \times V \to V$ called <strong>scalar multiplication</strong>, written as $(\lambda, v) \mapsto \lambda v$ or $\lambda \cdot v$</li>
+                        </ol>
+                        <p>These operations satisfy the following axioms for all $v, w \in V$ and $\lambda, \mu \in F$:</p>
+                        <ol>
+                            <li>$(\lambda + \mu) \cdot v = \lambda \cdot v + \mu \cdot v$ (distributivity over field addition)</li>
+                            <li>$\lambda \cdot (v + w) = \lambda \cdot v + \lambda \cdot w$ (distributivity over vector addition)</li>
+                            <li>$(\lambda \mu) \cdot v = \lambda \cdot (\mu \cdot v)$ (associativity of scalar multiplication)</li>
+                            <li>$1 \cdot v = v$ (multiplicative identity acts as identity)</li>
+                        </ol>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('11:33', 'Notation and Terminology', 'default', this)">
+                            <span class="play-icon">▶</span>11:33
+                        </div>
+                        <h3>Notation and Terminology</h3>
+                        <p><strong>Elements of V</strong> are called <strong>vectors</strong> and are not underlined (except the zero vector $\underline{0}$).</p>
+                        <p><strong>Elements of F</strong> are called <strong>scalars</strong>.</p>
+                        <p>The zero vector $\underline{0}$ is the additive identity of the group $(V, +)$ and is distinct from the element $0$ in the field $F$.</p>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('12:47', 'Column Vectors Example', 'example', this)">
+                            <span class="play-icon">▶</span>12:47
+                        </div>
+                        <h3>Column Vectors</h3>
+                        <p>The most familiar example is $F^n$, the space of $n$-dimensional column vectors with entries in the field $F$:</p>
+                        <ul>
+                            <li>$\mathbb{R}^n$ is the space of real $n$-dimensional column vectors</li>
+                            <li>$\mathbb{C}^n$ is the space of complex $n$-dimensional column vectors</li>
+                        </ul>
+                        <p>Addition is defined component-wise, and scalar multiplication is defined element-wise.</p>
+                        <p><strong>Important observation:</strong> $\mathbb{C}^n$ is both a complex vector space and a real vector space. We can restrict scalar multiplication to only real numbers, making it a real vector space as well.</p>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('15:33', 'Matrices Example', 'example', this)">
+                            <span class="play-icon">▶</span>15:33
+                        </div>
+                        <h3>Matrices</h3>
+                        <p>The space $M_{m,n}(F)$ of $m \times n$ matrices over the field $F$ forms a vector space. This is essentially the same as $F^{mn}$ (column vectors of length $mn$), just arranged in a rectangular format rather than a column.</p>
+                        <p>Matrices have additional structure beyond their vector space structure (matrix multiplication, etc.).</p>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('17:15', 'Function Spaces Example', 'example', this)">
+                            <span class="play-icon">▶</span>17:15
+                        </div>
+                        <h3>Function Spaces</h3>
+                        <p>For any non-empty set $X$, the space $F^X$ of functions from $X$ to $F$ is a vector space with operations defined pointwise:</p>
+                        <ul>
+                            <li>$(f + g)(x) = f(x) + g(x)$ for all $x \in X$</li>
+                            <li>$(\lambda f)(x) = \lambda \cdot f(x)$ for all $x \in X$</li>
+                        </ul>
+                        <p>This includes important subspaces like:</p>
+                        <ul>
+                            <li>$C(\mathbb{R})$ - continuous real-valued functions</li>
+                            <li>$C^\infty(\mathbb{R})$ - infinitely differentiable functions</li>
+                            <li>$P(\mathbb{R})$ - polynomial functions</li>
+                        </ul>
+                    </div>
+
+                    <div class="claim content-box">
+                        <div class="timestamp" onclick="openVideoSide('19:17', 'Additional Properties', 'claim', this)">
+                            <span class="play-icon">▶</span>19:17
+                        </div>
+                        <h3>Additional Properties</h3>
+                        <p>Other familiar properties of vector spaces follow from the axioms:</p>
+                        <ul>
+                            <li>$0 \cdot v = \underline{0}$ (scalar multiplication by zero gives zero vector)</li>
+                            <li>$(-1) \cdot v = -v$ (scalar multiplication by -1 gives additive inverse)</li>
+                        </ul>
+                        <p><em>These can be verified as exercises using the given axioms.</em></p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('20:54', 'Subspace Definition', 'definition', this)">
+                            <span class="play-icon">▶</span>20:54
+                        </div>
+                        <h3>Subspace</h3>
+                        <p>A <strong>subspace</strong> $U$ of an $F$-vector space $V$ is a subset $U \subseteq V$ that is itself an $F$-vector space under the same operations as $V$.</p>
+                        <p><strong>Equivalent condition:</strong> $U$ is a subspace if and only if:</p>
+                        <ol>
+                            <li>$(U, +)$ is a subgroup of $(V, +)$</li>
+                            <li>Scalar multiplication preserves $U$: for all $\lambda \in F$ and $u \in U$, we have $\lambda u \in U$</li>
+                        </ol>
+                    </div>
+
+                    <div class="theorem content-box">
+                        <div class="timestamp" onclick="openVideoSide('24:45', 'Subspace Test', 'theorem', this)">
+                            <span class="play-icon">▶</span>24:45
+                        </div>
+                        <h3>Subspace Test</h3>
+                        <p>A subset $U \subseteq V$ is a subspace if and only if:</p>
+                        <ol>
+                            <li>$U \neq \emptyset$ (non-empty)</li>
+                            <li>For all $u, w \in U$ and $\lambda \in F$: $u + \lambda w \in U$</li>
+                        </ol>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('26:27', 'Subspace Test Proof', 'proof', this)">
+                            <span class="play-icon">▶</span>26:27
+                        </div>
+                        <h3>Proof of Subspace Test</h3>
+                        <p><strong>Forward direction:</strong> If $U$ is a subspace, then it's non-empty (contains $\underline{0}$) and closed under addition and scalar multiplication, so $u + \lambda w \in U$.</p>
+                        <p><strong>Reverse direction:</strong> Suppose $U$ satisfies both conditions. Taking $\lambda = -1$ in condition 2 gives $u - w \in U$ for all $u, w \in U$. Combined with non-emptiness, this shows $U$ is a subgroup by the subgroup test from group theory.</p>
+                        <p>Taking $u = \underline{0}$ in condition 2 gives $\lambda w \in U$ for all $\lambda \in F$ and $w \in U$, so scalar multiplication preserves $U$. Therefore $U$ is a subspace.</p>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('31:22', 'Subspace Examples', 'example', this)">
+                            <span class="play-icon">▶</span>31:22
+                        </div>
+                        <h3>Subspace Examples</h3>
+                        <p><strong>Example 1:</strong> The set $\{(x,y,z) \in \mathbb{R}^3 : x + y + z = t\}$ is a subspace of $\mathbb{R}^3$ if and only if $t = 0$.</p>
+                        <p><strong>Example 2:</strong> In the vector space of all functions $\mathbb{R} \to \mathbb{R}$:</p>
+                        <ul>
+                            <li>$C(\mathbb{R})$ (continuous functions) is a subspace</li>
+                            <li>$C^\infty(\mathbb{R})$ (infinitely differentiable functions) is a subspace</li>
+                            <li>$P(\mathbb{R})$ (polynomial functions) is a subspace</li>
+                        </ul>
+                        <p>Each inclusion $P(\mathbb{R}) \subseteq C^\infty(\mathbb{R}) \subseteq C(\mathbb{R}) \subseteq \mathbb{R}^{\mathbb{R}}$ is a subspace inclusion.</p>
+                    </div>
+
+                    <div class="theorem content-box">
+                        <div class="timestamp" onclick="openVideoSide('36:43', 'Intersection of Subspaces', 'theorem', this)">
+                            <span class="play-icon">▶</span>36:43
+                        </div>
+                        <h3>Intersection of Subspaces</h3>
+                        <p>If $U$ and $W$ are subspaces of $V$, then $U \cap W$ is also a subspace of $V$.</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('37:16', 'Intersection Proof', 'proof', this)">
+                            <span class="play-icon">▶</span>37:16
+                        </div>
+                        <h3>Proof of Intersection Property</h3>
+                        <p><strong>Non-empty:</strong> Both $U$ and $W$ contain $\underline{0}$, so $\underline{0} \in U \cap W$.</p>
+                        <p><strong>Subspace test:</strong> For $x, y \in U \cap W$ and $\lambda \in F$:</p>
+                        <ul>
+                            <li>Since $U$ is a subspace: $x + \lambda y \in U$</li>
+                            <li>Since $W$ is a subspace: $x + \lambda y \in W$</li>
+                            <li>Therefore: $x + \lambda y \in U \cap W$</li>
+                        </ul>
+                        <p>Hence $U \cap W$ satisfies the subspace test.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('39:57', 'Union Warning', 'default', this)">
+                            <span class="play-icon">▶</span>39:57
+                        </div>
+                        <h3>Important Warning: Unions</h3>
+                        <p><strong>The union of subspaces is almost never a subspace.</strong></p>
+                        <p>This is a common mistake. If you want a subspace that contains both $U$ and $W$, you should use the <strong>subspace sum</strong> instead.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('41:22', 'Subspace Sum Definition', 'definition', this)">
+                            <span class="play-icon">▶</span>41:22
+                        </div>
+                        <h3>Subspace Sum</h3>
+                        <p>For subspaces $U$ and $W$ of $V$, the <strong>subspace sum</strong> is defined as:</p>
+                        <p>$$U + W = \{u + w : u \in U, w \in W\}$$</p>
+                        <p>This is the smallest subspace of $V$ containing both $U$ and $W$.</p>
+                    </div>
+
+                    <div class="theorem content-box">
+                        <div class="timestamp" onclick="openVideoSide('42:09', 'Subspace Sum Properties', 'theorem', this)">
+                            <span class="play-icon">▶</span>42:09
+                        </div>
+                        <h3>Subspace Sum Properties</h3>
+                        <p>For any subspaces $U$ and $W$ of $V$:</p>
+                        <ol>
+                            <li>$U + W$ is always a subspace of $V$</li>
+                            <li>$U + W$ contains both $U$ and $W$</li>
+                            <li>$U + W$ is the smallest subspace containing both $U$ and $W$</li>
+                        </ol>
+                        <p><em>Proof by subspace test (exercise).</em></p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('45:22', 'Linear Map Definition', 'definition', this)">
+                            <span class="play-icon">▶</span>45:22
+                        </div>
+                        <h3>Linear Map</h3>
+                        <p>A <strong>linear map</strong> (or linear transformation) from $V$ to $W$ is a function $\alpha: V \to W$ such that for all $u, v \in V$ and $\lambda \in F$:</p>
+                        <ol>
+                            <li>$\alpha(u + v) = \alpha(u) + \alpha(v)$ (preserves addition)</li>
+                            <li>$\alpha(\lambda v) = \lambda \alpha(v)$ (preserves scalar multiplication)</li>
+                        </ol>
+                        <p><strong>Equivalent condition:</strong> $\alpha(u + \lambda v) = \alpha(u) + \lambda \alpha(v)$ for all $u, v \in V$ and $\lambda \in F$.</p>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('48:02', 'Linear Map Examples', 'example', this)">
+                            <span class="play-icon">▶</span>48:02
+                        </div>
+                        <h3>Linear Map Examples</h3>
+                        <p><strong>Matrix multiplication:</strong> For $A \in M_{m,n}(F)$, the map $\alpha: F^n \to F^m$ defined by $\alpha(v) = Av$ is linear.</p>
+                        <p><strong>Differentiation:</strong> The map $D: C^\infty(\mathbb{R}) \to C^\infty(\mathbb{R})$ defined by $D(f) = f'$ is linear.</p>
+                        <p><strong>Integration:</strong> The map $I: C([0,1]) \to \mathbb{R}$ defined by $I(f) = \int_0^1 f(x) \, dx$ is linear.</p>
+                        <p><strong>Evaluation:</strong> For $x_0 \in X$, the map $\text{ev}_{x_0}: F^X \to F$ defined by $\text{ev}_{x_0}(f) = f(x_0)$ is linear.</p>
+                        <p><strong>Identity and zero maps:</strong> $\text{id}_V: V \to V$ and $0: V \to W$ are always linear.</p>
+                        <p><strong>Composition:</strong> If $\alpha: V \to W$ and $\beta: U \to V$ are linear, then $\alpha \circ \beta: U \to W$ is linear.</p>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('52:36', 'Non-Linear Examples', 'example', this)">
+                            <span class="play-icon">▶</span>52:36
+                        </div>
+                        <h3>Non-Linear Examples</h3>
+                        <p><strong>Squaring:</strong> The map $\alpha: \mathbb{R} \to \mathbb{R}$ defined by $\alpha(x) = x^2$ is not linear.</p>
+                        <p><strong>Adding constant:</strong> The map $\beta: \mathbb{R} \to \mathbb{R}$ defined by $\beta(x) = x + 1$ is not linear.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('53:06', 'End of Lecture Question', 'default', this)">
+                            <span class="play-icon">▶</span>53:06
+                        </div>
+                        <h3>Question for Next Time</h3>
+                        <p>Consider the complex vector space $\mathbb{C}$ and the map $\alpha: \mathbb{C} \to \mathbb{C}$ defined by complex conjugation $\alpha(z) = \overline{z}$.</p>
+                        <p><strong>Question:</strong> Is $\alpha$ linear?</p>
+                        <p><em>Think about this over the weekend - we'll discuss it next time!</em></p>
+                    </div>
+                    
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== RIGHT SIDE - VIDEO ===== -->
+        <div id="videoSide" class="video-side">
+            <div class="video-container">
+                <iframe 
+                    id="videoFrame"
+                    src="" 
+                    allowfullscreen 
+                    allow="autoplay">
+                </iframe>
+            </div>
+            
+            <!-- ===== CLOSE BUTTON ===== -->
+            <button class="close-button" onclick="closeVideoSide()">&times;</button>
+        </div>
+    </div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // ===== VIDEO CONFIGURATION =====
+        const PANOPTO_BASE_URL = "https://cambridgelectures.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=b8c80d3b-6fd7-4a23-90e3-b33700b80eae&autoplay=false&offerviewer=true&showtitle=true&showbrand=false&captions=false&interactivity=all";
+        
+        // ===== OPEN VIDEO SIDE FUNCTION =====
+        function openVideoSide(timestamp, title, contentType, timestampElement) {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Convert timestamp to seconds for Panopto
+            const timeInSeconds = convertTimestampToSeconds(timestamp);
+            
+            // Set the video URL with the timestamp
+            const videoUrl = PANOPTO_BASE_URL + `&start=${timeInSeconds}`;
+            videoFrame.src = videoUrl;
+            
+            // Remove full-width class and show video
+            contentSide.classList.remove('full-width');
+            videoSide.style.display = 'block';
+        }
+        
+        // ===== CLOSE VIDEO SIDE FUNCTION =====
+        function closeVideoSide() {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Hide the video side
+            videoSide.style.display = 'none';
+            
+            // Clear the video source to stop playback
+            videoFrame.src = '';
+            
+            // Add full-width class back
+            contentSide.classList.add('full-width');
+        }
+        
+        // ===== TIMESTAMP CONVERSION FUNCTION =====
+        function convertTimestampToSeconds(timestamp) {
+            const parts = timestamp.split(':');
+            const minutes = parseInt(parts[0]);
+            const seconds = parseInt(parts[1]);
+            return minutes * 60 + seconds;
+        }
+    </script>
+</body>
+</html>

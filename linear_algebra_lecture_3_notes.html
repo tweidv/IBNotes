@@ -1,0 +1,632 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear Algebra Lecture 3 Notes</title>
+    
+    <!-- MathJax for mathematical equations - renders LaTeX math notation -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],  // Inline math: $x^2$ or \(x^2\)
+                displayMath: [['$$', '$$'], ['\\[', '\\]']], // Display math: $$x^2$$ or \[x^2\]
+                processEscapes: true,  // Process backslash escapes
+                processEnvironments: true  // Process LaTeX environments
+            },
+            options: {
+                skipHtmlTags: ['script', 'style', 'textarea', 'pre']  // Skip these HTML tags
+            }
+        };
+    </script>
+    
+    <style>
+        /* ===== GLOBAL STYLES ===== */
+        body {
+            font-family: 'Times New Roman', serif;  /* Professional academic font */
+            line-height: 1.6;  /* Comfortable line spacing */
+            margin: 0;  /* Remove default margins */
+            padding: 0;  /* Remove default padding */
+            background-color: #f9f9f9;  /* Light background */
+            color: #333;  /* Dark text for readability */
+            font-size: 18px;
+            overflow-x: hidden;  /* Prevent horizontal scroll */
+        }
+        
+        /* ===== MAIN LAYOUT CONTAINER ===== */
+        .main-container {
+            display: flex;  /* Flexbox for side-by-side layout */
+            min-height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== LEFT SIDE - CONTENT ===== */
+        .content-side {
+            flex: 1;  /* Take up remaining space */
+            padding: 20px;  /* Page margins */
+            max-width: 50%;  /* Half the width */
+            display: flex;  /* Flexbox for centering */
+            justify-content: center;  /* Center horizontally */
+            position: relative;  /* For absolute positioning of scrollable content */
+        }
+        
+        /* When video is not open, take full width and center the content */
+        .content-side.full-width {
+            max-width: 100%;  /* Full width when no video */
+            justify-content: center;  /* Center the content */
+        }
+        
+        /* Scrollable content container when video is open */
+        .scrollable-content {
+            width: 100%;
+            max-width: 1000px;
+            overflow-y: auto;
+            max-height: 95vh;  /* 95% viewport height */
+            padding-right: 10px;  /* Space for scrollbar */
+        }
+        
+        /* When video is not open, no height restriction and center the container */
+        .content-side.full-width .scrollable-content {
+            max-height: none;
+        }
+        
+        /* ===== RIGHT SIDE - VIDEO ===== */
+        .video-side {
+            flex: 1;  /* Take up remaining space */
+            max-width: 50%;  /* Half the width */
+            background-color: #000;  /* Black background for video */
+            position: relative;  /* For absolute positioning of close button */
+            display: none;  /* Hidden by default */
+            overflow: hidden;  /* Prevent video from scrolling */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            background-color: white;  /* White content area */
+            padding: 40px;  /* Internal spacing */
+            border-radius: 8px;  /* Rounded corners */
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);  /* Subtle shadow */
+            max-width: 1000px;  /* Optimal reading width */
+            margin: 0 auto;  /* Center the content */
+        }
+        
+        /* ===== HEADINGS ===== */
+        h1 {
+            text-align: center;  /* Center the main title */
+            font-size: 2.2em;  /* Large title */
+            margin-bottom: 40px;  /* Space below title */
+            color: #2c3e50;  /* Dark blue color */
+            padding-bottom: 15px;  /* Space below title */
+        }
+        
+        h2, h3, h4, h5, h6 {
+            color: #2c3e50;  /* Dark blue for all headings */
+            padding-bottom: 8px;  /* Space below headings */
+            margin-top: 30px;  /* Space above headings */
+            font-size: 1.2em;  /* Slightly larger than body text */
+        }
+        
+        /* ===== CONTENT BOXES ===== */
+        /* Base styling for all content boxes */
+        .content-box {
+            padding: 20px;  /* Internal spacing */
+            margin: 20px 0;  /* Vertical spacing between boxes */
+            border-radius: 5px;  /* Rounded corners */
+            position: relative;  /* For absolute positioning of timestamps */
+            border-left: 5px solid;  /* Colored left border */
+            font-size: 18px;  /* Consistent text size */
+        }
+        
+        /* ===== CONTENT BOX TYPES ===== */
+        /* Definition boxes - Green theme for definitions */
+        .definition {
+            background-color: #f0f8f0;  /* Light green background */
+            border-left-color: #28a745;  /* Green left border */
+        }
+        
+        /* Theorem boxes - Purple theme for theorems */
+        .theorem {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Claim boxes - Light purple theme for claims */
+        .claim {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Corollary boxes - Medium purple theme for corollaries */
+        .corollary {
+            background-color: #f0e6ff;  /* Slightly darker purple background */
+            border-left-color: #8e44ad;  /* Darker purple left border */
+        }
+        
+        /* Proposition boxes - Dark purple theme for propositions */
+        .proposition {
+            background-color: #e8d5f2;  /* Even darker purple background */
+            border-left-color: #9b59b6;  /* Dark purple left border */
+        }
+        
+        /* Example boxes - Orange theme for examples */
+        .example {
+            background-color: #fff8f0;  /* Light orange background */
+            border-left-color: #fd7e14;  /* Orange left border */
+        }
+        
+        /* Proof boxes - Pink theme for proofs */
+        .proof {
+            background-color: #fff0f5;  /* Light pink background */
+            border-left-color: #e83e8c;  /* Pink left border */
+        }
+        
+        /* Default boxes - No special styling */
+        .default {
+            background-color: transparent;  /* No background */
+            border: none;  /* No border */
+            padding-left: 0;  /* No left padding */
+        }
+        
+        /* Non-examinable boxes - Gray theme for optional content */
+        .non-examinable {
+            background-color: #f8f9fa;  /* Light gray background */
+            border-left-color: #6c757d;  /* Gray left border */
+            opacity: 0.7;  /* Slightly faded to indicate optional nature */
+        }
+        
+        /* ===== TIMESTAMP STYLING ===== */
+        .timestamp {
+            position: absolute;  /* Positioned relative to content box */
+            top: 10px;  /* 10px from top of content box */
+            right: 15px;  /* 15px from right edge */
+            font-size: 0.8em;  /* Smaller text */
+            color: #666;  /* Gray color */
+            background-color: rgba(255,255,255,0.8);  /* Semi-transparent white background */
+            padding: 2px 6px;  /* Small padding */
+            border-radius: 3px;  /* Rounded corners */
+            cursor: pointer;  /* Indicates clickable */
+            transition: all 0.2s ease;  /* Smooth transitions */
+            display: flex;  /* Flexbox for icon alignment */
+            align-items: center;  /* Vertical center alignment */
+            gap: 3px;  /* Space between icon and text */
+        }
+        
+        /* Hover effect for timestamps */
+        .timestamp:hover {
+            background-color: rgba(255,255,255,0.95);  /* More opaque on hover */
+            color: #333;  /* Darker text on hover */
+            transform: scale(1.05);  /* Slight scale up */
+        }
+        
+        /* Play icon styling */
+        .play-icon {
+            font-size: 0.7em;  /* Smaller than timestamp text */
+        }
+        
+        /* ===== CONTENT BOX HEADINGS ===== */
+        .content-box h3 {
+            margin-top: 0;  /* No top margin for h3 in content boxes */
+            color: inherit;  /* Inherit color from parent */
+            border-bottom: none;  /* No bottom border */
+            padding-bottom: 0;  /* No bottom padding */
+        }
+        
+        /* Add prefixes to content box headings */
+        .content-box h3:before {
+            font-weight: bold;  /* Bold prefix text */
+        }
+        
+        .definition h3:before {
+            content: "Definition: ";  /* "Definition: " prefix */
+        }
+        
+        .theorem h3:before {
+            content: "Theorem: ";  /* "Theorem: " prefix */
+        }
+        
+        .claim h3:before {
+            content: "Claim: ";  /* "Claim: " prefix */
+        }
+        
+        .corollary h3:before {
+            content: "Corollary: ";  /* "Corollary: " prefix */
+        }
+        
+        .proposition h3:before {
+            content: "Proposition: ";  /* "Proposition: " prefix */
+        }
+        
+        .example h3:before {
+            content: "Example: ";  /* "Example: " prefix */
+        }
+        
+        .proof h3:before {
+            content: "Proof: ";  /* "Proof: " prefix */
+        }
+        
+        .default h3:before {
+            content: "";  /* No prefix for default boxes */
+        }
+        
+        /* ===== LISTS ===== */
+        ul, ol {
+            padding-left: 25px;  /* Indent lists */
+        }
+        
+        li {
+            margin: 8px 0;  /* Space between list items */
+        }
+        
+        /* ===== LINKS ===== */
+        a {
+            color: #3498db;  /* Blue link color */
+            text-decoration: none;  /* No underline by default */
+        }
+        
+        a:hover {
+            text-decoration: underline;  /* Underline on hover */
+        }
+        
+        /* ===== MATH EQUATIONS ===== */
+        .MathJax {
+            font-size: 1.1em !important;  /* Slightly larger math text */
+        }
+        
+        /* ===== VIDEO SIDE STYLES ===== */
+        .video-container {
+            position: relative;  /* For absolute positioning of iframe */
+            width: 100%;  /* Full width */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* Video iframe */
+        .video-container iframe {
+            position: absolute;  /* Absolute positioning within container */
+            top: 0;
+            left: 0;
+            width: 100%;  /* Full width */
+            height: 100%;  /* Full height */
+            border: none;  /* No border */
+        }
+        
+        /* ===== CLOSE BUTTON ===== */
+        .close-button {
+            position: absolute;  /* Absolute positioning */
+            top: 20px;  /* 20px from top */
+            right: 20px;  /* 20px from right */
+            background-color: rgba(0,0,0,0.7);  /* Semi-transparent black background */
+            color: white;  /* White text */
+            border: none;  /* No border */
+            font-size: 24px;  /* Large close button */
+            font-weight: bold;  /* Bold text */
+            cursor: pointer;  /* Indicates clickable */
+            line-height: 1;  /* Tight line height */
+            padding: 10px 15px;  /* Padding for button */
+            border-radius: 50%;  /* Circular button */
+            z-index: 10;  /* Above video */
+            transition: all 0.2s ease;  /* Smooth transitions */
+        }
+        
+        /* Close button hover effect */
+        .close-button:hover {
+            background-color: rgba(0,0,0,0.9);  /* More opaque on hover */
+            transform: scale(1.1);  /* Slight scale up */
+        }
+        
+        /* ===== RESPONSIVE DESIGN ===== */
+        /* Mobile and tablet styles */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;  /* Stack vertically on mobile */
+            }
+            
+            .content-side {
+                max-width: 100%;  /* Full width on mobile */
+                padding: 10px;  /* Smaller margins on mobile */
+            }
+            
+            .video-side {
+                max-width: 100%;  /* Full width on mobile */
+                height: 50vh;  /* Half viewport height on mobile */
+            }
+            
+            .video-container {
+                height: 100%;  /* Full height of video side */
+            }
+            
+            .container {
+                padding: 20px;  /* Smaller internal padding */
+            }
+            
+            h1 {
+                font-size: 1.8em;  /* Smaller title on mobile */
+            }
+            
+            /* Timestamps become static on mobile */
+            .timestamp {
+                position: static;  /* Normal flow instead of absolute */
+                display: block;  /* Block display */
+                margin-bottom: 10px;  /* Space below timestamp */
+            }
+            
+            /* On mobile, when video is open, content should still be scrollable */
+            .content-side {
+                overflow-y: auto;  /* Ensure content is scrollable on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- ===== LEFT SIDE - CONTENT ===== -->
+        <div class="content-side full-width">
+            <div class="scrollable-content">
+                <div class="container">
+                    <!-- ===== LECTURE TITLE ===== -->
+                    <h1>Linear Algebra Lecture 3</h1>
+                    <p style="text-align: center; color: #666; font-style: italic;">Bases of Vector Spaces</p>
+                    
+                    <!-- ===== CONTENT BOXES ===== -->
+                    
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('02:50', 'Course Overview', 'default', this)">
+                            <span class="play-icon">▶</span>02:50
+                        </div>
+                        <h3>Course Overview</h3>
+                        <p>This lecture continues exploring the concepts introduced in the final minutes of the previous lecture: bases of vector spaces, span of a set of vectors, linear combinations, and finite dimensional vector spaces.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('03:23', 'Span Properties', 'default', this)">
+                            <span class="play-icon">▶</span>03:23
+                        </div>
+                        <h3>Properties of Span</h3>
+                        <p>Several important properties of the span of a set $S$ in a vector space $V$:</p>
+                        <ol>
+                            <li><strong>Span is always a subspace:</strong> For any subset $S$ of $V$, $\text{span}(S)$ is always a subspace of $V$.</li>
+                            <li><strong>Smallest containing subspace:</strong> $\text{span}(S)$ is the smallest subspace that contains $S$ in the sense of inclusion.</li>
+                            <li><strong>Transitivity property:</strong> If $S$ spans $V$ and $S \subseteq \text{span}(T)$, then $T$ also spans $V$.</li>
+                            <li><strong>Empty set convention:</strong> By convention, $\text{span}(\emptyset) = \{0\}$ (the zero subspace).</li>
+                            <li><strong>Union property:</strong> $\text{span}(S \cup T) = \text{span}(S) + \text{span}(T)$.</li>
+                        </ol>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('07:00', 'Span Examples', 'example', this)">
+                            <span class="play-icon">▶</span>07:00
+                        </div>
+                        <h3>Span Examples in $\mathbb{R}^3$</h3>
+                        <p>Let $V = \mathbb{R}^3$ and consider two subsets:</p>
+                        <ul>
+                            <li>$S = \{(1,0,0), (1,1,2)\}$</li>
+                            <li>$T = \{(2,1,2), (0,1,2), (-1,2,4)\}$</li>
+                        </ul>
+                        <p>Neither set spans the whole space, but they have the same span: the set of vectors of the form $(x,y,2y)$ where $x$ and $y$ are real numbers. This demonstrates that sets of different sizes can have the same span.</p>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('08:44', 'Infinite Dimensional Example', 'example', this)">
+                            <span class="play-icon">▶</span>08:44
+                        </div>
+                        <h3>Span in Infinite Dimensional Space</h3>
+                        <p>Let $V$ be the space of all real sequences (functions from $\mathbb{N}$ to $\mathbb{R}$). Consider the subset $T = \{\delta_n : n \in \mathbb{N}\}$ where $\delta_n$ is the Kronecker delta function:</p>
+                        <p>$$\delta_n(m) = \begin{cases} 1 & \text{if } n = m \\ 0 & \text{if } n \neq m \end{cases}$$</p>
+                        <p>This set does <strong>not</strong> span $V$ because linear combinations must be finite sums, but general sequences have infinitely many non-zero terms. The span of $T$ consists of sequences that are eventually zero (zero for all but finitely many terms).</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('12:16', 'Linear Independence Definition', 'definition', this)">
+                            <span class="play-icon">▶</span>12:16
+                        </div>
+                        <h3>Linear Independence</h3>
+                        <p>A subset $S$ of a vector space $V$ is called <strong>linearly independent</strong> if for all linear combinations of $S$:</p>
+                        <p>$$\sum_{s \in S} \lambda_s s = 0$$</p>
+                        <p>where $\lambda_s \in F$ (the field) and only finitely many $\lambda_s$ are non-zero, we have that all coefficients $\lambda_s = 0$.</p>
+                        <p>In other words, the only way to write the zero vector as a linear combination of $S$ is as the trivial linear combination where all coefficients are zero.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('14:35', 'Linear Independence Properties', 'default', this)">
+                            <span class="play-icon">▶</span>14:35
+                        </div>
+                        <h3>Properties of Linear Independence</h3>
+                        <ol>
+                            <li><strong>Zero vector property:</strong> If the zero vector is in $S$, then $S$ is always linearly dependent.</li>
+                            <li><strong>Finite sets:</strong> For finite sets $S = \{v_1, v_2, \ldots, v_n\}$, linear independence means that if $\sum_{i=1}^n \lambda_i v_i = 0$, then all $\lambda_i = 0$.</li>
+                            <li><strong>Infinite sets:</strong> An infinite set $S$ is linearly independent if and only if every finite subset of $S$ is linearly independent.</li>
+                            <li><strong>Subset property:</strong> Every subset of a linearly independent set is itself linearly independent.</li>
+                        </ol>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('18:33', 'Linear Independence Examples', 'example', this)">
+                            <span class="play-icon">▶</span>18:33
+                        </div>
+                        <h3>Linear Independence Examples</h3>
+                        <p><strong>Example 1:</strong> In $\mathbb{R}^3$, the set $S = \{(1,0,0), (1,1,2)\}$ is linearly independent, while $T = \{(2,1,2), (0,1,2), (-1,2,4)\}$ is linearly dependent because:</p>
+                        <p>$$1 \cdot (2,1,2) - 5 \cdot (0,1,2) + 2 \cdot (-1,2,4) = (0,0,0)$$</p>
+                        <p><strong>Example 2:</strong> The set $\{\delta_n : n \in \mathbb{N}\}$ of Kronecker delta functions in the space of real sequences is linearly independent.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('22:47', 'Basis Definition', 'definition', this)">
+                            <span class="play-icon">▶</span>22:47
+                        </div>
+                        <h3>Basis</h3>
+                        <p>A subset $S$ of a vector space $V$ is a <strong>basis</strong> if $S$ is both linearly independent and a spanning set for $V$.</p>
+                        <p>Bases represent the confluence of linear independence and spanning properties, leading to many important results in linear algebra.</p>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('23:32', 'Basis Examples', 'example', this)">
+                            <span class="play-icon">▶</span>23:32
+                        </div>
+                        <h3>Basis Examples</h3>
+                        <p><strong>Standard basis for $F^n$:</strong> The set $\{e_1, e_2, \ldots, e_n\}$ where $e_i$ has 1 in the $i$-th position and 0 elsewhere.</p>
+                        <p><strong>Alternative basis for $F^3$:</strong> $\{(1,0,0), (1,1,0), (1,1,1)\}$ is also a basis for $F^3$.</p>
+                        <p><strong>Polynomial basis:</strong> For the space of real polynomials $P(\mathbb{R})$, the set $\{p_n : n \geq 0\}$ where $p_n(x) = x^n$ is a basis.</p>
+                    </div>
+
+                    <div class="proposition content-box">
+                        <div class="timestamp" onclick="openVideoSide('26:49', 'Finite Spanning Set Proposition', 'proposition', this)">
+                            <span class="play-icon">▶</span>26:49
+                        </div>
+                        <h3>Finite Spanning Set Contains a Basis</h3>
+                        <p>If $S$ is a finite spanning set for a vector space $V$, then there exists a subset $S' \subseteq S$ such that $S'$ is a basis for $V$.</p>
+                        <p>This shows that having a finite spanning set is equivalent to having a finite basis, justifying our definition of finite dimensionality.</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('28:32', 'Proof of Spanning Set Proposition', 'proof', this)">
+                            <span class="play-icon">▶</span>28:32
+                        </div>
+                        <h3>Proof of Spanning Set Proposition</h3>
+                        <p>If $S$ is already linearly independent, we're done. Otherwise, there exists a non-trivial linear combination equal to zero:</p>
+                        <p>$$\sum_{i=1}^n \lambda_i v_i = 0$$</p>
+                        <p>where at least one $\lambda_i \neq 0$. Without loss of generality, assume $\lambda_n \neq 0$. Then we can solve for $v_n$:</p>
+                        <p>$$v_n = -\frac{1}{\lambda_n} \sum_{i=1}^{n-1} \lambda_i v_i$$</p>
+                        <p>This shows that $v_n$ is in the span of the other vectors, so we can remove $v_n$ from $S$ and still have a spanning set. We repeat this process until we obtain a linearly independent set, which must happen in finitely many steps since $S$ is finite.</p>
+                    </div>
+
+                    <div class="theorem content-box">
+                        <div class="timestamp" onclick="openVideoSide('33:14', 'Steinitz Exchange Lemma', 'theorem', this)">
+                            <span class="play-icon">▶</span>33:14
+                        </div>
+                        <h3>Steinitz Exchange Lemma</h3>
+                        <p>Let $V$ be a finite-dimensional vector space over a field $F$, and let $S$ and $T$ be finite subsets of $V$ with $S$ linearly independent and $T$ spanning $V$. Then:</p>
+                        <ol>
+                            <li>$|T| \geq |S|$ (every spanning set is at least as big as every linearly independent set)</li>
+                            <li>There exists a subset $T' \subseteq T$ with $|T'| = |T| - |S|$ such that $S \cup T'$ spans $V$</li>
+                        </ol>
+                        <p><em>Proof omitted - will be covered in the next lecture</em></p>
+                    </div>
+
+                    <div class="corollary content-box">
+                        <div class="timestamp" onclick="openVideoSide('37:55', 'Basis Size Corollary', 'corollary', this)">
+                            <span class="play-icon">▶</span>37:55
+                        </div>
+                        <h3>All Bases Have the Same Size</h3>
+                        <p>In a finite-dimensional vector space, every basis is finite and all finite bases have the same size.</p>
+                        <p>This follows from applying the Steinitz Exchange Lemma with two different bases, showing that each has size at most the other.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('42:05', 'Dimension Definition', 'definition', this)">
+                            <span class="play-icon">▶</span>42:05
+                        </div>
+                        <h3>Dimension</h3>
+                        <p>The <strong>dimension</strong> of a finite-dimensional vector space $V$, denoted $\dim V$, is the size of any basis of $V$.</p>
+                        <p>This is well-defined because all bases have the same size.</p>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('43:24', 'Dimension Examples', 'example', this)">
+                            <span class="play-icon">▶</span>43:24
+                        </div>
+                        <h3>Dimension Examples</h3>
+                        <p><strong>$\dim F^n = n$:</strong> The standard basis has $n$ elements.</p>
+                        <p><strong>Complex numbers:</strong> $\mathbb{C}$ has dimension 1 as a complex vector space (basis: $\{1\}$) but dimension 2 as a real vector space (basis: $\{1, i\}$).</p>
+                    </div>
+
+                    <div class="corollary content-box">
+                        <div class="timestamp" onclick="openVideoSide('44:54', 'Size Bounds Corollary', 'corollary', this)">
+                            <span class="play-icon">▶</span>44:54
+                        </div>
+                        <h3>Size Bounds for Subsets</h3>
+                        <p>Let $V$ be a finite-dimensional vector space with dimension $n$. For finite subsets $S$ and $T$ of $V$:</p>
+                        <ol>
+                            <li>If $S$ is linearly independent, then $|S| \leq n$</li>
+                            <li>If $T$ spans $V$, then $|T| \geq n$</li>
+                        </ol>
+                        <p>Equality holds if and only if $S$ or $T$ respectively is a basis.</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('47:32', 'Proof of Size Bounds', 'proof', this)">
+                            <span class="play-icon">▶</span>47:32
+                        </div>
+                        <h3>Proof of Size Bounds</h3>
+                        <p>The inequalities follow immediately from the Steinitz Exchange Lemma applied with a basis for $V$.</p>
+                        <p>For the equality case: If $|S| = n$ and $S$ is linearly independent, then by the exchange lemma, we can replace all vectors in any basis with the vectors in $S$, showing that $S$ spans $V$ and hence is a basis. The proof for spanning sets is similar.</p>
+                    </div>
+
+                    <div class="non-examinable content-box">
+                        <div class="timestamp" onclick="openVideoSide('50:30', 'Infinite Dimensional Warning', 'non-examinable', this)">
+                            <span class="play-icon">▶</span>50:30
+                        </div>
+                        <h3>Infinite Dimensional Vector Spaces</h3>
+                        <p><strong>Note:</strong> This course will not prove that every vector space has a basis. While some infinite-dimensional vector spaces do have explicit bases (like the polynomial space), the general existence of bases for arbitrary vector spaces depends on the Axiom of Choice and is beyond the scope of this course.</p>
+                        <p>When working on problems, only assume a vector space has a basis if you can explicitly write one down or if the problem states the space is finite-dimensional.</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== RIGHT SIDE - VIDEO ===== -->
+        <div id="videoSide" class="video-side">
+            <div class="video-container">
+                <iframe 
+                    id="videoFrame"
+                    src="" 
+                    allowfullscreen 
+                    allow="autoplay">
+                </iframe>
+            </div>
+            
+            <!-- ===== CLOSE BUTTON ===== -->
+            <button class="close-button" onclick="closeVideoSide()">&times;</button>
+        </div>
+    </div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // ===== VIDEO CONFIGURATION =====
+        const PANOPTO_BASE_URL = "https://cambridgelectures.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=f59981d3-ff55-4e3c-888a-b33700b80959";
+        
+        // ===== OPEN VIDEO SIDE FUNCTION =====
+        function openVideoSide(timestamp, title, contentType, timestampElement) {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Convert timestamp to seconds for Panopto
+            const timeInSeconds = convertTimestampToSeconds(timestamp);
+            
+            // Set the video URL with the timestamp
+            const videoUrl = PANOPTO_BASE_URL + `&start=${timeInSeconds}`;
+            videoFrame.src = videoUrl;
+            
+            // Remove full-width class and show video
+            contentSide.classList.remove('full-width');
+            videoSide.style.display = 'block';
+        }
+        
+        // ===== CLOSE VIDEO SIDE FUNCTION =====
+        function closeVideoSide() {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Hide the video side
+            videoSide.style.display = 'none';
+            
+            // Clear the video source to stop playback
+            videoFrame.src = '';
+            
+            // Add full-width class back
+            contentSide.classList.add('full-width');
+        }
+        
+        // ===== TIMESTAMP CONVERSION FUNCTION =====
+        function convertTimestampToSeconds(timestamp) {
+            const parts = timestamp.split(':');
+            const minutes = parseInt(parts[0]);
+            const seconds = parseInt(parts[1]);
+            return minutes * 60 + seconds;
+        }
+    </script>
+</body>
+</html>

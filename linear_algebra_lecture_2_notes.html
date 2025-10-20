@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear Algebra Lecture 2 Notes</title>
+    
+    <!-- MathJax for mathematical equations - renders LaTeX math notation -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],  // Inline math: $x^2$ or \(x^2\)
+                displayMath: [['$$', '$$'], ['\\[', '\\]']], // Display math: $$x^2$$ or \[x^2\]
+                processEscapes: true,  // Process backslash escapes
+                processEnvironments: true  // Process LaTeX environments
+            },
+            options: {
+                skipHtmlTags: ['script', 'style', 'textarea', 'pre']  // Skip these HTML tags
+            }
+        };
+    </script>
+    
+    <style>
+        /* ===== GLOBAL STYLES ===== */
+        body {
+            font-family: 'Times New Roman', serif;  /* Professional academic font */
+            line-height: 1.6;  /* Comfortable line spacing */
+            margin: 0;  /* Remove default margins */
+            padding: 0;  /* Remove default padding */
+            background-color: #f9f9f9;  /* Light background */
+            color: #333;  /* Dark text for readability */
+            font-size: 18px;
+            overflow-x: hidden;  /* Prevent horizontal scroll */
+        }
+        
+        /* ===== MAIN LAYOUT CONTAINER ===== */
+        .main-container {
+            display: flex;  /* Flexbox for side-by-side layout */
+            min-height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== LEFT SIDE - CONTENT ===== */
+        .content-side {
+            flex: 1;  /* Take up remaining space */
+            padding: 20px;  /* Page margins */
+            max-width: 50%;  /* Half the width */
+            display: flex;  /* Flexbox for centering */
+            justify-content: center;  /* Center horizontally */
+            position: relative;  /* For absolute positioning of scrollable content */
+        }
+        
+        /* When video is not open, take full width and center the content */
+        .content-side.full-width {
+            max-width: 100%;  /* Full width when no video */
+            justify-content: center;  /* Center the content */
+        }
+        
+        /* Scrollable content container when video is open */
+        .scrollable-content {
+            width: 100%;
+            max-width: 1000px;
+            overflow-y: auto;
+            max-height: 95vh;  /* 95% viewport height */
+            padding-right: 10px;  /* Space for scrollbar */
+        }
+        
+        /* When video is not open, no height restriction and center the container */
+        .content-side.full-width .scrollable-content {
+            max-height: none;
+        }
+        
+        /* ===== RIGHT SIDE - VIDEO ===== */
+        .video-side {
+            flex: 1;  /* Take up remaining space */
+            max-width: 50%;  /* Half the width */
+            background-color: #000;  /* Black background for video */
+            position: relative;  /* For absolute positioning of close button */
+            display: none;  /* Hidden by default */
+            overflow: hidden;  /* Prevent video from scrolling */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            background-color: white;  /* White content area */
+            padding: 40px;  /* Internal spacing */
+            border-radius: 8px;  /* Rounded corners */
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);  /* Subtle shadow */
+            max-width: 1000px;  /* Optimal reading width */
+            margin: 0 auto;  /* Center the content */
+        }
+        
+        /* ===== HEADINGS ===== */
+        h1 {
+            text-align: center;  /* Center the main title */
+            font-size: 2.2em;  /* Large title */
+            margin-bottom: 40px;  /* Space below title */
+            color: #2c3e50;  /* Dark blue color */
+            padding-bottom: 15px;  /* Space below title */
+        }
+        
+        h2, h3, h4, h5, h6 {
+            color: #2c3e50;  /* Dark blue for all headings */
+            padding-bottom: 8px;  /* Space below headings */
+            margin-top: 30px;  /* Space above headings */
+            font-size: 1.2em;  /* Slightly larger than body text */
+        }
+        
+        /* ===== CONTENT BOXES ===== */
+        /* Base styling for all content boxes */
+        .content-box {
+            padding: 20px;  /* Internal spacing */
+            margin: 20px 0;  /* Vertical spacing between boxes */
+            border-radius: 5px;  /* Rounded corners */
+            position: relative;  /* For absolute positioning of timestamps */
+            border-left: 5px solid;  /* Colored left border */
+            font-size: 18px;  /* Consistent text size */
+        }
+        
+        /* ===== CONTENT BOX TYPES ===== */
+        /* Definition boxes - Green theme for definitions */
+        .definition {
+            background-color: #f0f8f0;  /* Light green background */
+            border-left-color: #28a745;  /* Green left border */
+        }
+        
+        /* Theorem boxes - Purple theme for theorems */
+        .theorem {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Claim boxes - Light purple theme for claims */
+        .claim {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Corollary boxes - Medium purple theme for corollaries */
+        .corollary {
+            background-color: #f0e6ff;  /* Slightly darker purple background */
+            border-left-color: #8e44ad;  /* Darker purple left border */
+        }
+        
+        /* Proposition boxes - Dark purple theme for propositions */
+        .proposition {
+            background-color: #e8d5f2;  /* Even darker purple background */
+            border-left-color: #9b59b6;  /* Dark purple left border */
+        }
+        
+        /* Example boxes - Orange theme for examples */
+        .example {
+            background-color: #fff8f0;  /* Light orange background */
+            border-left-color: #fd7e14;  /* Orange left border */
+        }
+        
+        /* Proof boxes - Pink theme for proofs */
+        .proof {
+            background-color: #fff0f5;  /* Light pink background */
+            border-left-color: #e83e8c;  /* Pink left border */
+        }
+        
+        /* Default boxes - No special styling */
+        .default {
+            background-color: transparent;  /* No background */
+            border: none;  /* No border */
+            padding-left: 0;  /* No left padding */
+        }
+        
+        /* Non-examinable boxes - Gray theme for optional content */
+        .non-examinable {
+            background-color: #f8f9fa;  /* Light gray background */
+            border-left-color: #6c757d;  /* Gray left border */
+            opacity: 0.7;  /* Slightly faded to indicate optional nature */
+        }
+        
+        /* ===== TIMESTAMP STYLING ===== */
+        .timestamp {
+            position: absolute;  /* Positioned relative to content box */
+            top: 10px;  /* 10px from top of content box */
+            right: 15px;  /* 15px from right edge */
+            font-size: 0.8em;  /* Smaller text */
+            color: #666;  /* Gray color */
+            background-color: rgba(255,255,255,0.8);  /* Semi-transparent white background */
+            padding: 2px 6px;  /* Small padding */
+            border-radius: 3px;  /* Rounded corners */
+            cursor: pointer;  /* Indicates clickable */
+            transition: all 0.2s ease;  /* Smooth transitions */
+            display: flex;  /* Flexbox for icon alignment */
+            align-items: center;  /* Vertical center alignment */
+            gap: 3px;  /* Space between icon and text */
+        }
+        
+        /* Hover effect for timestamps */
+        .timestamp:hover {
+            background-color: rgba(255,255,255,0.95);  /* More opaque on hover */
+            color: #333;  /* Darker text on hover */
+            transform: scale(1.05);  /* Slight scale up */
+        }
+        
+        /* Play icon styling */
+        .play-icon {
+            font-size: 0.7em;  /* Smaller than timestamp text */
+        }
+        
+        /* ===== CONTENT BOX HEADINGS ===== */
+        .content-box h3 {
+            margin-top: 0;  /* No top margin for h3 in content boxes */
+            color: inherit;  /* Inherit color from parent */
+            border-bottom: none;  /* No bottom border */
+            padding-bottom: 0;  /* No bottom padding */
+        }
+        
+        /* Add prefixes to content box headings */
+        .content-box h3:before {
+            font-weight: bold;  /* Bold prefix text */
+        }
+        
+        .definition h3:before {
+            content: "Definition: ";  /* "Definition: " prefix */
+        }
+        
+        .theorem h3:before {
+            content: "Theorem: ";  /* "Theorem: " prefix */
+        }
+        
+        .claim h3:before {
+            content: "Claim: ";  /* "Claim: " prefix */
+        }
+        
+        .corollary h3:before {
+            content: "Corollary: ";  /* "Corollary: " prefix */
+        }
+        
+        .proposition h3:before {
+            content: "Proposition: ";  /* "Proposition: " prefix */
+        }
+        
+        .example h3:before {
+            content: "Example: ";  /* "Example: " prefix */
+        }
+        
+        .proof h3:before {
+            content: "Proof: ";  /* "Proof: " prefix */
+        }
+        
+        .default h3:before {
+            content: "";  /* No prefix for default boxes */
+        }
+        
+        /* ===== LISTS ===== */
+        ul, ol {
+            padding-left: 25px;  /* Indent lists */
+        }
+        
+        li {
+            margin: 8px 0;  /* Space between list items */
+        }
+        
+        /* ===== LINKS ===== */
+        a {
+            color: #3498db;  /* Blue link color */
+            text-decoration: none;  /* No underline by default */
+        }
+        
+        a:hover {
+            text-decoration: underline;  /* Underline on hover */
+        }
+        
+        /* ===== MATH EQUATIONS ===== */
+        .MathJax {
+            font-size: 1.1em !important;  /* Slightly larger math text */
+        }
+        
+        /* ===== VIDEO SIDE STYLES ===== */
+        .video-container {
+            position: relative;  /* For absolute positioning of iframe */
+            width: 100%;  /* Full width */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* Video iframe */
+        .video-container iframe {
+            position: absolute;  /* Absolute positioning within container */
+            top: 0;
+            left: 0;
+            width: 100%;  /* Full width */
+            height: 100%;  /* Full height */
+            border: none;  /* No border */
+        }
+        
+        /* ===== CLOSE BUTTON ===== */
+        .close-button {
+            position: absolute;  /* Absolute positioning */
+            top: 20px;  /* 20px from top */
+            right: 20px;  /* 20px from right */
+            background-color: rgba(0,0,0,0.7);  /* Semi-transparent black background */
+            color: white;  /* White text */
+            border: none;  /* No border */
+            font-size: 24px;  /* Large close button */
+            font-weight: bold;  /* Bold text */
+            cursor: pointer;  /* Indicates clickable */
+            line-height: 1;  /* Tight line height */
+            padding: 10px 15px;  /* Padding for button */
+            border-radius: 50%;  /* Circular button */
+            z-index: 10;  /* Above video */
+            transition: all 0.2s ease;  /* Smooth transitions */
+        }
+        
+        /* Close button hover effect */
+        .close-button:hover {
+            background-color: rgba(0,0,0,0.9);  /* More opaque on hover */
+            transform: scale(1.1);  /* Slight scale up */
+        }
+        
+        /* ===== RESPONSIVE DESIGN ===== */
+        /* Mobile and tablet styles */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;  /* Stack vertically on mobile */
+            }
+            
+            .content-side {
+                max-width: 100%;  /* Full width on mobile */
+                padding: 10px;  /* Smaller margins on mobile */
+            }
+            
+            .video-side {
+                max-width: 100%;  /* Full width on mobile */
+                height: 50vh;  /* Half viewport height on mobile */
+            }
+            
+            .video-container {
+                height: 100%;  /* Full height of video side */
+            }
+            
+            .container {
+                padding: 20px;  /* Smaller internal padding */
+            }
+            
+            h1 {
+                font-size: 1.8em;  /* Smaller title on mobile */
+            }
+            
+            /* Timestamps become static on mobile */
+            .timestamp {
+                position: static;  /* Normal flow instead of absolute */
+                display: block;  /* Block display */
+                margin-bottom: 10px;  /* Space below timestamp */
+            }
+            
+            /* On mobile, when video is open, content should still be scrollable */
+            .content-side {
+                overflow-y: auto;  /* Ensure content is scrollable on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- ===== LEFT SIDE - CONTENT ===== -->
+        <div class="content-side full-width">
+            <div class="scrollable-content">
+                <div class="container">
+                    <!-- ===== LECTURE TITLE ===== -->
+                    <h1>Linear Algebra Lecture 2</h1>
+                    <p style="text-align: center; color: #666; font-style: italic;">Isomorphisms, Kernels, Images, and Quotient Spaces</p>
+                    
+                    <!-- ===== CONTENT BOXES ===== -->
+                    
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('0:41', 'Course Announcements', 'default', this)">
+                            <span class="play-icon">▶</span>0:41
+                        </div>
+                        <h3>Course Announcements</h3>
+                        <p>The first example sheet went up on Moodle on Saturday and should appear on the mass example sheets page today. The instructor will also upload scans of handwritten lecture notes, though these may be uploaded in batches of 2-3 lectures at a time rather than after every lecture.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('2:07', 'Complex Conjugation Question', 'default', this)">
+                            <span class="play-icon">▶</span>2:07
+                        </div>
+                        <h3>Complex Conjugation Question</h3>
+                        <p>From the previous lecture, we had a question about whether complex conjugation is a linear map. The answer depends on which field we're working over:</p>
+                        <ul>
+                            <li>If we view $\mathbb{C}$ as a <strong>complex vector space</strong>: No, because complex conjugation doesn't respect scalar multiplication by complex numbers</li>
+                            <li>If we view $\mathbb{C}$ as a <strong>real vector space</strong>: Yes, because it does respect scalar multiplication by real numbers</li>
+                        </ul>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('4:23', 'Isomorphism Definition', 'definition', this)">
+                            <span class="play-icon">▶</span>4:23
+                        </div>
+                        <h3>Isomorphism</h3>
+                        <p>An <strong>isomorphism</strong> $\alpha: V \to W$ between vector spaces $V$ and $W$ over a field $F$ is a bijective linear map.</p>
+                        <p>We say that $V$ and $W$ are <strong>isomorphic</strong> if there exists an isomorphism from $V$ to $W$, denoted $V \cong W$.</p>
+                        <p>Intuitively, if two vector spaces are isomorphic, then from the point of view of vector space structure, they are the same vector space - just with elements labeled differently.</p>
+                    </div>
+
+                    <div class="example content-box">
+                        <div class="timestamp" onclick="openVideoSide('6:45', 'Isomorphism Example', 'example', this)">
+                            <span class="play-icon">▶</span>6:45
+                        </div>
+                        <h3>Isomorphism Example</h3>
+                        <p>Let $V$ be the set of 4-dimensional column vectors over field $F$ and $W$ be the set of $2 \times 2$ matrices over $F$. Define the map $\alpha: V \to W$ by:</p>
+                        <p>$$\alpha\begin{pmatrix} a \\ b \\ c \\ d \end{pmatrix} = \begin{pmatrix} a & b \\ c & d \end{pmatrix}$$</p>
+                        <p>This is an isomorphism of vector spaces, showing that as far as vector space structure is concerned, $2 \times 2$ matrices are just an array of four numbers arranged differently.</p>
+                    </div>
+
+                    <div class="theorem content-box">
+                        <div class="timestamp" onclick="openVideoSide('8:37', 'Inverse of Isomorphism', 'theorem', this)">
+                            <span class="play-icon">▶</span>8:37
+                        </div>
+                        <h3>Inverse of Isomorphism</h3>
+                        <p>If $\alpha: V \to W$ is an isomorphism, then $\alpha^{-1}: W \to V$ is also an isomorphism.</p>
+                        <p><em>Proof:</em> The inverse of a bijection is always a bijection. For linearity, let $w_1, w_2 \in W$ and $\lambda \in F$. Since $\alpha$ is surjective, we can write $w_i = \alpha(v_i)$ for some $v_i \in V$. Then:</p>
+                        <p>$$\alpha^{-1}(w_1 + \lambda w_2) = \alpha^{-1}(\alpha(v_1) + \lambda \alpha(v_2)) = \alpha^{-1}(\alpha(v_1 + \lambda v_2)) = v_1 + \lambda v_2 = \alpha^{-1}(w_1) + \lambda \alpha^{-1}(w_2)$$</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('12:50', 'Isomorphism Properties', 'default', this)">
+                            <span class="play-icon">▶</span>12:50
+                        </div>
+                        <h3>Isomorphism Properties</h3>
+                        <p>The relation of being isomorphic is an equivalence relation on vector spaces:</p>
+                        <ul>
+                            <li><strong>Reflexive:</strong> Every vector space is isomorphic to itself (via the identity map)</li>
+                            <li><strong>Symmetric:</strong> If $V \cong W$, then $W \cong V$ (via the inverse isomorphism)</li>
+                            <li><strong>Transitive:</strong> If $V \cong W$ and $W \cong U$, then $V \cong U$ (via composition of isomorphisms)</li>
+                        </ul>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('14:13', 'Kernel and Image', 'definition', this)">
+                            <span class="play-icon">▶</span>14:13
+                        </div>
+                        <h3>Kernel and Image</h3>
+                        <p>For a linear map $\alpha: V \to W$ between vector spaces $V$ and $W$ over field $F$:</p>
+                        <ul>
+                            <li><strong>Kernel of $\alpha$:</strong> $\ker(\alpha) = \{v \in V : \alpha(v) = 0_W\}$ (subset of $V$)</li>
+                            <li><strong>Image of $\alpha$:</strong> $\text{im}(\alpha) = \{\alpha(v) : v \in V\}$ (subset of $W$)</li>
+                        </ul>
+                        <p>These definitions are analogous to what we saw in group theory, where the kernel consists of elements "killed off" by the map, and the image is what we get out at the other side.</p>
+                    </div>
+
+                    <div class="theorem content-box">
+                        <div class="timestamp" onclick="openVideoSide('16:18', 'Kernel and Image Properties', 'theorem', this)">
+                            <span class="play-icon">▶</span>16:18
+                        </div>
+                        <h3>Kernel and Image Properties</h3>
+                        <p>For any linear map $\alpha: V \to W$:</p>
+                        <ol>
+                            <li>$\ker(\alpha)$ is always a subspace of $V$</li>
+                            <li>$\text{im}(\alpha)$ is always a subspace of $W$</li>
+                            <li>$\alpha$ is surjective if and only if $\text{im}(\alpha) = W$</li>
+                            <li>$\alpha$ is injective if and only if $\ker(\alpha) = \{0_V\}$</li>
+                        </ol>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('18:05', 'Zero Vector Property', 'proof', this)">
+                            <span class="play-icon">▶</span>18:05
+                        </div>
+                        <h3>Zero Vector Property</h3>
+                        <p><strong>Claim:</strong> Any linear map takes the zero vector to the zero vector.</p>
+                        <p><em>Proof:</strong> For any linear map $\alpha: V \to W$, we have:</p>
+                        <p>$$\alpha(0_V) = \alpha(0_V + 0_V) = \alpha(0_V) + \alpha(0_V)$$</p>
+                        <p>Subtracting $\alpha(0_V)$ from both sides gives $\alpha(0_V) = 0_W$.</p>
+                        <p>This tells us that $0_V \in \ker(\alpha)$ and $0_W \in \text{im}(\alpha)$.</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('19:38', 'Injectivity Criterion', 'proof', this)">
+                            <span class="play-icon">▶</span>19:38
+                        </div>
+                        <h3>Injectivity Criterion</h3>
+                        <p><strong>Claim:</strong> $\alpha$ is injective if and only if $\ker(\alpha) = \{0_V\}$.</p>
+                        <p><em>Proof:</em></p>
+                        <p><strong>($\Rightarrow$):</strong> Suppose $\alpha$ is injective. We know $0_V \in \ker(\alpha)$. If $v \in \ker(\alpha)$, then $\alpha(v) = 0_W = \alpha(0_V)$. Since $\alpha$ is injective, $v = 0_V$. Therefore $\ker(\alpha) = \{0_V\}$.</p>
+                        <p><strong>($\Leftarrow$):</strong> Suppose $\ker(\alpha) = \{0_V\}$. Let $u, v \in V$ with $\alpha(u) = \alpha(v)$. Then $\alpha(u - v) = \alpha(u) - \alpha(v) = 0_W$, so $u - v \in \ker(\alpha) = \{0_V\}$. Therefore $u - v = 0_V$, so $u = v$. Hence $\alpha$ is injective.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('23:30', 'Quotient Space', 'definition', this)">
+                            <span class="play-icon">▶</span>23:30
+                        </div>
+                        <h3>Quotient Space</h3>
+                        <p>For a vector space $V$ over field $F$ and a subspace $W$ of $V$, the <strong>quotient space</strong> $V/W$ is the set of additive cosets of $W$ in $V$:</p>
+                        <p>$$V/W = \{v + W : v \in V\}$$</p>
+                        <p>Since $V$ is an abelian group under addition and $W$ is a normal subgroup, we can define vector space operations on $V/W$:</p>
+                        <ul>
+                            <li><strong>Addition:</strong> $(u + W) + (v + W) = (u + v) + W$</li>
+                            <li><strong>Scalar multiplication:</strong> $\lambda(v + W) = (\lambda v) + W$</li>
+                        </ul>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('25:21', 'Coset Equality Criterion', 'default', this)">
+                            <span class="play-icon">▶</span>25:21
+                        </div>
+                        <h3>Coset Equality Criterion</h3>
+                        <p>For vectors $u, v \in V$, the cosets $u + W$ and $v + W$ are equal if and only if $u - v \in W$.</p>
+                        <p>This criterion is used to check when two cosets are the same, even when represented by different elements.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('28:23', 'Well-Defined Operations', 'default', this)">
+                            <span class="play-icon">▶</span>28:23
+                        </div>
+                        <h3>Well-Defined Operations</h3>
+                        <p>It's crucial to verify that the vector space operations on $V/W$ are well-defined. This means that if we represent the same cosets with different elements, the operations should give the same result.</p>
+                        <p>For example, if $u + W = u' + W$ and $v + W = v' + W$, then $(u + v) + W = (u' + v') + W$ and $\lambda(u + W) = \lambda(u' + W)$.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('32:51', 'Quotient Map', 'definition', this)">
+                            <span class="play-icon">▶</span>32:51
+                        </div>
+                        <h3>Quotient Map</h3>
+                        <p>The <strong>quotient map</strong> $\pi_W: V \to V/W$ is defined by $\pi_W(v) = v + W$.</p>
+                        <p>This map is:</p>
+                        <ul>
+                            <li><strong>Surjective:</strong> Every coset is the image of some vector</li>
+                            <li><strong>Linear:</strong> $\pi_W(u + \lambda v) = \pi_W(u) + \lambda \pi_W(v)$</li>
+                            <li><strong>Kernel:</strong> $\ker(\pi_W) = W$</li>
+                        </ul>
+                        <p>The quotient map represents the "blurring out" process where information contained in $W$ is made unreadable.</p>
+                    </div>
+
+                    <div class="theorem content-box">
+                        <div class="timestamp" onclick="openVideoSide('37:22', 'First Isomorphism Theorem', 'theorem', this)">
+                            <span class="play-icon">▶</span>37:22
+                        </div>
+                        <h3>First Isomorphism Theorem</h3>
+                        <p>For vector spaces $V$ and $W$ over field $F$ and a linear map $\alpha: V \to W$, there is an isomorphism:</p>
+                        <p>$$\bar{\alpha}: V/\ker(\alpha) \to \text{im}(\alpha)$$</p>
+                        <p>defined by $\bar{\alpha}(v + \ker(\alpha)) = \alpha(v)$.</p>
+                        <p>This theorem says that what survives transmission through $\alpha$ is the same as what you would get if you took $V$ and blurred out the information in $\ker(\alpha)$.</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('40:25', 'First Isomorphism Theorem Proof', 'proof', this)">
+                            <span class="play-icon">▶</span>40:25
+                        </div>
+                        <h3>First Isomorphism Theorem Proof</h3>
+                        <p>We need to check that $\bar{\alpha}$ is well-defined, injective, surjective, and linear.</p>
+                        <p><strong>Well-defined and injective:</strong> For $u, v \in V$, the cosets $u + \ker(\alpha)$ and $v + \ker(\alpha)$ are equal if and only if $u - v \in \ker(\alpha)$, which happens if and only if $\alpha(u - v) = 0$, which happens if and only if $\alpha(u) = \alpha(v)$, which happens if and only if $\bar{\alpha}(u + \ker(\alpha)) = \bar{\alpha}(v + \ker(\alpha))$.</p>
+                        <p><strong>Surjective:</strong> Given $w \in \text{im}(\alpha)$, there exists $v \in V$ such that $w = \alpha(v) = \bar{\alpha}(v + \ker(\alpha))$.</p>
+                        <p><strong>Linear:</strong> $\bar{\alpha}((u + \ker(\alpha)) + \lambda(v + \ker(\alpha))) = \bar{\alpha}(u + \lambda v + \ker(\alpha)) = \alpha(u + \lambda v) = \alpha(u) + \lambda \alpha(v) = \bar{\alpha}(u + \ker(\alpha)) + \lambda \bar{\alpha}(v + \ker(\alpha))$.</p>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('46:13', 'Span and Linear Combinations', 'definition', this)">
+                            <span class="play-icon">▶</span>46:13
+                        </div>
+                        <h3>Span and Linear Combinations</h3>
+                        <p>For a vector space $V$ over field $F$ and a subset $S \subseteq V$:</p>
+                        <ul>
+                            <li><strong>Linear combination of $S$:</strong> An expression of the form $\sum_{s \in S} \lambda_s s$ where $\lambda_s \in F$ and only finitely many $\lambda_s$ are non-zero</li>
+                            <li><strong>Span of $S$:</strong> $\langle S \rangle = \{\text{all linear combinations of } S\}$</li>
+                            <li><strong>Spanning set:</strong> $S$ spans $V$ (or is a spanning set for $V$) if $\langle S \rangle = V$</li>
+                            <li><strong>Finite dimensional:</strong> $V$ is finite dimensional if it has a finite spanning set</li>
+                        </ul>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('47:19', 'Finite Sums Restriction', 'default', this)">
+                            <span class="play-icon">▶</span>47:19
+                        </div>
+                        <h3>Finite Sums Restriction</h3>
+                        <p>In linear algebra, we only allow finite sums of vectors. If $S$ is infinite, we require that all but finitely many coefficients $\lambda_s$ are zero, ensuring we're only adding finitely many terms.</p>
+                        <p>This restriction is necessary because we haven't defined a way to add infinitely many vectors together, and we won't in this course.</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== RIGHT SIDE - VIDEO ===== -->
+        <div id="videoSide" class="video-side">
+            <div class="video-container">
+                <iframe 
+                    id="videoFrame"
+                    src="" 
+                    allowfullscreen 
+                    allow="autoplay">
+                </iframe>
+            </div>
+            
+            <!-- ===== CLOSE BUTTON ===== -->
+            <button class="close-button" onclick="closeVideoSide()">&times;</button>
+        </div>
+    </div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // ===== VIDEO CONFIGURATION =====
+        const PANOPTO_BASE_URL = "https://cambridgelectures.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=542fa670-423a-4ea7-986b-b33700b805a1";
+        
+        // ===== OPEN VIDEO SIDE FUNCTION =====
+        function openVideoSide(timestamp, title, contentType, timestampElement) {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Convert timestamp to seconds for Panopto
+            const timeInSeconds = convertTimestampToSeconds(timestamp);
+            
+            // Set the video URL with the timestamp
+            const videoUrl = PANOPTO_BASE_URL + `&start=${timeInSeconds}`;
+            videoFrame.src = videoUrl;
+            
+            // Remove full-width class and show video
+            contentSide.classList.remove('full-width');
+            videoSide.style.display = 'block';
+        }
+        
+        // ===== CLOSE VIDEO SIDE FUNCTION =====
+        function closeVideoSide() {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Hide the video side
+            videoSide.style.display = 'none';
+            
+            // Clear the video source to stop playback
+            videoFrame.src = '';
+            
+            // Add full-width class back
+            contentSide.classList.add('full-width');
+        }
+        
+        // ===== TIMESTAMP CONVERSION FUNCTION =====
+        function convertTimestampToSeconds(timestamp) {
+            const parts = timestamp.split(':');
+            const minutes = parseInt(parts[0]);
+            const seconds = parseInt(parts[1]);
+            return minutes * 60 + seconds;
+        }
+    </script>
+</body>
+</html>

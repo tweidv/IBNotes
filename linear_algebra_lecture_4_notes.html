@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear Algebra Lecture 4 Notes</title>
+    
+    <!-- MathJax for mathematical equations - renders LaTeX math notation -->
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],  // Inline math: $x^2$ or \(x^2\)
+                displayMath: [['$$', '$$'], ['\\[', '\\]']], // Display math: $$x^2$$ or \[x^2\]
+                processEscapes: true,  // Process backslash escapes
+                processEnvironments: true  // Process LaTeX environments
+            },
+            options: {
+                skipHtmlTags: ['script', 'style', 'textarea', 'pre']  // Skip these HTML tags
+            }
+        };
+    </script>
+    
+    <style>
+        /* ===== GLOBAL STYLES ===== */
+        body {
+            font-family: 'Times New Roman', serif;  /* Professional academic font */
+            line-height: 1.6;  /* Comfortable line spacing */
+            margin: 0;  /* Remove default margins */
+            padding: 0;  /* Remove default padding */
+            background-color: #f9f9f9;  /* Light background */
+            color: #333;  /* Dark text for readability */
+            font-size: 18px;
+            overflow-x: hidden;  /* Prevent horizontal scroll */
+        }
+        
+        /* ===== MAIN LAYOUT CONTAINER ===== */
+        .main-container {
+            display: flex;  /* Flexbox for side-by-side layout */
+            min-height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== LEFT SIDE - CONTENT ===== */
+        .content-side {
+            flex: 1;  /* Take up remaining space */
+            padding: 20px;  /* Page margins */
+            max-width: 50%;  /* Half the width */
+            display: flex;  /* Flexbox for centering */
+            justify-content: center;  /* Center horizontally */
+            position: relative;  /* For absolute positioning of scrollable content */
+        }
+        
+        /* When video is not open, take full width and center the content */
+        .content-side.full-width {
+            max-width: 100%;  /* Full width when no video */
+            justify-content: center;  /* Center the content */
+        }
+        
+        /* Scrollable content container when video is open */
+        .scrollable-content {
+            width: 100%;
+            max-width: 1000px;
+            overflow-y: auto;
+            max-height: 95vh;  /* 95% viewport height */
+            padding-right: 10px;  /* Space for scrollbar */
+        }
+        
+        /* When video is not open, no height restriction and center the container */
+        .content-side.full-width .scrollable-content {
+            max-height: none;
+        }
+        
+        /* ===== RIGHT SIDE - VIDEO ===== */
+        .video-side {
+            flex: 1;  /* Take up remaining space */
+            max-width: 50%;  /* Half the width */
+            background-color: #000;  /* Black background for video */
+            position: relative;  /* For absolute positioning of close button */
+            display: none;  /* Hidden by default */
+            overflow: hidden;  /* Prevent video from scrolling */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            background-color: white;  /* White content area */
+            padding: 40px;  /* Internal spacing */
+            border-radius: 8px;  /* Rounded corners */
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);  /* Subtle shadow */
+            max-width: 1000px;  /* Optimal reading width */
+            margin: 0 auto;  /* Center the content */
+        }
+        
+        /* ===== HEADINGS ===== */
+        h1 {
+            text-align: center;  /* Center the main title */
+            font-size: 2.2em;  /* Large title */
+            margin-bottom: 40px;  /* Space below title */
+            color: #2c3e50;  /* Dark blue color */
+            padding-bottom: 15px;  /* Space below title */
+        }
+        
+        h2, h3, h4, h5, h6 {
+            color: #2c3e50;  /* Dark blue for all headings */
+            padding-bottom: 8px;  /* Space below headings */
+            margin-top: 30px;  /* Space above headings */
+            font-size: 1.2em;  /* Slightly larger than body text */
+        }
+        
+        /* ===== CONTENT BOXES ===== */
+        /* Base styling for all content boxes */
+        .content-box {
+            padding: 20px;  /* Internal spacing */
+            margin: 20px 0;  /* Vertical spacing between boxes */
+            border-radius: 5px;  /* Rounded corners */
+            position: relative;  /* For absolute positioning of timestamps */
+            border-left: 5px solid;  /* Colored left border */
+            font-size: 18px;  /* Consistent text size */
+        }
+        
+        /* ===== CONTENT BOX TYPES ===== */
+        /* Definition boxes - Green theme for definitions */
+        .definition {
+            background-color: #f0f8f0;  /* Light green background */
+            border-left-color: #28a745;  /* Green left border */
+        }
+        
+        /* Theorem boxes - Purple theme for theorems */
+        .theorem {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Claim boxes - Light purple theme for claims */
+        .claim {
+            background-color: #f8f0ff;  /* Light purple background */
+            border-left-color: #6f42c1;  /* Purple left border */
+        }
+        
+        /* Corollary boxes - Medium purple theme for corollaries */
+        .corollary {
+            background-color: #f0e6ff;  /* Slightly darker purple background */
+            border-left-color: #8e44ad;  /* Darker purple left border */
+        }
+        
+        /* Proposition boxes - Dark purple theme for propositions */
+        .proposition {
+            background-color: #e8d5f2;  /* Even darker purple background */
+            border-left-color: #9b59b6;  /* Dark purple left border */
+        }
+        
+        /* Example boxes - Orange theme for examples */
+        .example {
+            background-color: #fff8f0;  /* Light orange background */
+            border-left-color: #fd7e14;  /* Orange left border */
+        }
+        
+        /* Proof boxes - Pink theme for proofs */
+        .proof {
+            background-color: #fff0f5;  /* Light pink background */
+            border-left-color: #e83e8c;  /* Pink left border */
+        }
+        
+        /* Default boxes - No special styling */
+        .default {
+            background-color: transparent;  /* No background */
+            border: none;  /* No border */
+            padding-left: 0;  /* No left padding */
+        }
+        
+        /* Non-examinable boxes - Gray theme for optional content */
+        .non-examinable {
+            background-color: #f8f9fa;  /* Light gray background */
+            border-left-color: #6c757d;  /* Gray left border */
+            opacity: 0.7;  /* Slightly faded to indicate optional nature */
+        }
+        
+        /* ===== TIMESTAMP STYLING ===== */
+        .timestamp {
+            position: absolute;  /* Positioned relative to content box */
+            top: 10px;  /* 10px from top of content box */
+            right: 15px;  /* 15px from right edge */
+            font-size: 0.8em;  /* Smaller text */
+            color: #666;  /* Gray color */
+            background-color: rgba(255,255,255,0.8);  /* Semi-transparent white background */
+            padding: 2px 6px;  /* Small padding */
+            border-radius: 3px;  /* Rounded corners */
+            cursor: pointer;  /* Indicates clickable */
+            transition: all 0.2s ease;  /* Smooth transitions */
+            display: flex;  /* Flexbox for icon alignment */
+            align-items: center;  /* Vertical center alignment */
+            gap: 3px;  /* Space between icon and text */
+        }
+        
+        /* Hover effect for timestamps */
+        .timestamp:hover {
+            background-color: rgba(255,255,255,0.95);  /* More opaque on hover */
+            color: #333;  /* Darker text on hover */
+            transform: scale(1.05);  /* Slight scale up */
+        }
+        
+        /* Play icon styling */
+        .play-icon {
+            font-size: 0.7em;  /* Smaller than timestamp text */
+        }
+        
+        /* ===== CONTENT BOX HEADINGS ===== */
+        .content-box h3 {
+            margin-top: 0;  /* No top margin for h3 in content boxes */
+            color: inherit;  /* Inherit color from parent */
+            border-bottom: none;  /* No bottom border */
+            padding-bottom: 0;  /* No bottom padding */
+        }
+        
+        /* Add prefixes to content box headings */
+        .content-box h3:before {
+            font-weight: bold;  /* Bold prefix text */
+        }
+        
+        .definition h3:before {
+            content: "Definition: ";  /* "Definition: " prefix */
+        }
+        
+        .theorem h3:before {
+            content: "Theorem: ";  /* "Theorem: " prefix */
+        }
+        
+        .claim h3:before {
+            content: "Claim: ";  /* "Claim: " prefix */
+        }
+        
+        .corollary h3:before {
+            content: "Corollary: ";  /* "Corollary: " prefix */
+        }
+        
+        .proposition h3:before {
+            content: "Proposition: ";  /* "Proposition: " prefix */
+        }
+        
+        .example h3:before {
+            content: "Example: ";  /* "Example: " prefix */
+        }
+        
+        .proof h3:before {
+            content: "Proof: ";  /* "Proof: " prefix */
+        }
+        
+        .default h3:before {
+            content: "";  /* No prefix for default boxes */
+        }
+        
+        /* ===== LISTS ===== */
+        ul, ol {
+            padding-left: 25px;  /* Indent lists */
+        }
+        
+        li {
+            margin: 8px 0;  /* Space between list items */
+        }
+        
+        /* ===== LINKS ===== */
+        a {
+            color: #3498db;  /* Blue link color */
+            text-decoration: none;  /* No underline by default */
+        }
+        
+        a:hover {
+            text-decoration: underline;  /* Underline on hover */
+        }
+        
+        /* ===== MATH EQUATIONS ===== */
+        .MathJax {
+            font-size: 1.1em !important;  /* Slightly larger math text */
+        }
+        
+        /* ===== VIDEO SIDE STYLES ===== */
+        .video-container {
+            position: relative;  /* For absolute positioning of iframe */
+            width: 100%;  /* Full width */
+            height: 100vh;  /* Full viewport height */
+        }
+        
+        /* Video iframe */
+        .video-container iframe {
+            position: absolute;  /* Absolute positioning within container */
+            top: 0;
+            left: 0;
+            width: 100%;  /* Full width */
+            height: 100%;  /* Full height */
+            border: none;  /* No border */
+        }
+        
+        /* ===== CLOSE BUTTON ===== */
+        .close-button {
+            position: absolute;  /* Absolute positioning */
+            top: 20px;  /* 20px from top */
+            right: 20px;  /* 20px from right */
+            background-color: rgba(0,0,0,0.7);  /* Semi-transparent black background */
+            color: white;  /* White text */
+            border: none;  /* No border */
+            font-size: 24px;  /* Large close button */
+            font-weight: bold;  /* Bold text */
+            cursor: pointer;  /* Indicates clickable */
+            line-height: 1;  /* Tight line height */
+            padding: 10px 15px;  /* Padding for button */
+            border-radius: 50%;  /* Circular button */
+            z-index: 10;  /* Above video */
+            transition: all 0.2s ease;  /* Smooth transitions */
+        }
+        
+        /* Close button hover effect */
+        .close-button:hover {
+            background-color: rgba(0,0,0,0.9);  /* More opaque on hover */
+            transform: scale(1.1);  /* Slight scale up */
+        }
+        
+        /* ===== RESPONSIVE DESIGN ===== */
+        /* Mobile and tablet styles */
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;  /* Stack vertically on mobile */
+            }
+            
+            .content-side {
+                max-width: 100%;  /* Full width on mobile */
+                padding: 10px;  /* Smaller margins on mobile */
+            }
+            
+            .video-side {
+                max-width: 100%;  /* Full width on mobile */
+                height: 50vh;  /* Half viewport height on mobile */
+            }
+            
+            .video-container {
+                height: 100%;  /* Full height of video side */
+            }
+            
+            .container {
+                padding: 20px;  /* Smaller internal padding */
+            }
+            
+            h1 {
+                font-size: 1.8em;  /* Smaller title on mobile */
+            }
+            
+            /* Timestamps become static on mobile */
+            .timestamp {
+                position: static;  /* Normal flow instead of absolute */
+                display: block;  /* Block display */
+                margin-bottom: 10px;  /* Space below timestamp */
+            }
+            
+            /* On mobile, when video is open, content should still be scrollable */
+            .content-side {
+                overflow-y: auto;  /* Ensure content is scrollable on mobile */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- ===== LEFT SIDE - CONTENT ===== -->
+        <div class="content-side full-width">
+            <div class="scrollable-content">
+                <div class="container">
+                    <!-- ===== LECTURE TITLE ===== -->
+                    <h1>Linear Algebra Lecture 4</h1>
+                    <p style="text-align: center; color: #666; font-style: italic;">Steinitz Exchange Lemma, Subspaces, and Rank-Nullity Theorem</p>
+                    
+                    <!-- ===== CONTENT BOXES ===== -->
+                    
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('0:43', 'Lecture Overview', 'default', this)">
+                            <span class="play-icon">▶</span>0:43
+                        </div>
+                        <h3>Lecture Overview</h3>
+                        <p>In this lecture, we will prove the Steinitz exchange lemma that was stated in the previous lecture, explore consequences for subspaces, and introduce the famous rank-nullity theorem for linear maps.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('1:18', 'Steinitz Exchange Lemma Statement', 'default', this)">
+                            <span class="play-icon">▶</span>1:18
+                        </div>
+                        <h3>Steinitz Exchange Lemma Statement</h3>
+                        <p>The Steinitz exchange lemma states that in any vector space, if you have a linearly independent subset $S$ and a spanning set $T$, then:</p>
+                        <ul>
+                            <li>$S$ is always smaller than $T$ or perhaps equal in size</li>
+                            <li>By throwing away a number of elements of $T$ equal to the number of elements in $S$, you can put $S$ inside $T$ and still have a spanning set</li>
+                        </ul>
+                        <p>In other words, you can put any linearly independent set inside a spanning set.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('1:43', 'Previous Consequences', 'default', this)">
+                            <span class="play-icon">▶</span>1:43
+                        </div>
+                        <h3>Previous Consequences</h3>
+                        <p>From the Steinitz exchange lemma, we saw two important consequences:</p>
+                        <ol>
+                            <li>If you have a finite dimensional vector space (i.e., a vector space with a finite spanning set), then not only does it have a finite basis, but all bases are finite and have the same size</li>
+                            <li>Every linearly independent set has size at most the dimension, and every spanning set has size at least the dimension. You get equality in either case if and only if you have a basis</li>
+                        </ol>
+                    </div>
+
+                    <div class="proposition content-box">
+                        <div class="timestamp" onclick="openVideoSide('2:21', 'Subspaces of Finite Dimensional Spaces', 'proposition', this)">
+                            <span class="play-icon">▶</span>2:21
+                        </div>
+                        <h3>Subspaces of Finite Dimensional Vector Spaces</h3>
+                        <p>If $V$ is a finite dimensional vector space and $U$ is a subspace of $V$, then:</p>
+                        <ol>
+                            <li>$U$ is also finite dimensional as a vector space</li>
+                            <li>The dimension of $U$ is always at most the dimension of $V$</li>
+                            <li>We have equality: $\dim U = \dim V$ if and only if $U = V$</li>
+                        </ol>
+                        <p>So subspaces always have dimension that's less than or equal to the dimension of the finite dimensional vector space in which they sit, and if they're proper subspaces, it's strictly less.</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('3:26', 'Proof of Subspace Dimension', 'proof', this)">
+                            <span class="play-icon">▶</span>3:26
+                        </div>
+                        <h3>Proof of Subspace Dimension</h3>
+                        <p>The proof works by constructing a finite basis for $U$ one element at a time, using consequences of the Steinitz exchange lemma to ensure the process terminates.</p>
+                        <p><strong>Step 1:</strong> If $U = \{0\}$, then we're done immediately.</p>
+                        <p><strong>Step 2:</strong> If not, pick some non-zero vector $u_1 \in U$. This single element set is certainly linearly independent.</p>
+                        <p><strong>Step k:</strong> After step $k$, assume we've constructed a linearly independent subset $\{u_1, u_2, \ldots, u_k\}$ of size $k$.</p>
+                        <p>If this set is already a spanning set for $U$, then we're done because it's a basis of size $k$ and $k \leq \dim V$ (since a linearly independent set in $U$ is also linearly independent in $V$).</p>
+                        <p>If not, move to the next step: find a new vector $u_{k+1}$ to add to the set, which is just something that lies outside the span of $\{u_1, \ldots, u_k\}$.</p>
+                        <p>The set $\{u_1, \ldots, u_{k+1}\}$ must be linearly independent, otherwise we could write $u_{k+1}$ as a linear combination of the previous vectors, contradicting our choice.</p>
+                        <p>This process has to terminate after at most $\dim V$ steps because at each stage we have a linearly independent set in $V$, and a linearly independent set can never grow bigger than the dimension.</p>
+                        <p>Finally, if $\dim U = \dim V$, then $U$ has a basis of the same size as a basis of $V$, and by the previous corollary, the basis of $U$ is also a basis of $V$, so $U = V$.</p>
+                    </div>
+
+                    <div class="proposition content-box">
+                        <div class="timestamp" onclick="openVideoSide('10:34', 'Basis Extension', 'proposition', this)">
+                            <span class="play-icon">▶</span>10:34
+                        </div>
+                        <h3>Basis Extension</h3>
+                        <p>Another consequence of the Steinitz exchange lemma is that you can extend a basis from a subspace to a basis of the whole vector space.</p>
+                        <p>If $V$ is finite dimensional and $U$ is a subspace, then for any basis $B_U$ of $U$, there exists a basis $B_V$ of $V$ which contains $B_U$.</p>
+                        <p>This is called <strong>basis extension</strong> and will be referred to as such throughout the course.</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('11:55', 'Proof of Basis Extension', 'proof', this)">
+                            <span class="play-icon">▶</span>11:55
+                        </div>
+                        <h3>Proof of Basis Extension</h3>
+                        <p>Let $B_U$ be the given basis of $U$ and let $B_V$ be any basis of $V$ (which exists since $V$ is finite dimensional).</p>
+                        <p>Apply the second part of the Steinitz exchange lemma with $S = B_U$ (the linearly independent set) and $T = B_V$ (the spanning set).</p>
+                        <p>This gives us a subset $T' \subseteq T$ with $|T'| = |T| - |S|$ such that $S \cup T'$ spans $V$.</p>
+                        <p>Since $|T| = \dim V$ and $|S| = \dim U$, we have $|T'| = \dim V - \dim U$.</p>
+                        <p>Let $B_V = B_U \cup T'$. We need to check that this is linearly independent.</p>
+                        <p>Since it's a spanning set, by corollary 2, it will be linearly independent precisely when it has size at most $\dim V$.</p>
+                        <p>Indeed, $|B_V| = |B_U| + |T'| = \dim U + (\dim V - \dim U) = \dim V$, so $B_V$ is a basis.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('14:43', 'Basis Extension Strategy', 'default', this)">
+                            <span class="play-icon">▶</span>14:43
+                        </div>
+                        <h3>Basis Extension Strategy</h3>
+                        <p>It's always a good idea when you have a subspace sitting inside a vector space and need to do something with bases:</p>
+                        <p>Instead of just taking an arbitrary basis for the vector space, always start with a basis for the subspace and extend it to a basis for the whole vector space. This is almost never a bad idea.</p>
+                    </div>
+
+                    <div class="theorem content-box">
+                        <div class="timestamp" onclick="openVideoSide('15:13', 'Steinitz Exchange Lemma', 'theorem', this)">
+                            <span class="play-icon">▶</span>15:13
+                        </div>
+                        <h3>Steinitz Exchange Lemma</h3>
+                        <p>Let $V$ be an $F$-vector space, and let $S$ and $T$ be finite subsets of $V$ with $S$ linearly independent and $T$ spanning $V$. Then:</p>
+                        <ol>
+                            <li>$|T| \geq |S|$ (every spanning set is at least as big as every linearly independent set)</li>
+                            <li>There exists a subset $T' \subseteq T$ with $|T'| = |T| - |S|$ such that $S \cup T'$ spans $V$</li>
+                        </ol>
+                        <p>This allows us to "exchange" vectors in $T$ that we don't like for vectors in $S$ that we do like, while preserving the spanning property.</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('15:43', 'Proof of Steinitz Exchange Lemma', 'proof', this)">
+                            <span class="play-icon">▶</span>15:43
+                        </div>
+                        <h3>Proof of Steinitz Exchange Lemma</h3>
+                        <p>The proof is an iterative procedure where we throw away one element from $T$ and put one element of $S$ in its place, doing this carefully to preserve spanning at every stage.</p>
+                        <p>Let $S = \{u_1, u_2, \ldots, u_m\}$ and $T = \{v_1, v_2, \ldots, v_n\}$.</p>
+                        <p><strong>Base case:</strong> If $S$ is empty, we're done trivially.</p>
+                        <p><strong>Step 1:</strong> Put $u_1$ inside $T$. Since $T$ spans $V$, we can write $u_1 = \sum_{i=1}^n \lambda_i v_i$ with at least one $\lambda_i \neq 0$ (since $u_1 \neq 0$).</p>
+                        <p>Without loss of generality, assume $\lambda_1 \neq 0$. Then we can rearrange to get $v_1 = \frac{1}{\lambda_1}u_1 - \sum_{i=2}^n \frac{\lambda_i}{\lambda_1}v_i$.</p>
+                        <p>This tells us that $\{u_1, v_2, \ldots, v_n\}$ spans $V$ (since it contains $v_1$ in its span and certainly contains $v_2, \ldots, v_n$).</p>
+                        <p><strong>Step k+1:</strong> Suppose we've successfully put the first $k$ elements of $S$ inside $T$ and still have a spanning set. At step $k+1$, we want to put $u_{k+1}$ inside $T$.</p>
+                        <p>Write $u_{k+1} = \sum_{j=1}^k \mu_j u_j + \sum_{i=k+1}^n \lambda_i v_i$.</p>
+                        <p>Since $S$ is linearly independent, not all coefficients can be $\mu_j$ (otherwise we'd have a non-trivial linear combination of $S$ equal to zero). So some $\lambda_i$ must be non-zero.</p>
+                        <p>Without loss of generality, assume $\lambda_{k+1} \neq 0$. Then $v_{k+1}$ can be made the subject, and $\{u_1, \ldots, u_{k+1}, v_{k+2}, \ldots, v_n\}$ spans $V$.</p>
+                        <p>This process continues until all elements of $S$ are inside $T$. The only way it can terminate is if we run out of elements in $S$, so $m \leq n$.</p>
+                        <p>At the final step, we have a spanning set $S \cup T'$ where $T'$ consists of the vectors from $T$ that we didn't throw away.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('26:59', 'Linear Maps and Kernels', 'default', this)">
+                            <span class="play-icon">▶</span>26:59
+                        </div>
+                        <h3>Linear Maps and Kernels</h3>
+                        <p>Now we turn to how these ideas relate to linear maps, which leads us to our next big theorem of the course.</p>
+                        <p>Let $V$ be a finite dimensional $F$-vector space, $W$ be any $F$-vector space (not necessarily finite dimensional), and $\alpha: V \to W$ be a linear map.</p>
+                        <p>Recall that we have:</p>
+                        <ul>
+                            <li><strong>Kernel of $\alpha$:</strong> $\ker(\alpha) = \{v \in V : \alpha(v) = 0\}$ (a subspace of $V$)</li>
+                            <li><strong>Image of $\alpha$:</strong> $\text{im}(\alpha) = \{\alpha(v) : v \in V\}$ (a subspace of $W$)</li>
+                        </ul>
+                    </div>
+
+                    <div class="theorem content-box">
+                        <div class="timestamp" onclick="openVideoSide('28:17', 'Rank-Nullity Theorem', 'theorem', this)">
+                            <span class="play-icon">▶</span>28:17
+                        </div>
+                        <h3>Rank-Nullity Theorem</h3>
+                        <p>Let $V$ be finite dimensional and $\alpha: V \to W$ be a linear map. Then:</p>
+                        <ol>
+                            <li>The image of $\alpha$ is finite dimensional</li>
+                            <li>The kernel of $\alpha$ is finite dimensional (since it's a subspace of the finite dimensional vector space $V$)</li>
+                            <li>These three dimensions satisfy: $\dim V = \dim(\ker(\alpha)) + \dim(\text{im}(\alpha))$</li>
+                        </ol>
+                    </div>
+
+                    <div class="definition content-box">
+                        <div class="timestamp" onclick="openVideoSide('29:30', 'Nullity and Rank', 'definition', this)">
+                            <span class="play-icon">▶</span>29:30
+                        </div>
+                        <h3>Nullity and Rank</h3>
+                        <p>Because these dimensions are so useful and we'll write them down many times, we give them special names:</p>
+                        <ul>
+                            <li><strong>Nullity of $\alpha$:</strong> $\text{null}(\alpha) = \dim(\ker(\alpha))$</li>
+                            <li><strong>Rank of $\alpha$:</strong> $\text{rank}(\alpha) = \dim(\text{im}(\alpha))$</li>
+                        </ul>
+                        <p>So the rank-nullity theorem states: $\dim V = \text{rank}(\alpha) + \text{null}(\alpha)$</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('30:23', 'Proof of Rank-Nullity Theorem', 'proof', this)">
+                            <span class="play-icon">▶</span>30:23
+                        </div>
+                        <h3>Proof of Rank-Nullity Theorem</h3>
+                        <p>The proof uses a consequence of the first isomorphism theorem, which states that $V/\ker(\alpha) \cong \text{im}(\alpha)$ as vector spaces.</p>
+                        <p>It will be sufficient to prove the following lemma about dimensions of quotient spaces of finite dimensional vector spaces:</p>
+                        <p><strong>Lemma:</strong> If $V$ is finite dimensional and $U$ is a subspace of $V$, then $\dim(V/U) = \dim V - \dim U$.</p>
+                        <p>If we apply this lemma with $U = \ker(\alpha)$, it says that $\dim(V/\ker(\alpha)) = \dim V - \dim(\ker(\alpha))$.</p>
+                        <p>Since $V/\ker(\alpha) \cong \text{im}(\alpha)$, we have $\dim(\text{im}(\alpha)) = \dim V - \dim(\ker(\alpha))$, which gives us the rank-nullity theorem.</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('32:15', 'Proof of Quotient Space Dimension', 'proof', this)">
+                            <span class="play-icon">▶</span>32:15
+                        </div>
+                        <h3>Proof of Quotient Space Dimension</h3>
+                        <p>This is a consequence of basis extension. Let $B_U = \{u_1, \ldots, u_m\}$ be a basis of $U$.</p>
+                        <p>By basis extension, we can extend this to a basis $B_V = \{u_1, \ldots, u_m, v_{m+1}, \ldots, v_n\}$ of $V$.</p>
+                        <p>Here $m = \dim U$ and $n = \dim V$.</p>
+                        <p>We claim that $\{v_{m+1} + U, \ldots, v_n + U\}$ is a basis for the quotient space $V/U$.</p>
+                        <p><strong>Spanning:</strong> Every element of $V/U$ is represented by some vector $v \in V$. Write $v = \sum_{i=1}^m \mu_i u_i + \sum_{i=m+1}^n \lambda_i v_i$.</p>
+                        <p>Then $v + U = \sum_{i=m+1}^n \lambda_i (v_i + U)$ since the first part lives in $U$ and is absorbed into the coset.</p>
+                        <p><strong>Linear Independence:</strong> Suppose $\sum_{i=m+1}^n \lambda_i (v_i + U) = 0$ in $V/U$.</p>
+                        <p>This means $\sum_{i=m+1}^n \lambda_i v_i \in U$, so we can write it as $\sum_{j=1}^m \mu_j u_j$.</p>
+                        <p>Rearranging gives $\sum_{i=m+1}^n \lambda_i v_i - \sum_{j=1}^m \mu_j u_j = 0$ in $V$.</p>
+                        <p>Since $B_V$ is linearly independent, all coefficients must be zero, so $\lambda_i = 0$ for all $i$.</p>
+                        <p><strong>Size:</strong> The basis has size $n - m = \dim V - \dim U$ as required.</p>
+                    </div>
+
+                    <div class="default content-box">
+                        <div class="timestamp" onclick="openVideoSide('39:17', 'Alternative Proof', 'default', this)">
+                            <span class="play-icon">▶</span>39:17
+                        </div>
+                        <h3>Alternative Proof Avoiding Quotient Spaces</h3>
+                        <p>If you just care about the rank-nullity theorem and aren't comfortable with quotient spaces, you can rearrange the ideas to avoid them altogether.</p>
+                        <p><strong>Direct proof sketch:</strong></p>
+                        <ol>
+                            <li>Start with a basis $B_{\ker}$ for the kernel</li>
+                            <li>Extend to a basis $B_V$ for $V$</li>
+                            <li>Check that $\alpha$ applied to the new vectors (those not in $B_{\ker}$) forms a basis for the image</li>
+                        </ol>
+                        <p>The process of checking this is very similar to the maneuvers in the quotient space proof.</p>
+                    </div>
+
+                    <div class="corollary content-box">
+                        <div class="timestamp" onclick="openVideoSide('40:45', 'Linear Pigeonhole Principle', 'corollary', this)">
+                            <span class="play-icon">▶</span>40:45
+                        </div>
+                        <h3>Linear Pigeonhole Principle</h3>
+                        <p>A corollary of the rank-nullity theorem, which you might think of as a linear version of the pigeonhole principle:</p>
+                        <p>If $V$ and $W$ are finite dimensional vector spaces of the same dimension $n$, and $\alpha: V \to W$ is a linear map, then the following conditions are equivalent:</p>
+                        <ol>
+                            <li>$\alpha$ is injective</li>
+                            <li>$\alpha$ is surjective</li>
+                            <li>$\alpha$ is an isomorphism</li>
+                        </ol>
+                        <p>So for linear maps between spaces of the same dimension, either one of injectivity or surjectivity implies the other.</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('41:56', 'Proof of Linear Pigeonhole Principle', 'proof', this)">
+                            <span class="play-icon">▶</span>41:56
+                        </div>
+                        <h3>Proof of Linear Pigeonhole Principle</h3>
+                        <p>Recall that injectivity is equivalent to the kernel being trivial, i.e., $\text{null}(\alpha) = 0$.</p>
+                        <p>Surjectivity is by definition the image being everything in $W$, i.e., $\text{rank}(\alpha) = n$.</p>
+                        <p>By the rank-nullity theorem: $n = \text{rank}(\alpha) + \text{null}(\alpha)$.</p>
+                        <p>If $\text{null}(\alpha) = 0$, then $\text{rank}(\alpha) = n$, so $\alpha$ is surjective.</p>
+                        <p>If $\text{rank}(\alpha) = n$, then $\text{null}(\alpha) = 0$, so $\alpha$ is injective.</p>
+                        <p>Therefore, either condition implies the other, and both together give us an isomorphism.</p>
+                    </div>
+
+                    <div class="proposition content-box">
+                        <div class="timestamp" onclick="openVideoSide('43:23', 'Extension of Functions from Basis', 'proposition', this)">
+                            <span class="play-icon">▶</span>43:23
+                        </div>
+                        <h3>Extension of Functions from Basis</h3>
+                        <p>This proposition is independent of the Steinitz Exchange Lemma and is valid even for vector spaces that are not finite dimensional, but it requires that the vector space has a basis.</p>
+                        <p>Let $V$ be a vector space (not necessarily finite dimensional) with a basis $B$. For any vector space $W$ and any function $f: B \to W$, there is a unique linear map $F: V \to W$ extending $f$.</p>
+                        <p>In other words, a linear map is uniquely determined by what it does to a basis.</p>
+                    </div>
+
+                    <div class="proof content-box">
+                        <div class="timestamp" onclick="openVideoSide('45:42', 'Proof of Function Extension', 'proof', this)">
+                            <span class="play-icon">▶</span>45:42
+                        </div>
+                        <h3>Proof of Function Extension</h3>
+                        <p><strong>Existence:</strong> Since $B$ spans $V$, any vector $v \in V$ can be written as $v = \sum_{b \in B} \lambda_b b$ (a finite linear combination).</p>
+                        <p>Define $F(v) = \sum_{b \in B} \lambda_b f(b)$.</p>
+                        <p>This is well-defined because $B$ is a basis (in particular, linearly independent), so there is exactly one way to write each vector as a linear combination of $B$.</p>
+                        <p><strong>Linearity:</strong> Let $u, v \in V$ and $\lambda$ be a scalar. Write $u = \sum_{b \in B} \mu_b b$ and $v = \sum_{b \in B} \lambda_b b$.</p>
+                        <p>Then $u + \lambda v = \sum_{b \in B} (\mu_b + \lambda \lambda_b) b$, so:</p>
+                        <p>$$F(u + \lambda v) = \sum_{b \in B} (\mu_b + \lambda \lambda_b) f(b) = \sum_{b \in B} \mu_b f(b) + \lambda \sum_{b \in B} \lambda_b f(b) = F(u) + \lambda F(v)$$</p>
+                        <p><strong>Uniqueness:</strong> If $F'$ is another linear extension, then for any $v = \sum_{b \in B} \lambda_b b$:</p>
+                        <p>$$F'(v) = F'\left(\sum_{b \in B} \lambda_b b\right) = \sum_{b \in B} \lambda_b F'(b) = \sum_{b \in B} \lambda_b f(b) = F(v)$$</p>
+                        <p>So $F' = F$.</p>
+                    </div>
+
+                    <div class="corollary content-box">
+                        <div class="timestamp" onclick="openVideoSide('50:58', 'Coordinate Vector Isomorphism', 'corollary', this)">
+                            <span class="play-icon">▶</span>50:58
+                        </div>
+                        <h3>Coordinate Vector Isomorphism</h3>
+                        <p>For finite dimensional vector spaces, there is a special isomorphism that depends on the choice of basis:</p>
+                        <p>If $V$ is an $F$-vector space of dimension $n$ and $B = \{v_1, v_2, \ldots, v_n\}$ is a basis, then there is an isomorphism $F_B: V \to F^n$ which sends the linear combination $\sum_{i=1}^n \lambda_i v_i$ to the vector $(\lambda_1, \lambda_2, \ldots, \lambda_n)$.</p>
+                        <p>You might recognize this vector as the <strong>coordinate vector</strong> of $v$ in the basis $B$.</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== RIGHT SIDE - VIDEO ===== -->
+        <div id="videoSide" class="video-side">
+            <div class="video-container">
+                <iframe 
+                    id="videoFrame"
+                    src="" 
+                    allowfullscreen 
+                    allow="autoplay">
+                </iframe>
+            </div>
+            
+            <!-- ===== CLOSE BUTTON ===== -->
+            <button class="close-button" onclick="closeVideoSide()">&times;</button>
+        </div>
+    </div>
+
+    <!-- ===== JAVASCRIPT ===== -->
+    <script>
+        // ===== VIDEO CONFIGURATION =====
+        // Replace this URL with your actual Panopto video URL
+        const PANOPTO_BASE_URL = "https://cambridgelectures.cloud.panopto.eu/Panopto/Pages/Viewer.aspx?id=c8559bfa-7d6d-42ac-84bc-b33700b80f4c";
+        
+        // ===== OPEN VIDEO SIDE FUNCTION =====
+        // This function is called when a timestamp is clicked
+        // Parameters:
+        // - timestamp: The time in MM:SS format
+        // - title: The section title to display
+        // - contentType: The type of content ('default', 'definition', 'theorem', 'claim', 'corollary', 'proposition', 'example', 'proof', 'non-examinable')
+        // - timestampElement: The clicked timestamp element (used to find the parent content box)
+        function openVideoSide(timestamp, title, contentType, timestampElement) {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Convert timestamp to seconds for Panopto
+            const timeInSeconds = convertTimestampToSeconds(timestamp);
+            
+            // Set the video URL with the timestamp
+            const videoUrl = PANOPTO_BASE_URL + `&start=${timeInSeconds}`;
+            videoFrame.src = videoUrl;
+            
+            // Remove full-width class and show video
+            contentSide.classList.remove('full-width');
+            videoSide.style.display = 'block';
+        }
+        
+        // ===== CLOSE VIDEO SIDE FUNCTION =====
+        // This function closes the video side and stops video playback
+        function closeVideoSide() {
+            const videoSide = document.getElementById('videoSide');
+            const videoFrame = document.getElementById('videoFrame');
+            const contentSide = document.querySelector('.content-side');
+            
+            // Hide the video side
+            videoSide.style.display = 'none';
+            
+            // Clear the video source to stop playback
+            videoFrame.src = '';
+            
+            // Add full-width class back
+            contentSide.classList.add('full-width');
+        }
+        
+        // ===== TIMESTAMP CONVERSION FUNCTION =====
+        // Converts MM:SS format to seconds for Panopto
+        function convertTimestampToSeconds(timestamp) {
+            const parts = timestamp.split(':');
+            const minutes = parseInt(parts[0]);
+            const seconds = parseInt(parts[1]);
+            return minutes * 60 + seconds;
+        }
+    </script>
+</body>
+</html>
